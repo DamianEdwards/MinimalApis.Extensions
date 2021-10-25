@@ -1,0 +1,20 @@
+<Project>
+
+  <PropertyGroup>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <VersionSuffix Condition="'$(BuildNumber)' == ''">pre</VersionSuffix>
+    <VersionSuffix Condition="'$(BuildNumber)' != ''">pre.$(BuildNumber)</VersionSuffix>
+    <Authors>Damian Edwards</Authors>
+    <Copyright>Copyright © Damian Edwards</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/DamianEdwards/MinimalApis.Extensions</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/DamianEdwards/MinimalApis.Extensions</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IsPackable>true</IsPackable>
+    <DebugType>embedded</DebugType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
