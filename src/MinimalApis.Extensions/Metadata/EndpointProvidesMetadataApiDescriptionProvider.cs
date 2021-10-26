@@ -80,9 +80,11 @@ public class EndpointProvidesMetadataApiDescriptionProvider : IApiDescriptionPro
 
                 foreach (var responseType in responseMetadata)
                 {
-                    var apiResponseType = new ApiResponseType();
-                    apiResponseType.StatusCode = responseType.StatusCode;
-                    apiResponseType.Type = responseType.Type ?? typeof(void);
+                    var apiResponseType = new ApiResponseType
+                    {
+                        StatusCode = responseType.StatusCode,
+                        Type = responseType.Type ?? typeof(void)
+                    };
                     apiResponseType.ModelMetadata = CreateModelMetadata(apiResponseType.Type);
 
                     var contentTypes = new MediaTypeCollection();
