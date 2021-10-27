@@ -21,6 +21,7 @@ public class EndpointProvidesMetadataApiDescriptionProvider : IApiDescriptionPro
         _endpointDataSource = endpointDataSource;
     }
 
+    // Ensure it runs after the in-box providers for route handler endpoints, etc.
     public int Order => -1200;
 
     public void OnProvidersExecuting(ApiDescriptionProviderContext context)
@@ -32,13 +33,13 @@ public class EndpointProvidesMetadataApiDescriptionProvider : IApiDescriptionPro
     {
         foreach (var endpoint in _endpointDataSource.Endpoints.OfType<RouteEndpoint>())
         {
-            var method = endpoint.Metadata.OfType<MethodInfo>().FirstOrDefault();
+            var method = endpoint.Metadata.GetMetadata<MethodInfo>();
             if (method is null)
             {
                 continue;
             }
 
-            var excludeFromDescMetadata = endpoint.Metadata.OfType<ExcludeFromDescriptionAttribute>().FirstOrDefault();
+            var excludeFromDescMetadata = endpoint.Metadata.GetMetadata<ExcludeFromDescriptionAttribute>();
             if (excludeFromDescMetadata is not null)
                 continue;
 
