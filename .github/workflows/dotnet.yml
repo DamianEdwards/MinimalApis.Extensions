@@ -1,0 +1,86 @@
+name: .NET Build/Test/Pack main
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+    - '**/*.md'
+    - '**/*.gitignore'
+    - '**/*.gitattributes'
+  workflow_dispatch:
+    branches: [ main ]
+
+env:
+  DOTNET_SDK_VERSION: 6.0.100-rc.2.21505.57
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build, test, and pack
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET SDK ${{ env.DOTNET_SDK_VERSION }}
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Set current date as env variable
+      run: echo "NOW=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+    - name: Create build number
+      run: echo "BUILD_NUMBER=$NOW.$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore /p:BuildNumber=$BUILD_NUMBER /p:SourceRevisionId=$GITHUB_SHA /p:ContinuousIntegrationBuild=true
+
+    - name: Test
+      run: dotnet test --verbosity normal
+
+    - name: Pack
+      run: dotnet pack --no-build --configuration Release --output finalpackage --verbosity d /p:BuildNumber=$BUILD_NUMBER /p:SourceRevisionId=$GITHUB_SHA /p:ContinuousIntegrationBuild=true
+
+    - name: Publish artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: nupkg
+        path: finalpackage
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    name: Deploy to repo packages feed
+
+    steps:
+      - name: Download package artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: nupkg
+
+      - name: Setup .NET SDK ${{ env.DOTNET_SDK_VERSION }}
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+
+      - name: Add GitHub Package Repository source
+        run: dotnet nuget add source --username ${{ secrets.GPR_USERNAME }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name GPR ${{ secrets.GPR_URI }}
+
+      - name: Push to GitHub Packages
+        run: dotnet nuget push **/*.nupkg -s "GPR" --skip-duplicate
+
+  clean:
+    needs: deploy
+    runs-on: ubuntu-latest
+    name: Delete old packages on repo feed
+
+    steps:
+      - name: Delete old packages
+        uses: smartsquaregmbh/delete-old-packages@v0.3.1
+        with:
+          keep: 5
+          names: |
+            MinimalApis.Essentials
