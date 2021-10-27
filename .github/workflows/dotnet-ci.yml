@@ -1,13 +1,17 @@
-name: .NET Build/Test all branches/PRs
+name: CI All Branches/PRs
 
 on:
   push:
+    branches-ignore: [ main ]
+    paths-ignore:
+    - '**/*.md'
+    - '**/*.gitignore'
+    - '**/*.gitattributes'
   pull_request:
     paths-ignore:
     - '**/*.md'
     - '**/*.gitignore'
     - '**/*.gitattributes'
-
   workflow_dispatch:
 
 jobs:
