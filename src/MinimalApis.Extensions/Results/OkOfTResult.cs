@@ -1,8 +1,6 @@
-﻿using Mvc = Microsoft.AspNetCore.Mvc;
+﻿using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Results;
-
-using MinimalApis.Extensions.Metadata;
 
 public class Ok<TResult> : Json, IProvideEndpointResponseMetadata
 {

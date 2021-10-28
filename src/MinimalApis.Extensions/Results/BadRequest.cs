@@ -1,22 +1,19 @@
-﻿using Mvc = Microsoft.AspNetCore.Mvc;
+﻿using MinimalApis.Extensions.Metadata;
 
-namespace MinimalApis.Extensions.Results
+namespace MinimalApis.Extensions.Results;
+
+public class BadRequest : StatusCode, IProvideEndpointResponseMetadata
 {
-    using MinimalApis.Extensions.Metadata;
+    private const int ResponseStatusCode = StatusCodes.Status400BadRequest;
 
-    public class BadRequest : StatusCode, IProvideEndpointResponseMetadata
+    public BadRequest(string? message = null, int statusCode = ResponseStatusCode)
+        : base(statusCode, message)
     {
-        private const int ResponseStatusCode = StatusCodes.Status400BadRequest;
 
-        public BadRequest(string? message = null, int statusCode = ResponseStatusCode)
-            : base(statusCode, message)
-        {
+    }
 
-        }
-
-        public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
-        {
-            yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
-        }
+    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    {
+        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
     }
 }

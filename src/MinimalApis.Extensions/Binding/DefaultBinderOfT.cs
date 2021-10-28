@@ -35,9 +35,9 @@ public static class DefaultBinder<TValue>
 
     private static readonly MethodInfo CompletedTask = typeof(Task).GetMethod("get_CompletedTask")!;
     private static readonly MethodInfo HttpContext_getItems = typeof(HttpContext).GetMethod("get_Items")!;
-    private static readonly MethodInfo Dictionary_setItem = typeof(IDictionary<object,object?>).GetMethod("set_Item")!;
+    private static readonly MethodInfo Dictionary_setItem = typeof(IDictionary<object, object?>).GetMethod("set_Item")!;
     private static readonly Type[] IResult_types = new[] { typeof(IResult) };
-    private static readonly Type[] ExecuteAsync_ParamTypes = new [] { typeof(HttpContext) };
+    private static readonly Type[] ExecuteAsync_ParamTypes = new[] { typeof(HttpContext) };
     private static readonly MethodInfo IResult_ExecuteAsync = typeof(IResult).GetMethod("ExecuteAsync")!;
     private static readonly Type[] Execute_ParamTypes = new[] { typeof(TValue), typeof(HttpContext) };
     private static readonly Type RouteHandler_DelegateType = typeof(Func<,,>).MakeGenericType(typeof(TValue), typeof(HttpContext), typeof(IResult));
@@ -78,7 +78,7 @@ public static class DefaultBinder<TValue>
         // internal sealed class FakeResult : IResult {
         var fakeResultBuilder = module.DefineType("FakeResult", TypeAttributes.Class | TypeAttributes.Sealed, null, IResult_types);
         fakeResultBuilder.AddInterfaceImplementation(typeof(IResult));
-        
+
         // public Task ExecuteAsync(HttpContext context) {
         var fakeResultExecuteAsync = fakeResultBuilder.DefineMethod("ExecuteAsync", MethodAttributes.Public | MethodAttributes.Virtual, typeof(Task), ExecuteAsync_ParamTypes);
         fakeResultExecuteAsync.DefineParameter(0, ParameterAttributes.None, "httpContext");
@@ -106,7 +106,7 @@ public static class DefaultBinder<TValue>
         // Method parameters start at 1, 0 is the return value
         var param1 = routeHandlerExecute.DefineParameter(1, ParameterAttributes.None, parameterName);
         var param2 = routeHandlerExecute.DefineParameter(2, ParameterAttributes.None, "httpContext");
-        
+
         // TODO: Clone attributes from original parameter on to generated parameter
         //       This might be tricky as we don't have the source of the original parameter, only the instances which we
         //       we need to use to reverse-engineer IL source that would produce that instance
@@ -134,7 +134,7 @@ public static class DefaultBinder<TValue>
         // Func<TargetType, HttpContext, IResult>
         var routeHandlerMethod = routeHandlerType.GetMethod("Execute")!;
         var routeHandlerDelegate = routeHandlerMethod.CreateDelegate(RouteHandler_DelegateType);
-        
+
         return RequestDelegateFactory.Create(routeHandlerDelegate).RequestDelegate;
     }
 

@@ -1,22 +1,19 @@
-﻿using Mvc = Microsoft.AspNetCore.Mvc;
+﻿
+using MinimalApis.Extensions.Metadata;
 
-namespace MinimalApis.Extensions.Results
+namespace MinimalApis.Extensions.Results;
+public class Html : Text, IProvideEndpointResponseMetadata
 {
-    using MinimalApis.Extensions.Metadata;
+    private const string HtmlMediaType = "text/html";
 
-    public class Html : Text, IProvideEndpointResponseMetadata
+    public Html(string html)
+        : base(html, HtmlMediaType)
     {
-        private const string HtmlMediaType = "text/html";
 
-        public Html(string html)
-            : base(html, HtmlMediaType)
-        {
+    }
 
-        }
-
-        public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
-        {
-            yield return new Mvc.ProducesAttribute(HtmlMediaType);
-        }
+    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    {
+        yield return new Mvc.ProducesAttribute(HtmlMediaType);
     }
 }

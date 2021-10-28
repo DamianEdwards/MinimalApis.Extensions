@@ -26,7 +26,7 @@ public class JsonFormFile<TValue> : JsonFormFile, IProvideEndpointParameterMetad
     public static new async ValueTask<JsonFormFile<TValue>?> BindAsync(HttpContext context, ParameterInfo parameter)
     {
         var jsonFile = await JsonFormFile.BindAsync(context, parameter);
-        
+
         if (jsonFile is not null)
         {
             var value = await jsonFile.DeserializeAsync<TValue>();
@@ -41,11 +41,11 @@ public class JsonFormFile<TValue> : JsonFormFile, IProvideEndpointParameterMetad
 }
 
 /// <summary>
-/// Represents a JSON file in a multipart/form-data request (i.e. a form upload).
+/// Represents a JSON file in a multipart/form-data request (i.e. a form-based file upload).
 /// </summary>
 public class JsonFormFile : IProvideEndpointParameterMetadata
 {
-    internal static readonly JsonSerializerOptions DefaultSerializerOptions = new (JsonSerializerDefaults.Web);
+    internal static readonly JsonSerializerOptions DefaultSerializerOptions = new(JsonSerializerDefaults.Web);
 
     protected IFormFile? FormFile;
 

@@ -1,42 +1,41 @@
 ﻿using System.Text;
 
-namespace MinimalApis.Extensions.Results
+namespace MinimalApis.Extensions.Results;
+
+public abstract class ContentResult : IResult
 {
-    public abstract class ContentResult : IResult
+    private const string DefaultContentType = "text/plain; charset=utf-8";
+    private static readonly Encoding DefaultEncoding = Encoding.UTF8;
+
+    public string? ContentType { get; init; }
+
+    public string? ResponseContent { get; init; }
+
+    public int? StatusCode { get; init; }
+
+    public async Task ExecuteAsync(HttpContext httpContext)
     {
-        private const string DefaultContentType = "text/plain; charset=utf-8";
-        private static readonly Encoding DefaultEncoding = Encoding.UTF8;
+        var response = httpContext.Response;
 
-        public string? ContentType { get; init; }
+        ResponseContentTypeHelper.ResolveContentTypeAndEncoding(
+            ContentType,
+            response.ContentType,
+            (DefaultContentType, DefaultEncoding),
+            ResponseContentTypeHelper.GetEncoding,
+            out var resolvedContentType,
+            out var resolvedContentTypeEncoding);
 
-        public string? ResponseContent { get; init; }
+        response.ContentType = resolvedContentType;
 
-        public int? StatusCode { get; init; }
-
-        public async Task ExecuteAsync(HttpContext httpContext)
+        if (StatusCode != null)
         {
-            var response = httpContext.Response;
+            response.StatusCode = StatusCode.Value;
+        }
 
-            ResponseContentTypeHelper.ResolveContentTypeAndEncoding(
-                ContentType,
-                response.ContentType,
-                (DefaultContentType, DefaultEncoding),
-                ResponseContentTypeHelper.GetEncoding,
-                out var resolvedContentType,
-                out var resolvedContentTypeEncoding);
-
-            response.ContentType = resolvedContentType;
-
-            if (StatusCode != null)
-            {
-                response.StatusCode = StatusCode.Value;
-            }
-
-            if (ResponseContent != null)
-            {
-                response.ContentLength = resolvedContentTypeEncoding.GetByteCount(ResponseContent);
-                await response.WriteAsync(ResponseContent, resolvedContentTypeEncoding);
-            }
+        if (ResponseContent != null)
+        {
+            response.ContentLength = resolvedContentTypeEncoding.GetByteCount(ResponseContent);
+            await response.WriteAsync(ResponseContent, resolvedContentTypeEncoding);
         }
     }
 }

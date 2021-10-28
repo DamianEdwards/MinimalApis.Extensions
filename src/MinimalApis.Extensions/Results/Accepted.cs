@@ -1,22 +1,19 @@
-﻿using Mvc = Microsoft.AspNetCore.Mvc;
+﻿using MinimalApis.Extensions.Metadata;
 
-namespace MinimalApis.Extensions.Results
+namespace MinimalApis.Extensions.Results;
+
+public class Accepted : StatusCode, IProvideEndpointResponseMetadata
 {
-    using MinimalApis.Extensions.Metadata;
+    private const int ResponseStatusCode = StatusCodes.Status202Accepted;
 
-    public class Accepted : StatusCode, IProvideEndpointResponseMetadata
+    public Accepted(string? message = null)
+        : base(ResponseStatusCode, message)
     {
-        private const int ResponseStatusCode = StatusCodes.Status202Accepted;
 
-        public Accepted(string? message = null)
-            : base(ResponseStatusCode, message)
-        {
+    }
 
-        }
-
-        public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
-        {
-            yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
-        }
+    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    {
+        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Mvc = Microsoft.AspNetCore.Mvc;
 using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Binding;

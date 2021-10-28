@@ -1,31 +1,28 @@
-﻿using Mvc = Microsoft.AspNetCore.Mvc;
+﻿using MinimalApis.Extensions.Metadata;
 
-namespace MinimalApis.Extensions.Results
+namespace MinimalApis.Extensions.Results;
+
+public class Created : Json, IProvideEndpointResponseMetadata
 {
-    using MinimalApis.Extensions.Metadata;
+    protected const int ResponseStatusCode = StatusCodes.Status201Created;
 
-    public class Created : Json, IProvideEndpointResponseMetadata
+    public Created(string uri, object? value)
+        : base(value)
     {
-        protected const int ResponseStatusCode = StatusCodes.Status201Created;
+        Uri = uri;
+        StatusCode = ResponseStatusCode;
+    }
 
-        public Created(string uri, object? value)
-            : base(value)
-        {
-            Uri = uri;
-            StatusCode = ResponseStatusCode;
-        }
+    public string Uri { get; }
 
-        public string Uri { get; }
+    public override Task ExecuteAsync(HttpContext httpContext)
+    {
+        httpContext.Response.Headers.Location = Uri;
+        return base.ExecuteAsync(httpContext);
+    }
 
-        public override Task ExecuteAsync(HttpContext httpContext)
-        {
-            httpContext.Response.Headers.Location = Uri;
-            return base.ExecuteAsync(httpContext);
-        }
-
-        public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
-        {
-            yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
-        }
+    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    {
+        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
     }
 }

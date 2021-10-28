@@ -1,5 +1,4 @@
-﻿using Mvc = Microsoft.AspNetCore.Mvc;
-using MinimalApis.Extensions.Metadata;
+﻿using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Results;
 

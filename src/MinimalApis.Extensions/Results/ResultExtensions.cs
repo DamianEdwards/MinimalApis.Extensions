@@ -1,6 +1,4 @@
-﻿using Mvc = Microsoft.AspNetCore.Mvc;
-
-namespace MinimalApis.Extensions.Results;
+﻿namespace MinimalApis.Extensions.Results;
 
 public static class ResultExtensions
 {

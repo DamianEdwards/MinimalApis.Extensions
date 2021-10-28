@@ -1,9 +1,7 @@
-﻿using Mvc = Microsoft.AspNetCore.Mvc;
-
-namespace MinimalApis.Extensions.Results;
-
+﻿
 using MinimalApis.Extensions.Metadata;
 
+namespace MinimalApis.Extensions.Results;
 public class PlainText : StatusCode, IProvideEndpointResponseMetadata
 {
     private const string PlainTextMediaType = "text/plain";

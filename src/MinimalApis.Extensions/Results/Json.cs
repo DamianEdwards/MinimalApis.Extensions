@@ -1,25 +1,24 @@
 ﻿using System.Text;
 using System.Text.Json;
 
-namespace MinimalApis.Extensions.Results
+namespace MinimalApis.Extensions.Results;
+
+public class Json : ObjectResult
 {
-    public class Json : ObjectResult
+    protected const string JsonContentType = "application/json";
+
+    public Json(object? value)
+        : base(value)
     {
-        protected const string JsonContentType = "application/json";
 
-        public Json(object? value)
-            : base(value)
-        {
+    }
 
-        }
+    public JsonSerializerOptions? JsonSerializerOptions { get; init; }
 
-        public JsonSerializerOptions? JsonSerializerOptions { get; init; }
+    public override string DefaultContentType => $"{JsonContentType}; charset=utf-8";
 
-        public override string DefaultContentType => $"{JsonContentType}; charset=utf-8";
-
-        protected override async Task WriteResult(HttpContext httpContext, Encoding contentTypeEncoding)
-        {
-            await httpContext.Response.WriteAsJsonAsync(Value, JsonSerializerOptions, ContentType);
-        }
+    protected override async Task WriteResult(HttpContext httpContext, Encoding contentTypeEncoding)
+    {
+        await httpContext.Response.WriteAsJsonAsync(Value, JsonSerializerOptions, ContentType);
     }
 }

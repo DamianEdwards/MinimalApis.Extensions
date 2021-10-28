@@ -1,9 +1,7 @@
-﻿using Mvc = Microsoft.AspNetCore.Mvc;
-
-namespace MinimalApis.Extensions.Results;
-
+﻿
 using MinimalApis.Extensions.Metadata;
 
+namespace MinimalApis.Extensions.Results;
 public class NotFound : StatusCode, IProvideEndpointResponseMetadata
 {
     private const int ResponseStatusCode = StatusCodes.Status404NotFound;

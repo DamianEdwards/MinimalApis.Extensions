@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using Mvc = Microsoft.AspNetCore.Mvc;
 
 namespace MinimalApis.Extensions.Results;
 

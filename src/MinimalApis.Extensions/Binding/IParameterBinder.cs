@@ -1,7 +1,7 @@
-﻿namespace MinimalApis.Extensions.Binding;
-
+﻿
 using System.Reflection;
 
+namespace MinimalApis.Extensions.Binding;
 /// <summary>
 /// Represents a type that can bind parameters of route handler delegates.
 /// </summary>

@@ -9,6 +9,7 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <Using Include="Microsoft.AspNetCore.Http" />
+    <Using Alias="Mvc" Include="Microsoft.AspNetCore.Mvc" />
   </ItemGroup>
 
   <ItemGroup>
