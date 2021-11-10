@@ -3,19 +3,18 @@
 namespace MinimalApis.Extensions.Results;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status400BadRequest"/> or other 4xx response.
+/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status403Forbidden"/> response.
 /// </summary>
-public class BadRequest : StatusCode, IProvideEndpointResponseMetadata
+public class Forbidden : StatusCode, IProvideEndpointResponseMetadata
 {
-    private const int ResponseStatusCode = StatusCodes.Status400BadRequest;
+    private const int ResponseStatusCode = StatusCodes.Status403Forbidden;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="BadRequest"/> class.
+    /// Initializes a new instance of the <see cref="Forbidden"/> class.
     /// </summary>
     /// <param name="message">An optional message to return in the response body.</param>
-    /// <param name="statusCode">The status code to return. Defaults to <see cref="StatusCodes.Status400BadRequest"/>.</param>
-    public BadRequest(string? message = null, int statusCode = ResponseStatusCode)
-        : base(statusCode, message)
+    public Forbidden(string? message = null)
+        : base(ResponseStatusCode, message)
     {
 
     }

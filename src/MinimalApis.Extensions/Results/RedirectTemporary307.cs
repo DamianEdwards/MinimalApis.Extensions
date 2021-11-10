@@ -3,19 +3,18 @@
 namespace MinimalApis.Extensions.Results;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status400BadRequest"/> or other 4xx response.
+/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status307TemporaryRedirect"/> redirect response.
 /// </summary>
-public class BadRequest : StatusCode, IProvideEndpointResponseMetadata
+public class RedirectTemporary307 : StatusCode, IProvideEndpointResponseMetadata
 {
-    private const int ResponseStatusCode = StatusCodes.Status400BadRequest;
+    private const int ResponseStatusCode = StatusCodes.Status307TemporaryRedirect;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="BadRequest"/> class.
+    /// Initializes a new instance of the <see cref="RedirectTemporary307"/> class.
     /// </summary>
     /// <param name="message">An optional message to return in the response body.</param>
-    /// <param name="statusCode">The status code to return. Defaults to <see cref="StatusCodes.Status400BadRequest"/>.</param>
-    public BadRequest(string? message = null, int statusCode = ResponseStatusCode)
-        : base(statusCode, message)
+    public RedirectTemporary307()
+        : base(ResponseStatusCode, null)
     {
 
     }

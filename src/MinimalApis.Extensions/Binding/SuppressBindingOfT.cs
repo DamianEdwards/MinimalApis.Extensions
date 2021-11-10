@@ -9,19 +9,33 @@ namespace MinimalApis.Extensions.Binding;
 /// <typeparam name="TValue">The <see cref="Type"/> of the parameter to suppress binding for.</typeparam>
 public class SuppressBinding<TValue> : IProvideEndpointParameterMetadata
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SuppressBinding{TValue}"/> class.
+    /// </summary>
+    /// <param name="value">The type of the parameter that binding is being suppressed for.</param>
     public SuppressBinding(TValue? value)
     {
-        Value = value;
-    }
-    public TValue? Value { get; }
 
+    }
+
+    /// <summary>
+    /// Binds the specified parameter from <see cref="HttpContext.Request"/>. This method is called by the framework on your behalf
+    /// when populating parameters of a mapped route handler.
+    /// </summary>
+    /// <param name="context">The <see cref="HttpContext"/> to bind the parameter from.</param>
+    /// <param name="parameter">The route handler parameter being bound to.</param>
+    /// <returns>An instance of <see cref="SuppressBinding{TValue}"/>.</returns>
     public static ValueTask<SuppressBinding<TValue?>> BindAsync(HttpContext httpContext, ParameterInfo parameter)
     {
         return ValueTask.FromResult(new SuppressBinding<TValue?>(default));
     }
 
-    public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services)
-    {
-        yield return new Mvc.ConsumesAttribute(typeof(TValue), "application/json");
-    }
+    /// <summary>
+    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// </summary>
+    /// <param name="parameter">The parameter to provide metadata for.</param>
+    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <returns>The metadata.</returns>
+    public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services) =>
+        IProvideEndpointParameterMetadata.GetDefaultMetadataForWrapperType<TValue>(parameter, services);
 }

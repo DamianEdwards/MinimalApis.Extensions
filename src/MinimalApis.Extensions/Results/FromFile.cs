@@ -1,10 +1,13 @@
-﻿
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 
 namespace MinimalApis.Extensions.Results;
+
+/// <summary>
+/// Represents an <see cref="IResult"/> that uses the content of a file as the response body.
+/// </summary>
 public class FromFile : IResult
 {
     private const string DefaultMediaType = "text/plain";
@@ -15,6 +18,14 @@ public class FromFile : IResult
     private readonly IFileProvider? _fileProvider;
     private readonly IContentTypeProvider? _contentTypeProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FromFile"/> class.
+    /// </summary>
+    /// <param name="filePath">The path of the file to use as the reponse body.</param>
+    /// <param name="contentType">An optional content type for the response body. Defaults to a content type derived from the file name extension.</param>
+    /// <param name="statusCode">An optional status code to return. Defaults to <see cref="StatusCodes.Status200OK"/>.</param>
+    /// <param name="fileProvider">An optional <see cref="IFileProvider"/> to retrieve the file from. Defaults to <see cref="IHostingEnvironment.ContentRootFileProvider"/>.</param>
+    /// <param name="contentTypeProvider">An option <see cref="IContentTypeProvider"/> to use to lookup the content type from the file name extension. Defaults to <see cref="FileExtensionContentTypeProvider"/>.</param>
     public FromFile(string filePath, string? contentType, int? statusCode, IFileProvider? fileProvider = null, IContentTypeProvider? contentTypeProvider = null)
     {
         _filePath = filePath;
@@ -24,6 +35,11 @@ public class FromFile : IResult
         _contentTypeProvider = contentTypeProvider;
     }
 
+    /// <summary>
+    /// Writes an HTTP response reflecting the result.
+    /// </summary>
+    /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
+    /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
     public async Task ExecuteAsync(HttpContext httpContext)
     {
         var fileProvider = _fileProvider ?? httpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().ContentRootFileProvider;

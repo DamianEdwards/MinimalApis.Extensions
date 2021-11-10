@@ -4,11 +4,23 @@ using System.Reflection.Emit;
 
 namespace MinimalApis.Extensions.Binding;
 
+/// <summary>
+/// Provides the ability to invoke the default binding logic implemented by <see cref="RequestDelegateFactory"/>
+/// for the current request as if it had been handled by a delegate returned by <see cref="RequestDelegateFactory.Create" />.
+/// </summary>
+/// <typeparam name="TValue">The type of the value returned by the default binding logic.</typeparam>
 public static class DefaultBinder<TValue>
 {
     private static readonly string _itemsKey = $"__{nameof(DefaultBinder<TValue>)}_ValueResult_Key";
     private static readonly ConcurrentDictionary<(Type, ParameterInfo?), RequestDelegate> _delegateCache = new();
 
+    /// <summary>
+    /// Invokes the default binding logic implemented by <see cref="RequestDelegateFactory"/>
+    /// for the current request as if it had been handled by a delegate returned by <see cref="RequestDelegateFactory.Create" />.
+    /// </summary>
+    /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
+    /// <param name="parameter">An optional <see cref="ParameterInfo"/> for a parameter of a route handler delegate.</param>
+    /// <returns>The value and response status code returned.</returns>
     public static async Task<(TValue?, int)> GetValueAsync(HttpContext httpContext, ParameterInfo? parameter = null)
     {
         ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));

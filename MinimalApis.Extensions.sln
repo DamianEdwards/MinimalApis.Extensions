@@ -25,6 +25,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BFC56E58-C330-4F74-A3F3-5D5E05EDB576}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalApis.Extensions.UnitTests", "tests\MinimalApis.Extensions.UnitTests\MinimalApis.Extensions.UnitTests.csproj", "{55D2B60C-44E4-4DE5-B11E-61697AC58E2C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +39,10 @@ Global
 		{FD354BF3-40AB-4EC1-A356-2C8FE728BE88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD354BF3-40AB-4EC1-A356-2C8FE728BE88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD354BF3-40AB-4EC1-A356-2C8FE728BE88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55D2B60C-44E4-4DE5-B11E-61697AC58E2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55D2B60C-44E4-4DE5-B11E-61697AC58E2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55D2B60C-44E4-4DE5-B11E-61697AC58E2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55D2B60C-44E4-4DE5-B11E-61697AC58E2C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -43,6 +51,7 @@ Global
 		{FD354BF3-40AB-4EC1-A356-2C8FE728BE88} = {25518C7E-BA9B-4F1D-9962-8A81528BE6EB}
 		{A68B668C-5E11-40C1-89D8-E0F03AE5B46E} = {828C4A12-542D-44C8-B3B8-8B412B150036}
 		{969EECF2-9180-482C-9A19-4600ED289812} = {A68B668C-5E11-40C1-89D8-E0F03AE5B46E}
+		{55D2B60C-44E4-4DE5-B11E-61697AC58E2C} = {BFC56E58-C330-4F74-A3F3-5D5E05EDB576}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {72796434-AD5B-426F-A0BE-0B08B3B611D2}

@@ -1,5 +1,8 @@
 ﻿namespace MinimalApis.Extensions.Results;
 
+/// <summary>
+/// Contains extension methods for creating typed <see cref="IResult"/> objects to return from Minimal APIs.
+/// </summary>
 public static class ResultExtensions
 {
     public static Ok Ok(this IResultExtensions resultExtensions, string? message = null)
@@ -27,14 +30,14 @@ public static class ResultExtensions
         return new Created(uri, value);
     }
 
+    public static Conflict Conflict(this IResultExtensions resultExtensions, string? message = null)
+    {
+        return new Conflict(message);
+    }
+
     public static Created<TResult> Created<TResult>(this IResultExtensions resultExtensions, string uri, TResult result)
     {
         return new Created<TResult>(uri, result);
-    }
-
-    public static Text Text(this IResultExtensions resultExtensions, string text, string? contentType = null)
-    {
-        return new Text(text, contentType);
     }
 
     public static PlainText PlainText(this IResultExtensions resultExtensions, string text)
@@ -50,6 +53,36 @@ public static class ResultExtensions
     public static BadRequest BadRequest(this IResultExtensions resultExtensions, string? message = null, int statusCode = StatusCodes.Status400BadRequest)
     {
         return new BadRequest(message, statusCode);
+    }
+
+    public static RedirectTemporary Redirect(this IResultExtensions resultExtensions)
+    {
+        return new RedirectTemporary();
+    }
+
+    public static RedirectPermanent RedirectPermanent(this IResultExtensions resultExtensions)
+    {
+        return new RedirectPermanent();
+    }
+
+    public static RedirectTemporary307 RedirectTemporary307(this IResultExtensions resultExtensions)
+    {
+        return new RedirectTemporary307();
+    }
+
+    public static RedirectPermanent308 RedirectPermanent308(this IResultExtensions resultExtensions)
+    {
+        return new RedirectPermanent308();
+    }
+
+    public static Unauthorized Unauthorized(this IResultExtensions resultExtensions, string? message = null)
+    {
+        return new Unauthorized(message);
+    }
+
+    public static Forbidden Forbidden(this IResultExtensions resultExtensions, string? message = null)
+    {
+        return new Forbidden(message);
     }
 
     public static UnprocessableEntity UnprocessableEntity(this IResultExtensions resultExtensions, string? message = null)
@@ -101,15 +134,6 @@ public static class ResultExtensions
     public static IResult Problem(this IResultExtensions resultExtensions, Mvc.ProblemDetails problemDetails)
     {
         return new Problem(problemDetails);
-    }
-
-    public static CreatedJsonOrXml<TResult> CreatedJsonOrXml<TResult>(this IResultExtensions resultExtensions, TResult responseBody, string contentType)
-    {
-        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
-
-        Results.CreatedJsonOrXml<TResult>.ThrowIfUnsupportedContentType(contentType);
-
-        return new CreatedJsonOrXml<TResult>(responseBody, contentType);
     }
 
     public static IResult Html(this IResultExtensions resultExtensions, string html)

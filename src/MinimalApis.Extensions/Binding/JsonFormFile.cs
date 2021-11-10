@@ -12,17 +12,40 @@ namespace Microsoft.AspNetCore.Http;
 /// <typeparam name="TValue">The <see cref="Type"/> to deserialize the JSON payload into.</typeparam>
 public class JsonFormFile<TValue> : JsonFormFile, IProvideEndpointParameterMetadata
 {
+    /// <summary>
+    /// Creates a new <see cref="JsonFormFile{TValue}"/>.
+    /// </summary>
+    /// <param name="value">The value deserialized from the JSON file.</param>
+    /// <param name="jsonSerializerOptions">The <see cref="JsonSerializerOptions"/> to use when deserializing.</param>
     public JsonFormFile(TValue value, JsonSerializerOptions jsonSerializerOptions)
         : base(jsonSerializerOptions)
     {
         Value = value;
     }
 
+    /// <summary>
+    /// The value deserialized from the JSON file.
+    /// </summary>
     public TValue? Value { get; }
 
+    /// <summary>
+    /// Opens the underlying file stream from the <see cref="HttpRequest"/>.
+    /// Note this method should not be called directly when using <see cref="JsonFormFile{TValue}"/>.
+    /// Access the deserialized value via the <see cref="Value"/> property instead.
+    /// </summary>
+    /// <returns>The <see cref="Stream"/>.</returns>
+    /// <exception cref="InvalidOperationException">Always thrown when called on <see cref="JsonFormFile{TValue}"/>.</exception>
     public override Stream OpenReadStream() =>
-        throw new InvalidOperationException($"Cannot open underlying file stream directly. Access deserialized value via the {nameof(Value)} property.");
+        throw new InvalidOperationException($"Cannot open underlying file stream directly. Access the deserialized value via the {nameof(Value)} property.");
 
+    /// <summary>
+    /// Binds the specified parameter from <see cref="HttpContext.Request"/>. This method is called by the framework on your behalf
+    /// when populating parameters of a mapped route handler.
+    /// </summary>
+    /// <param name="context">The <see cref="HttpContext"/> to bind the parameter from.</param>
+    /// <param name="parameter">The route handler parameter being bound to.</param>
+    /// <returns>An instance of <see cref="JsonFormFile{TValue}"/> if a value for <see cref="TValue"/> can be
+    /// deserialized from the posted file, otherwise <c>null</c>.</returns>
     public static new async ValueTask<JsonFormFile<TValue>?> BindAsync(HttpContext context, ParameterInfo parameter)
     {
         var jsonFile = await JsonFormFile.BindAsync(context, parameter);
@@ -54,14 +77,27 @@ public class JsonFormFile : IProvideEndpointParameterMetadata
         JsonSerializerOptions = jsonSerializerOptions;
     }
 
+    /// <summary>
+    /// Creates a new <see cref="JsonFormFile"/>.
+    /// </summary>
+    /// <param name="formFile">The <see cref="IFormFile"/>.</param>
+    /// <param name="jsonSerializerOptions">The <see cref="JsonSerializerOptions"/> to use when deserializing the file.</param>
     public JsonFormFile(IFormFile formFile, JsonSerializerOptions jsonSerializerOptions)
         : this(jsonSerializerOptions)
     {
         FormFile = formFile;
     }
 
+    /// <summary>
+    /// The <see cref="JsonSerializerOptions"/> that are used when deserializing the file.
+    /// </summary>
     public JsonSerializerOptions JsonSerializerOptions { get; init; }
 
+    /// <summary>
+    /// Opens the underlying file stream of the uploaded <see cref="FormFile"/>.
+    /// </summary>
+    /// <returns>The <see cref="Stream"/>.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if called before <see cref="BindAsync"/> is called.</exception>
     public virtual Stream OpenReadStream()
     {
         if (FormFile is not null)
@@ -72,14 +108,37 @@ public class JsonFormFile : IProvideEndpointParameterMetadata
         throw new InvalidOperationException($"Cannot open the file read stream before {nameof(BindAsync)} is called.");
     }
 
-    public ValueTask<T?> DeserializeAsync<T>() => DeserializeAsync<T>(JsonSerializerOptions);
+    /// <summary>
+    /// Deserializes the contents of the JSON file to an instance of <typeparamref name="TValue"/> using the options
+    /// from <see cref="JsonSerializerOptions"/>.
+    /// </summary>
+    /// <typeparam name="TValue">The type to deserialize the JSON file to.</typeparam>
+    /// <returns>An instance of <typeparamref name="TValue"/> if the contents can be deserialized, otherwise <c>null</c>.</returns>
+    public ValueTask<TValue?> DeserializeAsync<TValue>() => DeserializeAsync<TValue>(JsonSerializerOptions);
 
-    public async ValueTask<T?> DeserializeAsync<T>(JsonSerializerOptions jsonOptions)
+    /// <summary>
+    /// Deserializes the contents of the JSON file to an instance of <typeparamref name="TValue"/> using the provided
+    /// <paramref name="jsonOptions"/>.
+    /// </summary>
+    /// <typeparam name="TValue">The type to deserialize the JSON file to.</typeparam>
+    /// <param name="jsonOptions"></param>
+    /// <returns>An instance of <typeparamref name="TValue"/> if the contents can be deserialized, otherwise <c>null</c>.</returns>
+    public async ValueTask<TValue?> DeserializeAsync<TValue>(JsonSerializerOptions jsonOptions)
     {
         using var fileStream = OpenReadStream();
-        return await JsonSerializer.DeserializeAsync<T>(fileStream, jsonOptions);
+        return await JsonSerializer.DeserializeAsync<TValue>(fileStream, jsonOptions);
     }
 
+    /// <summary>
+    /// Binds the specified parameter from <see cref="HttpContext.Request"/>. This method is called by the framework on your behalf
+    /// when populating parameters of a mapped route handler.
+    /// </summary>
+    /// <param name="context">The <see cref="HttpContext"/> to bind the parameter from.</param>
+    /// <param name="parameter">The route handler parameter being bound to.</param>
+    /// <returns>
+    /// An instance of <see cref="JsonFormFile"/> if the request contains a form file field with the same name as the provided
+    /// <see cref="ParameterInfo.Name"/>, otherwise <c>null</c>.
+    /// </returns>
     public static async ValueTask<JsonFormFile?> BindAsync(HttpContext context, ParameterInfo parameter)
     {
         if (!context.Request.HasFormContentType)
@@ -102,6 +161,12 @@ public class JsonFormFile : IProvideEndpointParameterMetadata
         return null;
     }
 
+    /// <summary>
+    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// </summary>
+    /// <param name="parameter">The parameter to provide metadata for.</param>
+    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <returns>The metadata.</returns>
     public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services)
     {
         yield return new Mvc.ConsumesAttribute("multipart/form-data");

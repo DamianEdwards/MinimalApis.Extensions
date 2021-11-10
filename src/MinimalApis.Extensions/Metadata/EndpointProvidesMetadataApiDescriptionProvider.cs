@@ -10,25 +10,50 @@ using MinimalApis.Extensions.Infrastructure;
 
 namespace MinimalApis.Extensions.Metadata;
 
+/// <summary>
+/// An <see cref="IApiDescriptionProvider"/> that adds <see cref="Endpoint"/> metadata provided by
+/// <see cref="IProvideEndpointParameterMetadata"/> and <see cref="IProvideEndpointResponseMetadata"/>
+/// too ApiExplorer and thus OpenAPI/Swagger documents and UI.
+/// </summary>
 public class EndpointProvidesMetadataApiDescriptionProvider : IApiDescriptionProvider
 {
     private readonly IServiceProvider _services;
     private readonly EndpointDataSource _endpointDataSource;
 
+    /// <summary>
+    /// Creates an instance of <see cref="EndpointProvidesMetadataApiDescriptionProvider"/>.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <param name="endpointDataSource">The <see cref="EndpointDataSource"/>.</param>
     public EndpointProvidesMetadataApiDescriptionProvider(IServiceProvider services, EndpointDataSource endpointDataSource)
     {
         _services = services;
         _endpointDataSource = endpointDataSource;
     }
 
-    // Ensure it runs after the in-box providers for route handler endpoints, etc.
+    /// <summary>
+    /// Gets the order value for this provider. This value should ensure it runs after the in-box providers
+    /// for route handler endpoints, etc.
+    /// </summary>
     public int Order => -1200;
 
+    /// <summary>
+    /// Called before the providers are executed.
+    /// </summary>
+    /// <param name="context">The <see cref="ApiDescriptionProviderContext"/>.</param>
     public void OnProvidersExecuting(ApiDescriptionProviderContext context)
     {
 
     }
 
+    /// <summary>
+    /// Called after the providers are executed.
+    /// </summary>
+    /// <param name="context">The <see cref="ApiDescriptionProviderContext"/>.</param>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when an existing <see cref="ApiDescription"/> cannot be found for a registered <see cref="RouteEndpoint"/>.
+    /// This should never happen. If it does, it might indicate an issue with the value of <see cref="Order"/>.
+    /// </exception>
     public void OnProvidersExecuted(ApiDescriptionProviderContext context)
     {
         foreach (var endpoint in _endpointDataSource.Endpoints.OfType<RouteEndpoint>())

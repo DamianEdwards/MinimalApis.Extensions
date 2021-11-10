@@ -14,19 +14,32 @@ public struct Bind<TValue> : IProvideEndpointParameterMetadata
 {
     private readonly TValue? _value;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Bind{TValue}"/> class.
+    /// </summary>
+    /// <param name="modelValue">The value bound.</param>
     public Bind(TValue? modelValue)
     {
         _value = modelValue;
     }
 
+    /// <summary>
+    /// The value bound.
+    /// </summary>
     public TValue? Value => _value;
 
     private static Bind<TValue?> WrapResult(TValue? value) => new(value);
 
     public static implicit operator TValue?(Bind<TValue> model) => model.Value;
 
-    // RequestDelegateFactory discovers this method via reflection and code-gens calls to it to populate
-    // parameter values for declared route handler delegates.
+    /// <summary>
+    /// Binds the specified parameter from <see cref="HttpContext.Request"/>. This method is called by the framework on your behalf
+    /// when populating parameters of a mapped route handler.
+    /// </summary>
+    /// <param name="context">The <see cref="HttpContext"/> to bind the parameter from.</param>
+    /// <param name="parameter">The route handler parameter being bound to.</param>
+    /// <returns>An instance of <see cref="Bind{TValue}"/>.</returns>
+    /// <exception cref="BadHttpRequestException">Thrown if the default binding logic results in a status code other than <see cref="StatusCodes.Status200OK"/>.</exception>
     public static async ValueTask<Bind<TValue?>> BindAsync(HttpContext context, ParameterInfo parameter)
     {
         var logger = context.RequestServices.GetRequiredService<ILogger<Bind<TValue>>>();
@@ -50,6 +63,12 @@ public struct Bind<TValue> : IProvideEndpointParameterMetadata
         return WrapResult(defaultBinderResult);
     }
 
+    /// <summary>
+    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// </summary>
+    /// <param name="parameter">The parameter to provide metadata for.</param>
+    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <returns>The metadata.</returns>
     public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services)
     {
         var logger = services.GetRequiredService<ILogger<Bind<TValue>>>();
@@ -57,7 +76,7 @@ public struct Bind<TValue> : IProvideEndpointParameterMetadata
 
         return binder switch
         {
-            IProvideEndpointResponseMetadata => IProvideEndpointParameterMetadata.GetMetadataLateBound(parameter, services),
+            IProvideEndpointParameterMetadata => IProvideEndpointParameterMetadata.GetMetadataLateBound(parameter, services),
             _ => new[] { new Mvc.ConsumesAttribute(typeof(TValue), "application/json") }
         };
     }
