@@ -30,6 +30,10 @@ public struct Bind<TValue> : IProvideEndpointParameterMetadata
 
     private static Bind<TValue?> WrapResult(TValue? value) => new(value);
 
+    /// <summary>
+    /// Converts the <see cref="Bind{TValue}"/> instance to a <typeparamref name="TValue"/>.
+    /// </summary>
+    /// <param name="model">The model.</param>
     public static implicit operator TValue?(Bind<TValue> model) => model.Value;
 
     /// <summary>

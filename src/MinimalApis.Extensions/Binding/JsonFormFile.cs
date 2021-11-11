@@ -44,7 +44,7 @@ public class JsonFormFile<TValue> : JsonFormFile, IProvideEndpointParameterMetad
     /// </summary>
     /// <param name="context">The <see cref="HttpContext"/> to bind the parameter from.</param>
     /// <param name="parameter">The route handler parameter being bound to.</param>
-    /// <returns>An instance of <see cref="JsonFormFile{TValue}"/> if a value for <see cref="TValue"/> can be
+    /// <returns>An instance of <see cref="JsonFormFile{TValue}"/> if a value for <typeparamref name="TValue"/> can be
     /// deserialized from the posted file, otherwise <c>null</c>.</returns>
     public static new async ValueTask<JsonFormFile<TValue>?> BindAsync(HttpContext context, ParameterInfo parameter)
     {
@@ -70,8 +70,15 @@ public class JsonFormFile : IProvideEndpointParameterMetadata
 {
     internal static readonly JsonSerializerOptions DefaultSerializerOptions = new(JsonSerializerDefaults.Web);
 
+    /// <summary>
+    /// The <see cref="IFormFile"/>.
+    /// </summary>
     protected IFormFile? FormFile;
 
+    /// <summary>
+    /// Initializes a new instnace of the <see cref="JsonFormFile"/> class.
+    /// </summary>
+    /// <param name="jsonSerializerOptions"></param>
     protected internal JsonFormFile(JsonSerializerOptions jsonSerializerOptions)
     {
         JsonSerializerOptions = jsonSerializerOptions;

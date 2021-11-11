@@ -5,11 +5,11 @@ namespace MinimalApis.Extensions.Metadata;
 /// <summary>
 /// Marker interface that indicates a type provides a static method that returns <see cref="Endpoint"/> metadata for a
 /// parameter on a route handler delegate. The method must be of the form:
-/// <code>public static <see cref="IEnumerable{object}"/> GetMetadata(<see cref="ParameterInfo"/> parameter, <see cref="IServiceProvider"/> services)</code>
+/// <code>public static <see cref="IEnumerable{Object}"/> GetMetadata(<see cref="ParameterInfo"/> parameter, <see cref="IServiceProvider"/> services)</code>
 /// </summary>
 public interface IProvideEndpointParameterMetadata
 {
-    static readonly string GetMetadataMethodName = "GetMetadata";
+    internal static readonly string GetMetadataMethodName = "GetMetadata";
     //static abstract IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services);
 
     internal static IEnumerable<object> GetDefaultMetadataForWrapperType<TValue>(ParameterInfo parameter, IServiceProvider services)

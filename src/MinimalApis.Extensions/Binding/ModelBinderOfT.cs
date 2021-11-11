@@ -16,7 +16,7 @@ namespace MinimalApis.Extensions.Binding;
 /// </para>
 /// <para>
 /// This requires registering the model binding services by calling
-/// <see cref="MvcCoreServiceCollectionExtensions.AddMvcCore"/> or <see cref="MvcServiceCollectionExtensions.AddControllers"/>.
+/// <see cref="MvcCoreServiceCollectionExtensions.AddMvcCore(IServiceCollection)"/> or <see cref="MvcServiceCollectionExtensions.AddControllers(IServiceCollection)"/>.
 /// </para>
 /// </summary>
 /// <typeparam name="TValue">The type to model bind</typeparam>

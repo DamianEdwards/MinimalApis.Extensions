@@ -6,7 +6,7 @@ namespace MinimalApis.Extensions.Binding;
 
 /// <summary>
 /// Provides the ability to invoke the default binding logic implemented by <see cref="RequestDelegateFactory"/>
-/// for the current request as if it had been handled by a delegate returned by <see cref="RequestDelegateFactory.Create" />.
+/// for the current request as if it had been handled by a delegate returned by <see cref="RequestDelegateFactory.Create(Delegate, RequestDelegateFactoryOptions?)" />.
 /// </summary>
 /// <typeparam name="TValue">The type of the value returned by the default binding logic.</typeparam>
 public static class DefaultBinder<TValue>
@@ -16,7 +16,7 @@ public static class DefaultBinder<TValue>
 
     /// <summary>
     /// Invokes the default binding logic implemented by <see cref="RequestDelegateFactory"/>
-    /// for the current request as if it had been handled by a delegate returned by <see cref="RequestDelegateFactory.Create" />.
+    /// for the current request as if it had been handled by a delegate returned by <see cref="RequestDelegateFactory.Create(Delegate, RequestDelegateFactoryOptions?)" />.
     /// </summary>
     /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
     /// <param name="parameter">An optional <see cref="ParameterInfo"/> for a parameter of a route handler delegate.</param>

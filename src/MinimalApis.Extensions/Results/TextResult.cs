@@ -6,7 +6,7 @@
 public abstract class TextResult : StatusCode
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Text"/> class.
+    /// Initializes a new instance of the <see cref="TextResult"/> class.
     /// </summary>
     /// <param name="text">The text to write to the response body.</param>
     /// <param name="contentType">The content type of the response body.</param>

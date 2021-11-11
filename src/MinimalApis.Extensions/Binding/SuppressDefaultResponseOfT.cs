@@ -49,7 +49,7 @@ public class SuppressDefaultResponse<TValue> : IProvideEndpointParameterMetadata
     /// Binds the specified parameter from <see cref="HttpContext.Request"/>. This method is called by the framework on your behalf
     /// when populating parameters of a mapped route handler.
     /// </summary>
-    /// <param name="context">The <see cref="HttpContext"/> to bind the parameter from.</param>
+    /// <param name="httpContext">The <see cref="HttpContext"/> to bind the parameter from.</param>
     /// <param name="parameter">The route handler parameter being bound to.</param>
     /// <returns>An instance of <see cref="SuppressDefaultResponse{TValue}"/>.</returns>
     public static async ValueTask<SuppressDefaultResponse<TValue?>> BindAsync(HttpContext httpContext, ParameterInfo parameter)

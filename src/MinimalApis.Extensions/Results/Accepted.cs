@@ -22,7 +22,7 @@ public class Accepted : StatusCode, IProvideEndpointResponseMetadata
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="parameter">The parameter to provide metadata for.</param>
+    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
     /// <param name="services">The <see cref="IServiceProvider"/>.</param>
     /// <returns>The metadata.</returns>
     public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)

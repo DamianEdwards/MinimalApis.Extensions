@@ -12,7 +12,6 @@ public class RedirectPermanent308 : StatusCode, IProvideEndpointResponseMetadata
     /// <summary>
     /// Initializes a new instance of the <see cref="RedirectPermanent"/> class.
     /// </summary>
-    /// <param name="message">An optional message to return in the response body.</param>
     public RedirectPermanent308()
         : base(ResponseStatusCode, null)
     {
@@ -22,7 +21,7 @@ public class RedirectPermanent308 : StatusCode, IProvideEndpointResponseMetadata
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="parameter">The parameter to provide metadata for.</param>
+    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
     /// <param name="services">The <see cref="IServiceProvider"/>.</param>
     /// <returns>The metadata.</returns>
     public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)

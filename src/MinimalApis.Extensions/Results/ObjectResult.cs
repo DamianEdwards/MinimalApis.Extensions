@@ -8,6 +8,9 @@ namespace MinimalApis.Extensions.Results;
 public abstract class ObjectResult : IResult
 {
     //protected const string DefaultContentType = "application/json; charset=utf-8";
+    /// <summary>
+    /// The default <see cref="Encoding"/> to use.
+    /// </summary>
     protected static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
     /// <summary>

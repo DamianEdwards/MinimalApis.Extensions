@@ -12,8 +12,7 @@ public class SuppressBinding<TValue> : IProvideEndpointParameterMetadata
     /// <summary>
     /// Initializes a new instance of the <see cref="SuppressBinding{TValue}"/> class.
     /// </summary>
-    /// <param name="value">The type of the parameter that binding is being suppressed for.</param>
-    public SuppressBinding(TValue? value)
+    public SuppressBinding()
     {
 
     }
@@ -22,12 +21,12 @@ public class SuppressBinding<TValue> : IProvideEndpointParameterMetadata
     /// Binds the specified parameter from <see cref="HttpContext.Request"/>. This method is called by the framework on your behalf
     /// when populating parameters of a mapped route handler.
     /// </summary>
-    /// <param name="context">The <see cref="HttpContext"/> to bind the parameter from.</param>
+    /// <param name="httpContext">The <see cref="HttpContext"/> to bind the parameter from.</param>
     /// <param name="parameter">The route handler parameter being bound to.</param>
     /// <returns>An instance of <see cref="SuppressBinding{TValue}"/>.</returns>
     public static ValueTask<SuppressBinding<TValue?>> BindAsync(HttpContext httpContext, ParameterInfo parameter)
     {
-        return ValueTask.FromResult(new SuppressBinding<TValue?>(default));
+        return ValueTask.FromResult(new SuppressBinding<TValue?>());
     }
 
     /// <summary>
