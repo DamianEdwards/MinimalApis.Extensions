@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 using MinimalApis.Extensions.Binding;
 
-namespace MinimalApis.Extensions.UnitTests;
+namespace MinimalApis.Extensions.UnitTests.Binding;
 
 public class ValidatedOfT
 {
@@ -16,7 +16,7 @@ public class ValidatedOfT
     [InlineData("{\"name\":\"Test Value\"}")]
     public async Task BindAsync_Returns_Valid_Object_For_Valid_Json(string jsonBody)
     {
-        var (httpContext, _, _, _) = CreateMockHttpContext(jsonBody);
+        var (httpContext, _, _, _) = MockHelpers.CreateMockHttpContext(jsonBody);
         var parameterInfo = new Mock<ParameterInfo>();
 
         var result = await Validated<TestType>.BindAsync(httpContext.Object, parameterInfo.Object);
@@ -34,7 +34,7 @@ public class ValidatedOfT
     [InlineData("{}", 1)]
     public async Task BindAsync_Returns_Invalid_Object_For_Invalid_Json(string jsonBody, int expectedErrorCount)
     {
-        var (httpContext, _, _, _) = CreateMockHttpContext(jsonBody);
+        var (httpContext, _, _, _) = MockHelpers.CreateMockHttpContext(jsonBody);
         var parameterInfo = new Mock<ParameterInfo>();
 
         var result = await Validated<TestType>.BindAsync(httpContext.Object, parameterInfo.Object);
@@ -49,7 +49,7 @@ public class ValidatedOfT
     [Fact]
     public async Task BindAsync_Returns_Null_For_Null_Request_Body()
     {
-        var (httpContext, _, _, _) = CreateMockHttpContext("null");
+        var (httpContext, _, _, _) = MockHelpers.CreateMockHttpContext("null");
         var parameterInfo = new Mock<ParameterInfo>();
 
         var result = await Validated<TestType>.BindAsync(httpContext.Object, parameterInfo.Object);
@@ -60,7 +60,7 @@ public class ValidatedOfT
     [Fact]
     public async Task BindAsync_Returns_Null_For_Request_With_No_Body()
     {
-        var (httpContext, _, httpRequest, _) = CreateMockHttpContext();
+        var (httpContext, _, httpRequest, _) = MockHelpers.CreateMockHttpContext();
         httpRequest.SetupGet(x => x.ContentType).Returns("application/json");
         var parameterInfo = new Mock<ParameterInfo>();
 
@@ -72,7 +72,7 @@ public class ValidatedOfT
     [Fact]
     public async Task BindAsync_Uses_Binding_Logic_Of_Wrapped_Type()
     {
-        var (httpContext, _, httpRequest, _) = CreateMockHttpContext("{}");
+        var (httpContext, _, httpRequest, _) = MockHelpers.CreateMockHttpContext("{}");
         httpRequest.SetupGet(x => x.ContentType).Returns("application/json");
         var parameterInfo = new Mock<ParameterInfo>();
 
@@ -85,7 +85,7 @@ public class ValidatedOfT
     [Fact]
     public async Task BindAsync_Returns_415_For_Non_Json_Request()
     {
-        var (httpContext, _, httpRequest, services) = CreateMockHttpContext("some text");
+        var (httpContext, _, httpRequest, services) = MockHelpers.CreateMockHttpContext("some text");
         httpRequest.SetupGet(x => x.ContentType).Returns("text/plain");
         services.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(ILoggerFactory)))).Returns(new LoggerFactory());
         var parameterInfo = new Mock<ParameterInfo>();
@@ -99,7 +99,7 @@ public class ValidatedOfT
     [Fact]
     public async Task BindAsync_Returns_400_For_Empty_Json_Request()
     {
-        var (httpContext, _, httpRequest, services) = CreateMockHttpContext("");
+        var (httpContext, _, httpRequest, services) = MockHelpers.CreateMockHttpContext("");
         httpRequest.SetupGet(x => x.Body).Returns(new MemoryStream());
         services.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(ILoggerFactory)))).Returns(new LoggerFactory());
 
@@ -109,39 +109,6 @@ public class ValidatedOfT
 
         Assert.Equal(StatusCodes.Status400BadRequest, result.DefaultBindingResultStatusCode);
         Assert.Equal(1, result.Errors.Count);
-    }
-
-    private static (Mock<HttpContext>, Mock<IFeatureCollection>, Mock<HttpRequest>, Mock<IServiceProvider>) CreateMockHttpContext(string? requestBody = null)
-    {
-        var httpContext = new Mock<HttpContext>();
-        var features = new Mock<IFeatureCollection>();
-        var httpRequest = new Mock<HttpRequest>();
-        var httpResponse = new Mock<HttpResponse>();
-        var serviceProvider = new Mock<IServiceProvider>();
-        var items = new Dictionary<object, object?>();
-
-        httpRequest.SetupGet(x => x.Method).Returns("POST");
-        httpRequest.SetupGet(x => x.HttpContext).Returns(httpContext.Object);
-        httpResponse.SetupProperty(x => x.StatusCode);
-        httpContext.SetupGet(x => x.Items).Returns(items);
-        httpContext.SetupGet(x => x.Features).Returns(features.Object);
-        httpContext.SetupGet(x => x.Request).Returns(httpRequest.Object);
-        httpContext.SetupGet(x => x.Response).Returns(httpResponse.Object);
-        httpContext.SetupGet(x => x.RequestAborted).Returns(CancellationToken.None);
-        httpContext.SetupGet(x => x.RequestServices).Returns(serviceProvider.Object);
-
-        if (requestBody != null)
-        {
-            var bodyDetectionFeature = new Mock<IHttpRequestBodyDetectionFeature>();
-            var bodyBytes = Encoding.UTF8.GetBytes(requestBody);
-            bodyDetectionFeature.SetupGet(x => x.CanHaveBody).Returns(true);
-            features.Setup(x => x.Get<IHttpRequestBodyDetectionFeature>()).Returns(bodyDetectionFeature.Object);
-            httpRequest.SetupGet(x => x.ContentType).Returns("application/json");
-            httpRequest.SetupGet(x => x.ContentLength).Returns(bodyBytes.Length);
-            httpRequest.SetupGet(x => x.Body).Returns(new MemoryStream(bodyBytes));
-        }
-
-        return (httpContext, features, httpRequest, serviceProvider);
     }
 
     private class TestType

@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using System.Text.Json;
-using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Results;
 
@@ -42,6 +41,6 @@ public class Json : ObjectResult
     /// <returns>A <see cref="Task"/> that represents the asynchronous write operation.</returns>
     protected override async Task WriteResult(HttpContext httpContext, Encoding contentTypeEncoding)
     {
-        await httpContext.Response.WriteAsJsonAsync(Value, JsonSerializerOptions, ContentType);
+        await httpContext.Response.WriteAsJsonAsync(Value, JsonSerializerOptions, httpContext.Response.ContentType);
     }
 }

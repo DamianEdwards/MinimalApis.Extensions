@@ -28,7 +28,7 @@ public abstract class ObjectResult : IResult
     public object? Value { get; }
 
     /// <summary>
-    /// Gets the default content type to use for the response if one is specified via <see cref="ContentType"/>.
+    /// Gets the default content type to use for the response if one is not specified via <see cref="ContentType"/>.
     /// </summary>
     public abstract string DefaultContentType { get; }
 

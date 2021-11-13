@@ -9,13 +9,18 @@ namespace MinimalApis.Extensions.Results;
 public class Ok<TResult> : Json, IProvideEndpointResponseMetadata
 {
     /// <summary>
+    /// The <see cref="StatusCodes.Status200OK"/> response status code.
+    /// </summary>
+    protected const int ResponseStatusCode = StatusCodes.Status200OK;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="Ok{TResult}"/> class.
     /// </summary>
     /// <param name="result">The object to serialize to the response body.</param>
     public Ok(TResult result)
         : base(result)
     {
-
+        StatusCode = ResponseStatusCode;
     }
 
     /// <summary>
@@ -26,6 +31,6 @@ public class Ok<TResult> : Json, IProvideEndpointResponseMetadata
     /// <returns>The metadata.</returns>
     public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(typeof(TResult), StatusCodes.Status200OK, JsonContentType);
+        yield return new Mvc.ProducesResponseTypeAttribute(typeof(TResult), ResponseStatusCode, JsonContentType);
     }
 }
