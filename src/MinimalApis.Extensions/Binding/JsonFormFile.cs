@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 using MinimalApis.Extensions.Metadata;
 
-namespace Microsoft.AspNetCore.Http;
+namespace MinimalApis.Extensions.Binding;
 
 /// <summary>
 /// Represents a JSON file in a multipart/form-data request (i.e. a form upload).

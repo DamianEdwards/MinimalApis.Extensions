@@ -30,7 +30,7 @@ public abstract class ContentResult : IResult
     /// </summary>
     /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
     /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
-    public async Task ExecuteAsync(HttpContext httpContext)
+    public virtual async Task ExecuteAsync(HttpContext httpContext)
     {
         var response = httpContext.Response;
 

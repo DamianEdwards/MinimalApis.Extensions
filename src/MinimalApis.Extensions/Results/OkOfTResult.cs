@@ -20,8 +20,14 @@ public class Ok<TResult> : Json, IProvideEndpointResponseMetadata
     public Ok(TResult result)
         : base(result)
     {
+        Result = result;
         StatusCode = ResponseStatusCode;
     }
+
+    /// <summary>
+    /// Gets the object that will be serialized to the response body.
+    /// </summary>
+    public TResult Result { get; init; }
 
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.

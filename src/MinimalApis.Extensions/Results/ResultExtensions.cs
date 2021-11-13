@@ -127,40 +127,44 @@ public static class ResultExtensions
     /// Returns a <see cref="RedirectTemporary"/> <see cref="IResult"/> with <see cref="StatusCodes.Status302Found"/>.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
+    /// <param name="url">The URL to redirect to.</param>
     /// <returns>The <see cref="RedirectTemporary"/> instance.</returns>
-    public static RedirectTemporary Redirect(this IResultExtensions resultExtensions)
+    public static RedirectTemporary Redirect(this IResultExtensions resultExtensions, string url)
     {
-        return new RedirectTemporary();
+        return new RedirectTemporary(url);
     }
 
     /// <summary>
     /// Returns a <see cref="Results.RedirectPermanent"/> <see cref="IResult"/> with <see cref="StatusCodes.Status301MovedPermanently"/>.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
+    /// <param name="url">The URL to redirect to.</param>
     /// <returns>The <see cref="Results.RedirectPermanent"/> instance.</returns>
-    public static RedirectPermanent RedirectPermanent(this IResultExtensions resultExtensions)
+    public static RedirectPermanent RedirectPermanent(this IResultExtensions resultExtensions, string url)
     {
-        return new RedirectPermanent();
+        return new RedirectPermanent(url);
     }
 
     /// <summary>
     /// Returns a <see cref="Results.RedirectTemporary307"/> <see cref="IResult"/> with <see cref="StatusCodes.Status307TemporaryRedirect"/>.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
+    /// <param name="url">The URL to redirect to.</param>
     /// <returns>The <see cref="Results.RedirectTemporary307"/> instance.</returns>
-    public static RedirectTemporary307 RedirectTemporary307(this IResultExtensions resultExtensions)
+    public static RedirectTemporary307 RedirectTemporary307(this IResultExtensions resultExtensions, string url)
     {
-        return new RedirectTemporary307();
+        return new RedirectTemporary307(url);
     }
 
     /// <summary>
     /// Returns a <see cref="Results.RedirectPermanent308"/> <see cref="IResult"/> with <see cref="StatusCodes.Status308PermanentRedirect"/>.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
+    /// <param name="url">The URL to redirect to.</param>
     /// <returns>The <see cref="Results.RedirectPermanent308"/> instance.</returns>
-    public static RedirectPermanent308 RedirectPermanent308(this IResultExtensions resultExtensions)
+    public static RedirectPermanent308 RedirectPermanent308(this IResultExtensions resultExtensions, string url)
     {
-        return new RedirectPermanent308();
+        return new RedirectPermanent308(url);
     }
 
     /// <summary>

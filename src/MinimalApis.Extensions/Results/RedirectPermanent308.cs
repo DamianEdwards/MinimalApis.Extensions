@@ -12,10 +12,24 @@ public class RedirectPermanent308 : StatusCode, IProvideEndpointResponseMetadata
     /// <summary>
     /// Initializes a new instance of the <see cref="RedirectPermanent"/> class.
     /// </summary>
-    public RedirectPermanent308()
+    /// <param name="url">The URL to redirect to.</param>
+    public RedirectPermanent308(string url)
         : base(ResponseStatusCode, null)
     {
+        Url = url;
+    }
 
+    /// <summary>
+    /// The URL to redirect to.
+    /// </summary>
+    public string Url { get; init; }
+
+    /// <inheritdoc />
+    public override Task ExecuteAsync(HttpContext httpContext)
+    {
+        httpContext.Response.Headers.Location = Url;
+
+        return base.ExecuteAsync(httpContext);
     }
 
     /// <summary>
