@@ -1,4 +1,6 @@
-﻿namespace MinimalApis.Extensions.Results;
+﻿using MinimalApis.Extensions.Binding;
+
+namespace MinimalApis.Extensions.Results;
 
 /// <summary>
 /// Contains extension methods for creating typed <see cref="IResult"/> objects to return from Minimal APIs.
@@ -299,6 +301,23 @@ public static class ResultExtensions
     public static ValidationProblem ValidationProblem(this IResultExtensions resultExtensions, IDictionary<string, string[]> errors)
     {
         return new ValidationProblem(errors);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TInput"></typeparam>
+    /// <param name="resultExtensions"></param>
+    /// <param name="validatedInput"></param>
+    /// <returns></returns>
+    public static Results<ValidationProblem, Problem> ValidationProblem<TInput>(this IResultExtensions resultExtensions, Validated<TInput> validatedInput)
+    {
+        return validatedInput.DefaultBindingResultStatusCode switch
+        {
+            null => new ValidationProblem(validatedInput.Errors),
+            int sc when sc >= 400 && sc < 500 => resultExtensions.Problem(statusCode: sc),
+            _ => resultExtensions.Problem()
+        };
     }
 
     /// <summary>

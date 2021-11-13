@@ -126,6 +126,42 @@ public sealed class Results<TResult1, TResult2, TResult3> : ResultsBase, IProvid
     public static implicit operator Results<TResult1, TResult2, TResult3>(TResult3 result) => new(result);
 
     /// <summary>
+    /// Converts the <see cref="Results{TResult1, TResult2}"/> to a <see cref="Results{TResult1, TResult2, TResult3}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3>(Results<TResult1, TResult2> result) => new(result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult2, TResult1}"/> to a <see cref="Results{TResult1, TResult2, TResult3}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3>(Results<TResult2, TResult1> result) => new(result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult2, TResult3}"/> to a <see cref="Results{TResult1, TResult2, TResult3}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3>(Results<TResult2, TResult3> result) => new(result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult3, TResult2}"/> to a <see cref="Results{TResult1, TResult2, TResult3}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3>(Results<TResult3, TResult2> result) => new(result.Result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult1, TResult3}"/> to a <see cref="Results{TResult1, TResult2, TResult3}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3>(Results<TResult1, TResult3> result) => new(result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult3, TResult1}"/> to a <see cref="Results{TResult1, TResult2, TResult3}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3>(Results<TResult3, TResult1> result) => new(result);
+
+    /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
     /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
@@ -177,6 +213,78 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4> : ResultsBas
     public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(TResult4 result) => new(result);
 
     /// <summary>
+    /// Converts the <see cref="Results{TResult1, TResult2}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult1, TResult2> result) => new(result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult2, TResult1}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult2, TResult1> result) => new(result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult2, TResult3}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult2, TResult3> result) => new(result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult3, TResult2}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult3, TResult2> result) => new(result.Result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult1, TResult3}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult1, TResult3> result) => new(result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult3, TResult1}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult3, TResult1> result) => new(result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult1, TResult2, TResult3}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult1, TResult2, TResult3> result) => new(result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult1, TResult3, TResult2}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult1, TResult3, TResult2> result) => new(result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult2, TResult1, TResult3}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult2, TResult1, TResult3> result) => new(result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult2, TResult3, TResult1}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult2, TResult3, TResult1> result) => new(result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult3, TResult1, TResult1}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult3, TResult1, TResult2> result) => new(result);
+
+    /// <summary>
+    /// Converts the <see cref="Results{TResult3, TResult2, TResult1}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult3, TResult2, TResult1> result) => new(result);
+
+    /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
     /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
@@ -184,6 +292,8 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4> : ResultsBas
     /// <returns>The metadata.</returns>
     public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services) => GetMetadata(endpoint, services, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4));
 }
+
+// TODO: Add the rest of the implicit operators to convert every Results combo to every other Results combo, should likely code-gen this :\
 
 /// <summary>
 /// Represents the result of an <see cref="Endpoint"/> route handler delegate that can return five different <see cref="IResult"/> types.
