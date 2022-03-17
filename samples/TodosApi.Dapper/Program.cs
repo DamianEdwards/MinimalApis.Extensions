@@ -6,6 +6,7 @@ using Microsoft.Data.Sqlite;
 using Dapper;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using TodosApi.Dapper;
+using MinimalApis.Extensions.Binding;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,10 @@ app.MapGet("/error", () => Results.Problem("An error occurred.", statusCode: 500
    .ExcludeFromDescription();
 
 app.MapTodosApi();
+
+// TEMP: These don't belong here and will be removed/moved later
+app.MapPost("/bodyas/bytes", (Body<byte[]> body) => $"Received {body.Value?.Length} bytes");
+app.MapPost("/bodyas/string", (Body<string> body) => $"Received: {body.Value}");
 
 app.MapFallback(([FromHeader]string? accept) =>
     accept?.Contains("application/json") == true
