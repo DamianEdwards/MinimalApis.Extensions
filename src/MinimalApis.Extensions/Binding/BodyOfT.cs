@@ -45,18 +45,26 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
         if (context.Request.Headers.ContentLength > MaxSizeLessThanLOH)
         {
             // TODO: Allow specifying an attribute on the parameter to increase the allowed request size
-            throw new InvalidOperationException($"Request body size is too large to bind to {nameof(Body<TValue>)}.");
+            throw LimitMemoryStream.CreateOverCapacityException(MaxSizeLessThanLOH);
         }
 
         byte[]? bodyBuffer = null;
-        int bytesRead;
+        int bodyLength;
 
         if (context.Request.Headers.ContentLength.HasValue)
         {
             // Read directly into the buffer of request size
             var contentLength = (int)context.Request.Headers.ContentLength.Value;
             bodyBuffer = new byte[contentLength];
-            bytesRead = await context.Request.Body.ReadAsync(bodyBuffer, 0, contentLength);
+            var offset = 0;
+            var eos = false;
+            while (!eos)
+            {
+                var bytesRead = await context.Request.Body.ReadAsync(bodyBuffer, offset, contentLength);
+                offset += bytesRead;
+                eos = offset >= contentLength || bytesRead == 0;
+            }
+            bodyLength = offset;
         }
         else
         {
@@ -65,7 +73,7 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
             using var ms = new LimitMemoryStream(MaxSizeLessThanLOH, bufferSize);
             await context.Request.Body.CopyToAsync(ms, bufferSize);
             bodyBuffer = ms.ToArray();
-            bytesRead = bodyBuffer.Length;
+            bodyLength = bodyBuffer.Length;
         }
 
         if (typeof(TValue) == typeof(byte[]))
@@ -76,7 +84,7 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
         if (typeof(TValue) == typeof(string))
         {
             var requestEncoding = context.Request.GetTypedHeaders().ContentType?.Encoding ?? Encoding.UTF8;
-            var bodyAsString = requestEncoding.GetString(bodyBuffer, 0, bytesRead);
+            var bodyAsString = requestEncoding.GetString(bodyBuffer, 0, bodyLength);
             
             return new Body<TValue>((TValue)(object)bodyAsString);
         }
@@ -186,9 +194,9 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
             }
         }
 
-        private static Exception CreateOverCapacityException(int maxBufferSize)
+        public static Exception CreateOverCapacityException(int maxBufferSize)
         {
-            return new HttpRequestException("Too big!");
+            return new BadHttpRequestException($"The request body size was greather than the max allowed size of {maxBufferSize}.");
         }
     }
 }
