@@ -24,7 +24,7 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
     /// <summary>
     /// 
     /// </summary>
-    public TValue? Value { get; }
+    public TValue Value { get; }
 
     /// <summary>
     /// 
@@ -32,7 +32,7 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
     /// <param name="context"></param>
     /// <param name="parameter"></param>
     /// <returns></returns>
-    public static async ValueTask<Body<TValue?>> BindAsync(HttpContext context, ParameterInfo parameter)
+    public static async ValueTask<Body<TValue>> BindAsync(HttpContext context, ParameterInfo parameter)
     {
         // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap
         const int MaxSizeLessThanLOH = 84999;
@@ -70,7 +70,7 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
 
         if (typeof(TValue) == typeof(byte[]))
         {
-            return new Body<TValue?>((TValue)(object)bodyBuffer);
+            return new Body<TValue>((TValue)(object)bodyBuffer);
         }
 
         if (typeof(TValue) == typeof(string))
@@ -78,7 +78,7 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
             var requestEncoding = context.Request.GetTypedHeaders().ContentType?.Encoding ?? Encoding.UTF8;
             var bodyAsString = requestEncoding.GetString(bodyBuffer, 0, bytesRead);
             
-            return new Body<TValue?>((TValue)(object)bodyAsString);
+            return new Body<TValue>((TValue)(object)bodyAsString);
         }
 
         throw new InvalidOperationException(_unsupportedTypeExceptionMessage);
