@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
@@ -46,19 +47,19 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
     /// <returns></returns>
     public static async ValueTask<Body<TBody>> BindAsync(HttpContext context, ParameterInfo parameter)
     {
+        if (!IsSupportedTValue(typeof(TBody)))
+        {
+            throw new ArgumentException(_unsupportedTypeExceptionMessage, nameof(TBody));
+        }
+
         // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap
         const int MaxSizeLessThanLOH = 84999;
 
-        var maxBodySize = MaxSizeLessThanLOH;
-
-        if (!IsSupportedTValue(typeof(TBody)))
-        {
-            throw new InvalidOperationException(_unsupportedTypeExceptionMessage);
-        }
+        var maxLength = parameter.GetCustomAttribute<MaxLengthAttribute>();
+        var maxBodySize = maxLength?.Length ?? MaxSizeLessThanLOH;
 
         if (context.Request.Headers.ContentLength > maxBodySize)
         {
-            // TODO: Allow specifying an attribute on the parameter to increase the allowed request size
             throw LimitMemoryStream.CreateOverCapacityException(maxBodySize);
         }
 
