@@ -49,15 +49,17 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
         // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap
         const int MaxSizeLessThanLOH = 84999;
 
+        var maxBodySize = MaxSizeLessThanLOH;
+
         if (!IsSupportedTValue(typeof(TBody)))
         {
             throw new InvalidOperationException(_unsupportedTypeExceptionMessage);
         }
 
-        if (context.Request.Headers.ContentLength > MaxSizeLessThanLOH)
+        if (context.Request.Headers.ContentLength > maxBodySize)
         {
             // TODO: Allow specifying an attribute on the parameter to increase the allowed request size
-            throw LimitMemoryStream.CreateOverCapacityException(MaxSizeLessThanLOH);
+            throw LimitMemoryStream.CreateOverCapacityException(maxBodySize);
         }
 
         byte[]? bodyBuffer = null;
@@ -80,9 +82,9 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
         }
         else
         {
-            // Read up to LOH size
+            // Read up to max size
             var bufferSize = 1024;
-            using var ms = new LimitMemoryStream(MaxSizeLessThanLOH, bufferSize);
+            using var ms = new LimitMemoryStream(maxBodySize, bufferSize);
             await context.Request.Body.CopyToAsync(ms, bufferSize, context.RequestAborted);
             bodyBuffer = ms.ToArray();
             bodyLength = bodyBuffer.Length;
@@ -112,6 +114,10 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
     /// <returns></returns>
     public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services)
     {
+        if (typeof(TBody) == typeof(byte[]))
+        {
+            yield return new Mvc.ConsumesAttribute("application/octet-stream");
+        }
         if (IsSupportedTValue(typeof(TBody)))
         {
             yield return new Mvc.ConsumesAttribute("text/plain");
