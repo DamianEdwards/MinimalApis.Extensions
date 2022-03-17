@@ -38,7 +38,7 @@ app.MapTodosApi();
 
 // TEMP: These don't belong here and will be removed/moved later
 app.MapPost("/bodyas/bytes", (Body<byte[]> body) => $"Received {body.Value?.Length} bytes");
-app.MapPost("/bodyas/string", (Body<string> body) => $"Received: {body.Value}");
+app.MapPost("/bodyas/string", (Body<string> body) => $"Received: {body}");
 
 app.MapFallback(([FromHeader]string? accept) =>
     accept?.Contains("application/json") == true

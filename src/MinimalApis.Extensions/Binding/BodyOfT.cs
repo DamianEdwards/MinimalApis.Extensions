@@ -9,14 +9,14 @@ namespace MinimalApis.Extensions.Binding;
 /// <summary>
 /// 
 /// </summary>
-/// <typeparam name="TValue"></typeparam>
-public record struct Body<TValue> : IProvideEndpointParameterMetadata
+/// <typeparam name="TBody"></typeparam>
+public record struct Body<TBody> : IProvideEndpointParameterMetadata
 {
     /// <summary>
     /// 
     /// </summary>
     /// <param name="value"></param>
-    public Body(TValue value)
+    public Body(TBody value)
     {
         Value = value;
     }
@@ -24,7 +24,19 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
     /// <summary>
     /// 
     /// </summary>
-    public TValue Value { get; }
+    public TBody Value { get; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public override string? ToString() => Value?.ToString();
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
+    public static implicit operator TBody(Body<TBody> value) => value.Value;
 
     /// <summary>
     /// 
@@ -32,12 +44,12 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
     /// <param name="context"></param>
     /// <param name="parameter"></param>
     /// <returns></returns>
-    public static async ValueTask<Body<TValue>> BindAsync(HttpContext context, ParameterInfo parameter)
+    public static async ValueTask<Body<TBody>> BindAsync(HttpContext context, ParameterInfo parameter)
     {
         // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap
         const int MaxSizeLessThanLOH = 84999;
 
-        if (!IsSupportedTValue(typeof(TValue)))
+        if (!IsSupportedTValue(typeof(TBody)))
         {
             throw new InvalidOperationException(_unsupportedTypeExceptionMessage);
         }
@@ -60,7 +72,7 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
             var eos = false;
             while (!eos)
             {
-                var bytesRead = await context.Request.Body.ReadAsync(bodyBuffer, offset, contentLength);
+                var bytesRead = await context.Request.Body.ReadAsync(bodyBuffer, offset, contentLength, context.RequestAborted);
                 offset += bytesRead;
                 eos = offset >= contentLength || bytesRead == 0;
             }
@@ -71,30 +83,36 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
             // Read up to LOH size
             var bufferSize = 1024;
             using var ms = new LimitMemoryStream(MaxSizeLessThanLOH, bufferSize);
-            await context.Request.Body.CopyToAsync(ms, bufferSize);
+            await context.Request.Body.CopyToAsync(ms, bufferSize, context.RequestAborted);
             bodyBuffer = ms.ToArray();
             bodyLength = bodyBuffer.Length;
         }
 
-        if (typeof(TValue) == typeof(byte[]))
+        if (typeof(TBody) == typeof(byte[]))
         {
-            return new Body<TValue>((TValue)(object)bodyBuffer);
+            return new Body<TBody>((TBody)(object)bodyBuffer);
         }
 
-        if (typeof(TValue) == typeof(string))
+        if (typeof(TBody) == typeof(string))
         {
             var requestEncoding = context.Request.GetTypedHeaders().ContentType?.Encoding ?? Encoding.UTF8;
             var bodyAsString = requestEncoding.GetString(bodyBuffer, 0, bodyLength);
             
-            return new Body<TValue>((TValue)(object)bodyAsString);
+            return new Body<TBody>((TBody)(object)bodyAsString);
         }
 
         throw new InvalidOperationException(_unsupportedTypeExceptionMessage);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="parameter"></param>
+    /// <param name="services"></param>
+    /// <returns></returns>
     public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services)
     {
-        if (IsSupportedTValue(typeof(TValue)))
+        if (IsSupportedTValue(typeof(TBody)))
         {
             yield return new Mvc.ConsumesAttribute("text/plain");
         }
@@ -102,7 +120,7 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
 
     private static readonly Type[] _supportedTypes = new[] { typeof(byte[]), typeof(string) };
 
-    private static readonly string _unsupportedTypeExceptionMessage = $"{nameof(Body<TValue>)} only supports the following types: {Environment.NewLine}"
+    private static readonly string _unsupportedTypeExceptionMessage = $"{nameof(Body<TBody>)} only supports the following types: {Environment.NewLine}"
         + string.Join(Environment.NewLine, _supportedTypes.Select(t => t.Name).ToArray());
 
     private static bool IsSupportedTValue(Type type)
