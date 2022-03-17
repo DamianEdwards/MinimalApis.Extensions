@@ -91,7 +91,7 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
         else
         {
             // Read up to max size
-            var bufferSize = 1024;
+            var bufferSize = 4096;
             using var ms = new LimitMemoryStream(maxBodySize, bufferSize);
             await context.Request.Body.CopyToAsync(ms, bufferSize, context.RequestAborted);
             bodyBuffer = ms.ToArray();
