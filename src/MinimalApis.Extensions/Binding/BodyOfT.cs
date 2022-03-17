@@ -49,13 +49,14 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
         }
 
         byte[]? bodyBuffer = null;
+        int bytesRead;
 
         if (context.Request.Headers.ContentLength.HasValue)
         {
             // Read directly into the buffer of request size
             var contentLength = (int)context.Request.Headers.ContentLength.Value;
             bodyBuffer = new byte[contentLength];
-            await context.Request.Body.ReadAsync(bodyBuffer, 0, contentLength);
+            bytesRead = await context.Request.Body.ReadAsync(bodyBuffer, 0, contentLength);
         }
         else
         {
@@ -64,6 +65,7 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
             using var ms = new LimitMemoryStream(MaxSizeLessThanLOH, bufferSize);
             await context.Request.Body.CopyToAsync(ms, bufferSize);
             bodyBuffer = ms.ToArray();
+            bytesRead = bodyBuffer.Length;
         }
 
         if (typeof(TValue) == typeof(byte[]))
@@ -74,7 +76,7 @@ public record struct Body<TValue> : IProvideEndpointParameterMetadata
         if (typeof(TValue) == typeof(string))
         {
             var requestEncoding = context.Request.GetTypedHeaders().ContentType?.Encoding ?? Encoding.UTF8;
-            var bodyAsString = requestEncoding.GetString(bodyBuffer);
+            var bodyAsString = requestEncoding.GetString(bodyBuffer, 0, bytesRead);
             
             return new Body<TValue?>((TValue)(object)bodyAsString);
         }
