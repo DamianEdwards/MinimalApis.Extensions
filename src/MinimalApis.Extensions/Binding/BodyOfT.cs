@@ -74,9 +74,16 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
             var eos = false;
             while (!eos)
             {
-                var bytesRead = await context.Request.Body.ReadAsync(bodyBuffer, offset, contentLength, context.RequestAborted);
-                offset += bytesRead;
-                eos = offset >= contentLength || bytesRead == 0;
+                try
+                {
+                    var bytesRead = await context.Request.Body.ReadAsync(bodyBuffer, offset, contentLength, context.RequestAborted);
+                    offset += bytesRead;
+                    eos = offset >= contentLength || bytesRead == 0;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    throw new BadHttpRequestException("Content-Length header value specified length longer than actual request body size. Correct or remove the Content-Length header and try again.");
+                }
             }
             bodyLength = offset;
         }
