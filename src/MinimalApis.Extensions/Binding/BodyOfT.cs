@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Reflection;
@@ -13,6 +14,10 @@ namespace MinimalApis.Extensions.Binding;
 /// <typeparam name="TBody"></typeparam>
 public record struct Body<TBody> : IProvideEndpointParameterMetadata
 {
+    // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap
+    private const int MaxSizeLessThanLOH = 84999;
+    private static readonly ConcurrentDictionary<ParameterInfo, int> _paramMaxLengthCache = new();
+
     /// <summary>
     /// 
     /// </summary>
@@ -52,74 +57,112 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
             throw new ArgumentException(_unsupportedTypeExceptionMessage, nameof(TBody));
         }
 
-        // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap
-        const int MaxSizeLessThanLOH = 84999;
-
-        var maxLength = parameter.GetCustomAttribute<MaxLengthAttribute>();
-        var maxBodySize = maxLength?.Length ?? MaxSizeLessThanLOH;
+        var maxBodySize = _paramMaxLengthCache.GetOrAdd(parameter,
+            pi => pi.GetCustomAttribute<MaxLengthAttribute>()?.Length ?? MaxSizeLessThanLOH);
 
         if (context.Request.Headers.ContentLength > maxBodySize)
         {
             throw LimitMemoryStream.CreateOverCapacityException(maxBodySize);
         }
 
-        byte[]? bodyBuffer;
-        int bodyLength;
-
-        if (context.Request.Headers.ContentLength.HasValue)
+        // Pipelines
+        var readSize = (int?)context.Request.Headers.ContentLength ?? maxBodySize;
+        SequencePosition position = default;
+        try
         {
-            // Read directly into the buffer of request size
-            var contentLength = (int)context.Request.Headers.ContentLength.Value;
-            bodyBuffer = new byte[contentLength];
-            var offset = 0;
-            var eos = false;
-            while (!eos)
+            var result = await context.Request.BodyReader.ReadAtLeastAsync(readSize, context.RequestAborted);
+            position = result.Buffer.End;
+            if (result.IsCanceled)
             {
-                try
-                {
-                    var bytesRead = await context.Request.Body.ReadAsync(bodyBuffer, offset, contentLength, context.RequestAborted);
-                    offset += bytesRead;
-                    eos = offset >= contentLength || bytesRead == 0;
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    throw new BadHttpRequestException("Content-Length header value specified length longer than actual request body size. Correct or remove the Content-Length header and try again.");
-                }
+                throw new OperationCanceledException("Read call was canceled.");
             }
-            bodyLength = offset;
-        }
-        else
-        {
-            // Read up to max size
-            var bufferSize = 4096;
-            using var limitStream = new LimitMemoryStream(maxBodySize, bufferSize);
-            await context.Request.Body.CopyToAsync(limitStream, bufferSize, context.RequestAborted);
-            if (typeof(TBody) == typeof(ReadOnlyMemory<byte>) && limitStream.TryGetBuffer(out var streamBuffer))
+            if (!result.IsCompleted)
             {
-                // Return the underlying buffer allocated by the MemoryStream
-                return new Body<TBody>((TBody)(object)streamBuffer);
+                // Too big!
+                throw new BadHttpRequestException("Body is too big.", StatusCodes.Status400BadRequest);
             }
-            bodyBuffer = limitStream.ToArray();
-            bodyLength = bodyBuffer.Length;
+
+            if (typeof(TBody) == typeof(byte[]))
+            {
+                return new Body<TBody>((TBody)(object)result.Buffer.ToArray());
+            }
+
+            if (typeof(TBody) == typeof(ReadOnlyMemory<byte>))
+            {
+                return new Body<TBody>((TBody)(object)new ReadOnlyMemory<byte>(result.Buffer.ToArray()));
+            }
+
+            if (typeof(TBody) == typeof(string))
+            {
+                var requestEncoding = context.Request.GetTypedHeaders().ContentType?.Encoding ?? Encoding.UTF8;
+                var bodyAsString = string.Create((int)result.Buffer.Length, result, (chars, state) => requestEncoding.GetChars(state.Buffer, chars));
+                return new Body<TBody>((TBody)(object)bodyAsString);
+            }
+        }
+        finally
+        {
+            context.Request.BodyReader.AdvanceTo(position);
         }
 
-        if (typeof(TBody) == typeof(byte[]))
-        {
-            return new Body<TBody>((TBody)(object)bodyBuffer);
-        }
+        //// Streams
+        //byte[]? bodyBuffer;
+        //int bodyLength;
 
-        if (typeof(TBody) == typeof(ReadOnlyMemory<byte>))
-        {
-            return new Body<TBody>((TBody)(object)new ReadOnlyMemory<byte>(bodyBuffer));
-        }
+        //if (context.Request.Headers.ContentLength.HasValue)
+        //{
+        //    var contentLength = (int)context.Request.Headers.ContentLength.Value;
 
-        if (typeof(TBody) == typeof(string))
-        {
-            var requestEncoding = context.Request.GetTypedHeaders().ContentType?.Encoding ?? Encoding.UTF8;
-            var bodyAsString = requestEncoding.GetString(bodyBuffer, 0, bodyLength);
+        //    // Read directly into the buffer of request size
+        //    var offset = 0;
+        //    var eos = false;
+        //    bodyBuffer = new byte[contentLength];
+        //    while (!eos)
+        //    {
+        //        try
+        //        {
+        //            var bytesRead = await context.Request.Body.ReadAsync(bodyBuffer, offset, contentLength, context.RequestAborted);
+        //            offset += bytesRead;
+        //            eos = offset >= contentLength || bytesRead == 0;
+        //        }
+        //        catch (ArgumentOutOfRangeException)
+        //        {
+        //            throw new BadHttpRequestException("Content-Length header value specified length longer than actual request body size. Correct or remove the Content-Length header and try again.");
+        //        }
+        //    }
+        //    bodyLength = offset;
+        //}
+        //else
+        //{
+        //    // Read up to max size
+        //    const int bufferSize = 4096;
+        //    using var limitStream = new LimitMemoryStream(maxBodySize, bufferSize);
+        //    await context.Request.Body.CopyToAsync(limitStream, bufferSize, context.RequestAborted);
+        //    if (typeof(TBody) == typeof(ReadOnlyMemory<byte>) && limitStream.TryGetBuffer(out var streamBuffer))
+        //    {
+        //        // Return the underlying buffer allocated by the MemoryStream
+        //        return new Body<TBody>((TBody)(object)streamBuffer);
+        //    }
+        //    bodyBuffer = limitStream.ToArray();
+        //    bodyLength = bodyBuffer.Length;
+        //}
+
+        //if (typeof(TBody) == typeof(byte[]))
+        //{
+        //    return new Body<TBody>((TBody)(object)bodyBuffer);
+        //}
+
+        //if (typeof(TBody) == typeof(ReadOnlyMemory<byte>))
+        //{
+        //    return new Body<TBody>((TBody)(object)new ReadOnlyMemory<byte>(bodyBuffer));
+        //}
+
+        //if (typeof(TBody) == typeof(string))
+        //{
+        //    var requestEncoding = context.Request.GetTypedHeaders().ContentType?.Encoding ?? Encoding.UTF8;
+        //    var bodyAsString = requestEncoding.GetString(bodyBuffer, 0, bodyLength);
             
-            return new Body<TBody>((TBody)(object)bodyAsString);
-        }
+        //    return new Body<TBody>((TBody)(object)bodyAsString);
+        //}
 
         throw new InvalidOperationException(_unsupportedTypeExceptionMessage);
     }
