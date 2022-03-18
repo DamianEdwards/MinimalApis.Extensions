@@ -52,6 +52,11 @@ public abstract class ObjectResult : IResult
     {
         var response = httpContext.Response;
 
+        if (StatusCode != null)
+        {
+            response.StatusCode = StatusCode.Value;
+        }
+
         ResponseContentTypeHelper.ResolveContentTypeAndEncoding(
             ContentType,
             response.ContentType,
@@ -61,11 +66,6 @@ public abstract class ObjectResult : IResult
             out var resolvedContentTypeEncoding);
 
         response.ContentType = resolvedContentType;
-
-        if (StatusCode != null)
-        {
-            response.StatusCode = StatusCode.Value;
-        }
 
         await WriteResult(httpContext, resolvedContentTypeEncoding);
     }

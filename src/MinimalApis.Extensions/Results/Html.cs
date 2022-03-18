@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> that returns HTML content in the response body.
 /// </summary>
-public class Html : TextResult, IProvideEndpointResponseMetadata
+public class Html : ResultBase, IProvideEndpointResponseMetadata
 {
     private const string HtmlMediaType = "text/html";
 
@@ -14,9 +14,10 @@ public class Html : TextResult, IProvideEndpointResponseMetadata
     /// </summary>
     /// <param name="html">The HTML to return in the response body.</param>
     public Html(string html)
-        : base(html, HtmlMediaType)
     {
-
+        StatusCode = StatusCodes.Status200OK;
+        ContentType = HtmlMediaType;
+        ResponseContent = html;
     }
 
     /// <summary>

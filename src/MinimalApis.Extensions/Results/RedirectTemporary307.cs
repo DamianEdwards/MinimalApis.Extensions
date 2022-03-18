@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status307TemporaryRedirect"/> redirect response.
 /// </summary>
-public class RedirectTemporary307 : StatusCode, IProvideEndpointResponseMetadata
+public class RedirectTemporary307 : ResultBase, IProvideEndpointResponseMetadata
 {
     private const int ResponseStatusCode = StatusCodes.Status307TemporaryRedirect;
 
@@ -14,8 +14,8 @@ public class RedirectTemporary307 : StatusCode, IProvideEndpointResponseMetadata
     /// </summary>
     /// <param name="url">The URL to redirect to.</param>
     public RedirectTemporary307(string url)
-        : base(ResponseStatusCode, null)
     {
+        StatusCode = ResponseStatusCode;
         Url = url;
     }
 

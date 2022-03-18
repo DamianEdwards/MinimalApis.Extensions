@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status404NotFound"/> response.
 /// </summary>
-public class NotFound : StatusCode, IProvideEndpointResponseMetadata
+public class NotFound : ResultBase, IProvideEndpointResponseMetadata
 {
     private const int ResponseStatusCode = StatusCodes.Status404NotFound;
 
@@ -14,9 +14,9 @@ public class NotFound : StatusCode, IProvideEndpointResponseMetadata
     /// </summary>
     /// <param name="message">An optional message to return in the response body.</param>
     public NotFound(string? message = null)
-        : base(ResponseStatusCode, message)
     {
-
+        StatusCode = ResponseStatusCode;
+        ResponseContent = message;
     }
 
     /// <summary>

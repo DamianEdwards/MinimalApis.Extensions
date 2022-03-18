@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status308PermanentRedirect"/> redirect response.
 /// </summary>
-public class RedirectPermanent308 : StatusCode, IProvideEndpointResponseMetadata
+public class RedirectPermanent308 : ResultBase, IProvideEndpointResponseMetadata
 {
     private const int ResponseStatusCode = StatusCodes.Status308PermanentRedirect;
 
@@ -14,8 +14,8 @@ public class RedirectPermanent308 : StatusCode, IProvideEndpointResponseMetadata
     /// </summary>
     /// <param name="url">The URL to redirect to.</param>
     public RedirectPermanent308(string url)
-        : base(ResponseStatusCode, null)
     {
+        StatusCode = ResponseStatusCode;
         Url = url;
     }
 

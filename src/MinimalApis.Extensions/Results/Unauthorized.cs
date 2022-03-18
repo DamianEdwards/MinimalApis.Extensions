@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status401Unauthorized"/> response.
 /// </summary>
-public class Unauthorized : StatusCode, IProvideEndpointResponseMetadata
+public class Unauthorized : ResultBase, IProvideEndpointResponseMetadata
 {
     private const int ResponseStatusCode = StatusCodes.Status401Unauthorized;
 
@@ -14,9 +14,9 @@ public class Unauthorized : StatusCode, IProvideEndpointResponseMetadata
     /// </summary>
     /// <param name="message">An optional message to return in the response body.</param>
     public Unauthorized(string? message = null)
-        : base(ResponseStatusCode, message)
     {
-
+        StatusCode = ResponseStatusCode;
+        ResponseContent = message;
     }
 
     /// <summary>

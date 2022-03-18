@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents an <see cref="IResult"/> for a response with the specified status code.
 /// </summary>
-public class StatusCode : ContentResult
+public class StatusCode : ResultBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="StatusCode"/> class.
@@ -14,7 +14,7 @@ public class StatusCode : ContentResult
     public StatusCode(int statusCode, string? text, string? contentType = null)
     {
         StatusCode = statusCode;
-        ResponseContent = text;
         ContentType = contentType;
+        ResponseContent = text;
     }
 }

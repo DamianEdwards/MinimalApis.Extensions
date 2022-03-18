@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status200OK"/> response.
 /// </summary>
-public class Ok : StatusCode, IProvideEndpointResponseMetadata
+public class Ok : ResultBase, IProvideEndpointResponseMetadata
 {
     /// <summary>
     /// The <see cref="StatusCodes.Status200OK"/> status code.
@@ -17,9 +17,9 @@ public class Ok : StatusCode, IProvideEndpointResponseMetadata
     /// </summary>
     /// <param name="message">An optional message to return in the response body.</param>
     public Ok(string? message = null)
-        : base(ResponseStatusCode, message)
     {
-
+        StatusCode = ResponseStatusCode;
+        ResponseContent = message;
     }
 
     /// <summary>

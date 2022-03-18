@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status202Accepted"/> response.
 /// </summary>
-public class Accepted : StatusCode, IProvideEndpointResponseMetadata
+public class Accepted : ResultBase, IProvideEndpointResponseMetadata
 {
     private const int ResponseStatusCode = StatusCodes.Status202Accepted;
 
@@ -14,9 +14,9 @@ public class Accepted : StatusCode, IProvideEndpointResponseMetadata
     /// </summary>
     /// <param name="message">An optional message to return in the response body.</param>
     public Accepted(string? message = null)
-        : base(ResponseStatusCode, message)
     {
-
+        StatusCode = ResponseStatusCode;
+        ResponseContent = message;
     }
 
     /// <summary>

@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status200OK"/> response with a plain text response body.
 /// </summary>
-public class PlainText : TextResult, IProvideEndpointResponseMetadata
+public class PlainText : ResultBase, IProvideEndpointResponseMetadata
 {
     private const string PlainTextMediaType = "text/plain";
     private const int ResponseStatusCode = StatusCodes.Status200OK;
@@ -15,9 +15,10 @@ public class PlainText : TextResult, IProvideEndpointResponseMetadata
     /// </summary>
     /// <param name="text">The text to write to the response body.</param>
     public PlainText(string text)
-        : base(text, PlainTextMediaType)
     {
-
+        StatusCode = ResponseStatusCode;
+        ContentType = PlainTextMediaType;
+        ResponseContent = text;
     }
 
     /// <summary>
