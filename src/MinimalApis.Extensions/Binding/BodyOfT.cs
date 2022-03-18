@@ -63,7 +63,7 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
             throw LimitMemoryStream.CreateOverCapacityException(maxBodySize);
         }
 
-        byte[]? bodyBuffer = null;
+        byte[]? bodyBuffer;
         int bodyLength;
 
         if (context.Request.Headers.ContentLength.HasValue)
@@ -92,15 +92,25 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
         {
             // Read up to max size
             var bufferSize = 4096;
-            using var ms = new LimitMemoryStream(maxBodySize, bufferSize);
-            await context.Request.Body.CopyToAsync(ms, bufferSize, context.RequestAborted);
-            bodyBuffer = ms.ToArray();
+            using var limitStream = new LimitMemoryStream(maxBodySize, bufferSize);
+            await context.Request.Body.CopyToAsync(limitStream, bufferSize, context.RequestAborted);
+            if (typeof(TBody) == typeof(ReadOnlyMemory<byte>) && limitStream.TryGetBuffer(out var streamBuffer))
+            {
+                // Return the underlying buffer allocated by the MemoryStream
+                return new Body<TBody>((TBody)(object)streamBuffer);
+            }
+            bodyBuffer = limitStream.ToArray();
             bodyLength = bodyBuffer.Length;
         }
 
         if (typeof(TBody) == typeof(byte[]))
         {
             return new Body<TBody>((TBody)(object)bodyBuffer);
+        }
+
+        if (typeof(TBody) == typeof(ReadOnlyMemory<byte>))
+        {
+            return new Body<TBody>((TBody)(object)new ReadOnlyMemory<byte>(bodyBuffer));
         }
 
         if (typeof(TBody) == typeof(string))
@@ -122,7 +132,7 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
     /// <returns></returns>
     public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services)
     {
-        if (typeof(TBody) == typeof(byte[]))
+        if (typeof(TBody) == typeof(byte[]) || typeof(TBody) == typeof(ReadOnlyMemory<byte>))
         {
             yield return new Mvc.ConsumesAttribute("application/octet-stream");
         }
@@ -132,7 +142,7 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
         }
     }
 
-    private static readonly Type[] _supportedTypes = new[] { typeof(byte[]), typeof(string) };
+    private static readonly Type[] _supportedTypes = new[] { typeof(byte[]), typeof(string), typeof(ReadOnlyMemory<byte>) };
 
     private static readonly string _unsupportedTypeExceptionMessage = $"{nameof(Body<TBody>)} only supports the following types: {Environment.NewLine}"
         + string.Join(Environment.NewLine, _supportedTypes.Select(t => t.Name).ToArray());
