@@ -12,11 +12,33 @@ public class Accepted : ResultBase, IProvideEndpointResponseMetadata
     /// <summary>
     /// Initializes a new instance of the <see cref="Accepted"/> class.
     /// </summary>
+    /// <param name="location">The location at which the status of requested content can be monitored.</param>
     /// <param name="message">An optional message to return in the response body.</param>
-    public Accepted(string? message = null)
+    public Accepted(string? location = null, string? message = null)
     {
         StatusCode = ResponseStatusCode;
         ResponseContent = message;
+        Location = location;
+    }
+
+    /// <summary>
+    /// Gets the location at which the status of the requested content can be monitored.
+    /// </summary>
+    public string? Location { get; }
+
+    /// <summary>
+    /// Writes an HTTP response reflecting the result.
+    /// </summary>
+    /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
+    /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
+    public override Task ExecuteAsync(HttpContext httpContext)
+    {
+        if (!string.IsNullOrEmpty(Location))
+        {
+            httpContext.Response.Headers.Location = Location;
+        }
+
+        return base.ExecuteAsync(httpContext);
     }
 
     /// <summary>

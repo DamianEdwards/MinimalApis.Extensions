@@ -9,7 +9,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="MinimalApis.Extensions.Results.Ok&lt;TResult&gt;" Collapsed="true">
-    <Position X="1" Y="4" Width="1.5" />
+    <Position X="1.25" Y="4" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAABAAAAAQAAAAAAAAAA=</HashCode>
       <FileName>Results\OkOfTResult.cs</FileName>
@@ -87,7 +87,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="MinimalApis.Extensions.Results.Created&lt;TResult&gt;" Collapsed="true">
-    <Position X="4.5" Y="4" Width="1.5" />
+    <Position X="4.25" Y="4" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAASAAAAAAAAAA=</HashCode>
       <FileName>Results\CreatedOfTResult.cs</FileName>
@@ -95,7 +95,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="MinimalApis.Extensions.Results.Created" Collapsed="true">
-    <Position X="6.75" Y="2.5" Width="1.5" />
+    <Position X="6.75" Y="4" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAASAAgAAAAAEA=</HashCode>
       <FileName>Results\Created.cs</FileName>
@@ -105,7 +105,7 @@
   <Class Name="MinimalApis.Extensions.Results.Accepted" Collapsed="true">
     <Position X="9" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAQAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAAABAAAAAQAAAAAAAAEA=</HashCode>
       <FileName>Results\Accepted.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
