@@ -9,7 +9,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="MinimalApis.Extensions.Results.Ok&lt;TResult&gt;" Collapsed="true">
-    <Position X="0.5" Y="4" Width="1.5" />
+    <Position X="1" Y="4" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAABAAAAAQAAAAAAAAAA=</HashCode>
       <FileName>Results\OkOfTResult.cs</FileName>
@@ -47,7 +47,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="MinimalApis.Extensions.Results.Html" Collapsed="true">
-    <Position X="11.75" Y="4" Width="1.5" />
+    <Position X="14.25" Y="4" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
       <FileName>Results\Html.cs</FileName>
@@ -71,7 +71,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="MinimalApis.Extensions.Results.ValidationProblem" Collapsed="true">
-    <Position X="5" Y="5.25" Width="1.5" />
+    <Position X="2.5" Y="6.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAQAAAAAAAAAA=</HashCode>
       <FileName>Results\ValidationProblem.cs</FileName>
@@ -79,7 +79,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="MinimalApis.Extensions.Results.Problem" Collapsed="true">
-    <Position X="5" Y="4" Width="1.5" />
+    <Position X="2.75" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAACQAAAAAAAAAAAAAAQAAQAAAAAAAAAA=</HashCode>
       <FileName>Results\Problem.cs</FileName>
@@ -87,17 +87,17 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="MinimalApis.Extensions.Results.Created&lt;TResult&gt;" Collapsed="true">
-    <Position X="2.75" Y="5.25" Width="1.5" />
+    <Position X="4.5" Y="4" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAASAAAAAAAAAA=</HashCode>
       <FileName>Results\CreatedOfTResult.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="MinimalApis.Extensions.Results.Created" Collapsed="true">
-    <Position X="2.75" Y="4" Width="1.5" />
+    <Position X="6.75" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAASAAAAAAAAEA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAASAAgAAAAAEA=</HashCode>
       <FileName>Results\Created.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -158,11 +158,12 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="MinimalApis.Extensions.Results.NotFound" Collapsed="true">
-    <Position X="14.25" Y="4" Width="1.5" />
+  <Class Name="MinimalApis.Extensions.Results.Gone" Collapsed="true">
+    <Position X="11.75" Y="4" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAQAAAAAAAAAA=</HashCode>
-      <FileName>Results\NotFound.cs</FileName>
+      <FileName>Results\Gone.cs</FileName>
+      <NewMemberFileName>Results\NotFound.cs</NewMemberFileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>

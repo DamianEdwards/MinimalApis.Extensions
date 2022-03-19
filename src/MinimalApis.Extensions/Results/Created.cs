@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status201Created"/> response.
 /// </summary>
-public class Created : Json, IProvideEndpointResponseMetadata
+public class Created : ResultBase, IProvideEndpointResponseMetadata
 {
     /// <summary>
     /// The <see cref="StatusCodes.Status201Created"/> response status code.
@@ -18,16 +18,21 @@ public class Created : Json, IProvideEndpointResponseMetadata
     /// <param name="uri">The URI the location response header will be set to.</param>
     /// <param name="value">An optional value representing the created entity.</param>
     public Created(string uri, object? value)
-        : base(value)
     {
-        Uri = uri;
         StatusCode = ResponseStatusCode;
+        Uri = uri;
+        Value = value;
     }
 
     /// <summary>
     /// Gets the URI that the location response header will be set to.
     /// </summary>
     public string Uri { get; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public object? Value { get; }
 
     /// <summary>
     /// Writes an HTTP response reflecting the result.

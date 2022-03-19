@@ -6,18 +6,28 @@ namespace MinimalApis.Extensions.Results;
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status201Created"/> response for the creation
 /// of an entity represented by the <typeparamref name="TResult"/> type.
 /// </summary>
-public class Created<TResult> : Created, IProvideEndpointResponseMetadata
+public class Created<TResult> : Json, IProvideEndpointResponseMetadata
 {
+    /// <summary>
+    /// The <see cref="StatusCodes.Status201Created"/> response status code.
+    /// </summary>
+    protected const int ResponseStatusCode = StatusCodes.Status201Created;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Created{TResult}"/> class.
     /// </summary>
     /// <param name="uri">The URI the location response header will be set to.</param>
     /// <param name="value">An optional value representing the created entity.</param>
     public Created(string uri, TResult? value)
-        : base(uri, value)
+        : base(value)
     {
-
+        Uri = uri;
     }
+
+    /// <summary>
+    /// Gets the URI that the location response header will be set to.
+    /// </summary>
+    public string Uri { get; }
 
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
@@ -25,7 +35,7 @@ public class Created<TResult> : Created, IProvideEndpointResponseMetadata
     /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
     /// <param name="services">The <see cref="IServiceProvider"/>.</param>
     /// <returns>The metadata.</returns>
-    public static new IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
     {
         yield return new Mvc.ProducesResponseTypeAttribute(typeof(TResult), ResponseStatusCode, JsonContentType);
     }
