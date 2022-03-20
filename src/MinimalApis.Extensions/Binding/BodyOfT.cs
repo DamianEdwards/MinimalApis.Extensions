@@ -123,11 +123,7 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
     /// <returns></returns>
     public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services)
     {
-        if (typeof(TBody) == typeof(byte[]) || typeof(TBody) == typeof(ReadOnlyMemory<byte>))
-        {
-            yield return new Mvc.ConsumesAttribute("application/octet-stream");
-        }
-        if (IsSupportedTValue(typeof(TBody)))
+        if (typeof(TBody) == typeof(string))
         {
             yield return new Mvc.ConsumesAttribute("text/plain");
         }
