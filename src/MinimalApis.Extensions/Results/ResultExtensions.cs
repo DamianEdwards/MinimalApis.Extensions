@@ -284,7 +284,7 @@ public static class ResultExtensions
     /// in HTTP API responses based on https://tools.ietf.org/html/rfc7807.JSON Problem Details due to validation errors.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
-    /// <param name="errors"></param>
+    /// <param name="errors">The validation errors.</param>
     /// <returns>The <see cref="Results.ValidationProblem"/> instance.</returns>
     public static ValidationProblem ValidationProblem(this IResultExtensions resultExtensions, Dictionary<string, string[]> errors)
     {

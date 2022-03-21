@@ -1,8 +1,7 @@
-﻿using Microsoft.Data.Sqlite;
-using Dapper;
+﻿using System.Data;
 using MinimalApis.Extensions.Results;
 using MinimalApis.Extensions.Binding;
-using System.Data;
+using Dapper;
 
 namespace TodosApi.Dapper;
 
