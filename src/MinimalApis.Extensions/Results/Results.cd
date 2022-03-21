@@ -9,19 +9,20 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="MinimalApis.Extensions.Results.Ok&lt;TResult&gt;" Collapsed="true">
-    <Position X="1.25" Y="4" Width="1.5" />
+    <Position X="4.25" Y="5.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAABAAAAAQAAAAAAAAAA=</HashCode>
+      <HashCode>AIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAgAAAAAEA=</HashCode>
       <FileName>Results\OkOfTResult.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="MinimalApis.Extensions.Results.Json" Collapsed="true">
-    <Position X="2.75" Y="2.5" Width="1.5" />
+    <Position X="4.25" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AIAAAEAAAAAAACAAAAAAAAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AIAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAYAAgAAAAAEA=</HashCode>
       <FileName>Results\Json.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="MinimalApis.Extensions.Results.RedirectPermanent" Collapsed="true">
     <Position X="9" Y="6.5" Width="1.75" />
@@ -54,14 +55,6 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="MinimalApis.Extensions.Results.ObjectResult" Collapsed="true">
-    <Position X="2.75" Y="0.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAIAAAAAAAAACAAAAAAAAAAAAAAAQAAIAAwAAAAAEA=</HashCode>
-      <FileName>Results\ObjectResult.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
   <Class Name="MinimalApis.Extensions.Results.ResultBase" Collapsed="true">
     <Position X="10.5" Y="0.75" Width="1.5" />
     <TypeIdentifier>
@@ -71,17 +64,17 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="MinimalApis.Extensions.Results.ValidationProblem" Collapsed="true">
-    <Position X="2.5" Y="6.5" Width="2" />
+    <Position X="1.25" Y="4" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAQAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
       <FileName>Results\ValidationProblem.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="MinimalApis.Extensions.Results.Problem" Collapsed="true">
-    <Position X="2.75" Y="5.25" Width="1.5" />
+    <Position X="1.5" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAACQAAAAAAAAAAAAAAQAAQAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQaAAQAAAAAEA=</HashCode>
       <FileName>Results\Problem.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -89,7 +82,7 @@
   <Class Name="MinimalApis.Extensions.Results.Created&lt;TResult&gt;" Collapsed="true">
     <Position X="4.25" Y="4" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAASAAAAAAAAAA=</HashCode>
+      <HashCode>AIAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAgAAAAAEA=</HashCode>
       <FileName>Results\CreatedOfTResult.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -143,7 +136,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="MinimalApis.Extensions.Results.FromFile" Collapsed="true">
-    <Position X="6.75" Y="0.75" Width="1.5" />
+    <Position X="6.75" Y="2.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAEAAAgAAAAAAAACAAAAAABBAAAAAAIAAACAAEA=</HashCode>
       <FileName>Results\FromFile.cs</FileName>

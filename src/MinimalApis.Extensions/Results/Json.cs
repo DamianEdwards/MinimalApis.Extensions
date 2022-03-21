@@ -1,27 +1,33 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
+using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Results;
 
 /// <summary>
 /// Represents an <see cref="IResult"/> that serializes an object to JSON content in the response body.
 /// </summary>
-public class Json : ObjectResult
+public class Json : IResult, IProvideEndpointResponseMetadata
 {
-    /// <summary>
-    /// The <c>application/json</c> media type.
-    /// </summary>
-    protected const string JsonContentType = "application/json";
+    private const string JsonContentType = "application/json";
 
     /// <summary>
     /// Initializes a new intance of the <see cref="Json"/> class.
     /// </summary>
     /// <param name="value">The value to serialize as JSON to the response body.</param>
     public Json(object? value)
-        : base(value)
     {
-
+        Value = value;
     }
+
+    /// <summary>
+    /// Gets the value to be serialized to the response body.
+    /// </summary>
+    public object? Value { get; }
+
+    /// <summary>
+    /// Gets or sets the response status code.
+    /// </summary>
+    public int? StatusCode { get; init; }
 
     /// <summary>
     /// The <see cref="JsonSerializerOptions"/> to use when writing the response body JSON content.
@@ -29,18 +35,28 @@ public class Json : ObjectResult
     public JsonSerializerOptions? JsonSerializerOptions { get; init; }
 
     /// <summary>
-    /// Gets the default content type to use for the response if one isn't specified via <see cref="ObjectResult.ContentType"/>.
+    /// Writes an HTTP response reflecting the result.
     /// </summary>
-    public override string DefaultContentType => $"{JsonContentType}; charset=utf-8";
+    /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
+    /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
+    public virtual async Task ExecuteAsync(HttpContext httpContext)
+    {
+        if (StatusCode is { } code)
+        {
+            httpContext.Response.StatusCode = code;
+        }
+
+        await httpContext.Response.WriteAsJsonAsync(Value, JsonSerializerOptions, JsonContentType);
+    }
 
     /// <summary>
-    /// Writes the response body JSON content.
+    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="httpContext">The <see cref="HttpContext"/> for the response.</param>
-    /// <param name="contentTypeEncoding">The <see cref="Encoding"/> to encode the response content with.</param>
-    /// <returns>A <see cref="Task"/> that represents the asynchronous write operation.</returns>
-    protected override async Task WriteResult(HttpContext httpContext, Encoding contentTypeEncoding)
+    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
+    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <returns>The metadata.</returns>
+    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
     {
-        await httpContext.Response.WriteAsJsonAsync(Value, JsonSerializerOptions, httpContext.Response.ContentType);
+        yield return new Mvc.ProducesAttribute(JsonContentType);
     }
 }

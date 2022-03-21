@@ -1,5 +1,4 @@
 ﻿using System.Buffers;
-using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -9,7 +8,22 @@ using MinimalApis.Extensions.Metadata;
 namespace MinimalApis.Extensions.Binding;
 
 /// <summary>
-/// 
+/// Represents the request body read into the type specified by <typeparamref name="TBody"/>.
+/// <para>
+/// The following types are supported:
+/// <list type="bullet">
+/// <item><see cref="String"/>, i.e. <c>Body&lt;string&gt;</c></item>
+/// <item><see cref="T:byte[]"/>, i.e. <c>Body&lt;byte[]&gt;</c></item>
+/// <item><see cref="ReadOnlyMemory{Byte}"/>, i.e. <c>Body&lt;ReadOnlyMemory&lt;byte&gt;&gt;</c></item>
+/// </list>
+/// </para>
+/// <example>
+/// Use the <see cref="MaxLengthAttribute"/> to set the size of the request body accepted:
+/// <code>
+/// app.MapPost("/myapi", ([MaxLength(100)]Body&lt;string&gt; body) => $"Received: {body}");
+/// </code>
+/// Max accepted request body size defaults to <c>84999</c> bytes to prevent allocations to the <see href="https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap">Large Object Heap</see>.
+/// </example>
 /// </summary>
 /// <typeparam name="TBody"></typeparam>
 public record struct Body<TBody> : IProvideEndpointParameterMetadata
@@ -19,10 +33,10 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
     private static readonly ConditionalWeakTable<ParameterInfo, MaxLengthAttribute?> _paramMaxLengthAttrCache = new();
 
     /// <summary>
-    /// 
+    /// Initializes a new instance of the <see cref="Body{TBody}"/> class.
     /// </summary>
-    /// <param name="value"></param>
-    /// <exception cref="ArgumentException"></exception>
+    /// <param name="value">The body value.</param>
+    /// <exception cref="ArgumentException">Thrown when <typeparamref name="TBody"/> is not one of the supported types.</exception>
     public Body(TBody value)
     {
         if (!IsSupportedTValue(typeof(TBody)))
@@ -34,28 +48,32 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
     }
 
     /// <summary>
-    /// 
+    /// Gets the body value.
     /// </summary>
     public TBody Value { get; }
 
     /// <summary>
-    /// 
+    /// Gets the result of calling <c><see cref="Value"/>.ToString()</c>.
     /// </summary>
     /// <returns></returns>
     public override string? ToString() => Value?.ToString();
 
     /// <summary>
-    /// 
+    /// Gets <see cref="Body{TBody}"/> as <typeparamref name="TBody"/>.
     /// </summary>
     /// <param name="value"></param>
     public static implicit operator TBody(Body<TBody> value) => value.Value;
 
     /// <summary>
-    /// 
+    /// Binds the specified parameter from <see cref="HttpContext.Request"/>. This method is called by the framework on your behalf
+    /// when populating parameters of a mapped route handler.
     /// </summary>
-    /// <param name="context"></param>
-    /// <param name="parameter"></param>
-    /// <returns></returns>
+    /// <param name="context">The <see cref="HttpContext"/> to bind the parameter from.</param>
+    /// <param name="parameter">The route handler parameter being bound to.</param>
+    /// <returns>An instance of <see cref="Body{TValue}"/>.</returns>
+    /// <exception cref="ArgumentException">Thrown when <typeparamref name="TBody"/> is not one of the supported types.</exception>
+    /// <exception cref="BadHttpRequestException">Thrown when the request body exceeds the maximum size allowed.</exception>
+    /// <exception cref="OperationCanceledException">Thrown when reading the request body is canceled.</exception>
     public static async ValueTask<Body<TBody>> BindAsync(HttpContext context, ParameterInfo parameter)
     {
         if (!IsSupportedTValue(typeof(TBody)))
@@ -112,15 +130,16 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
             context.Request.BodyReader.AdvanceTo(position);
         }
 
-        throw new InvalidOperationException(_unsupportedTypeExceptionMessage);
+        // Should never hit here
+        throw new InvalidOperationException("Supported types mismatch.");
     }
 
     /// <summary>
-    /// 
+    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="parameter"></param>
-    /// <param name="services"></param>
-    /// <returns></returns>
+    /// <param name="parameter">The parameter to provide metadata for.</param>
+    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <returns>The metadata.</returns>
     public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services)
     {
         if (typeof(TBody) == typeof(string))

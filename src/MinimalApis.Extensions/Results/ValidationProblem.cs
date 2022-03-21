@@ -3,13 +3,11 @@
 namespace MinimalApis.Extensions.Results;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a response with a machine-readable format for specifying validation errors
-/// in HTTP API responses based on https://tools.ietf.org/html/rfc7807.JSON Problem Details response body.
+/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status400BadRequest"/> response with a machine-readable format
+/// for specifying validation errors in HTTP API responses based on https://tools.ietf.org/html/rfc7807.JSON Problem Details response body.
 /// </summary>
 public class ValidationProblem : Problem, IProvideEndpointResponseMetadata
 {
-    private const int ResponseStatusCode = StatusCodes.Status400BadRequest;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidationProblem"/> class.
     /// </summary>
@@ -18,7 +16,7 @@ public class ValidationProblem : Problem, IProvideEndpointResponseMetadata
         : base(new HttpValidationProblemDetails(errors)
         {
             Title = "One or more validation errors occurred.",
-            Status = ResponseStatusCode
+            Status = StatusCodes.Status400BadRequest
         })
     {
 
@@ -32,6 +30,6 @@ public class ValidationProblem : Problem, IProvideEndpointResponseMetadata
     /// <returns>The metadata.</returns>
     public static new IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(typeof(HttpValidationProblemDetails), ResponseStatusCode, ResponseContentType);
+        yield return new Mvc.ProducesResponseTypeAttribute(typeof(HttpValidationProblemDetails), StatusCodes.Status400BadRequest, ProblemJsonContentType);
     }
 }
