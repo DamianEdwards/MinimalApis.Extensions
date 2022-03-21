@@ -144,7 +144,7 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
     {
         if (typeof(TBody) == typeof(string))
         {
-            yield return new Mvc.ConsumesAttribute("text/plain");
+            yield return new Mvc.ConsumesAttribute(typeof(string), "text/plain");
         }
     }
 

@@ -36,14 +36,6 @@ app.MapGet("/error", () => Results.Problem("An error occurred.", statusCode: 500
 
 app.MapTodosApi();
 
-// TEMP: These don't belong here and will be removed/moved later
-app.MapPost("/bodyas/bytes", (Body<byte[]> body) => $"Received {body.Value.Length} bytes")
-    .Accepts<string>("text/plain");
-app.MapPost("/bodyas/rom", (Body<ReadOnlyMemory<byte>> body) => $"Received {body.Value.Length} bytes")
-    .Accepts<string>("text/plain");
-app.MapPost("/bodyas/string", (Body<string> body) => $"Received: {body}");
-app.MapPost("/bodyas/string/max100", ([MaxLength(100)]Body<string> body) => $"Received: {body}");
-
 app.MapFallback(([FromHeader]string? accept) =>
     accept?.Contains("application/json") == true
         ? Results.Redirect("/swagger/v1/swagger.json")
