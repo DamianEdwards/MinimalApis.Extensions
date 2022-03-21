@@ -8,7 +8,8 @@ using MinimalApis.Extensions.Metadata;
 namespace MinimalApis.Extensions.Binding;
 
 /// <summary>
-/// Represents the request body read into the type specified by <typeparamref name="TBody"/>.
+/// Represents the request body read into the type specified by <typeparamref name="TBody"/>.<br/>
+/// Max accepted request body size defaults to <c>84999</c> bytes to prevent allocations to the <see href="https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap">Large Object Heap</see>.
 /// <para>
 /// The following types are supported:
 /// <list type="bullet">
@@ -22,10 +23,19 @@ namespace MinimalApis.Extensions.Binding;
 /// <code>
 /// app.MapPost("/myapi", ([MaxLength(100)]Body&lt;string&gt; body) => $"Received: {body}");
 /// </code>
-/// Max accepted request body size defaults to <c>84999</c> bytes to prevent allocations to the <see href="https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap">Large Object Heap</see>.
 /// </example>
 /// </summary>
-/// <typeparam name="TBody"></typeparam>
+/// <typeparam name="TBody">
+/// The type to read the request body into.
+/// <para>
+/// The following types are supported:
+/// <list type="bullet">
+/// <item><see cref="String"/>, i.e. <c>Body&lt;string&gt;</c></item>
+/// <item><see cref="T:byte[]"/>, i.e. <c>Body&lt;byte[]&gt;</c></item>
+/// <item><see cref="ReadOnlyMemory{Byte}"/>, i.e. <c>Body&lt;ReadOnlyMemory&lt;byte&gt;&gt;</c></item>
+/// </list>
+/// </para>
+/// </typeparam>
 public record struct Body<TBody> : IProvideEndpointParameterMetadata
 {
     // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap
