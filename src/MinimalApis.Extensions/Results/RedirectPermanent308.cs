@@ -15,8 +15,10 @@ public class RedirectPermanent308 : ResultBase, IProvideEndpointResponseMetadata
     /// <param name="uri">The URI to redirect to.</param>
     public RedirectPermanent308(string uri)
     {
-        StatusCode = ResponseStatusCode;
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+
         Uri = uri;
+        StatusCode = ResponseStatusCode;
     }
 
     /// <summary>
@@ -27,6 +29,8 @@ public class RedirectPermanent308 : ResultBase, IProvideEndpointResponseMetadata
     /// <inheritdoc />
     public override Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+
         httpContext.Response.Headers.Location = Uri;
 
         return base.ExecuteAsync(httpContext);

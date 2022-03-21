@@ -27,6 +27,9 @@ public class EndpointProvidesMetadataApiDescriptionProvider : IApiDescriptionPro
     /// <param name="endpointDataSource">The <see cref="EndpointDataSource"/>.</param>
     public EndpointProvidesMetadataApiDescriptionProvider(IServiceProvider services, EndpointDataSource endpointDataSource)
     {
+        ArgumentNullException.ThrowIfNull(services, nameof(services));
+        ArgumentNullException.ThrowIfNull(endpointDataSource, nameof(endpointDataSource));
+
         _services = services;
         _endpointDataSource = endpointDataSource;
     }
@@ -56,6 +59,8 @@ public class EndpointProvidesMetadataApiDescriptionProvider : IApiDescriptionPro
     /// </exception>
     public void OnProvidersExecuted(ApiDescriptionProviderContext context)
     {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+
         foreach (var endpoint in _endpointDataSource.Endpoints.OfType<RouteEndpoint>())
         {
             var method = endpoint.Metadata.GetMetadata<MethodInfo>();

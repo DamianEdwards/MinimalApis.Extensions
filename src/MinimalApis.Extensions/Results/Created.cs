@@ -43,6 +43,8 @@ public class Created : ResultBase, IProvideEndpointResponseMetadata
     /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
     public override Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+
         httpContext.Response.Headers.Location = Uri;
         return base.ExecuteAsync(httpContext);
     }

@@ -27,6 +27,8 @@ public class SuppressDefaultResponse<TValue> : IProvideEndpointParameterMetadata
     /// <param name="exception">The <see cref="Exception"/>.</param>
     public SuppressDefaultResponse(Exception exception)
     {
+        ArgumentNullException.ThrowIfNull(exception, nameof(exception));
+
         Exception = exception;
     }
 
@@ -49,15 +51,18 @@ public class SuppressDefaultResponse<TValue> : IProvideEndpointParameterMetadata
     /// Binds the specified parameter from <see cref="HttpContext.Request"/>. This method is called by the framework on your behalf
     /// when populating parameters of a mapped route handler.
     /// </summary>
-    /// <param name="httpContext">The <see cref="HttpContext"/> to bind the parameter from.</param>
+    /// <param name="context">The <see cref="HttpContext"/> to bind the parameter from.</param>
     /// <param name="parameter">The route handler parameter being bound to.</param>
     /// <returns>An instance of <see cref="SuppressDefaultResponse{TValue}"/>.</returns>
-    public static async ValueTask<SuppressDefaultResponse<TValue?>> BindAsync(HttpContext httpContext, ParameterInfo parameter)
+    public static async ValueTask<SuppressDefaultResponse<TValue?>> BindAsync(HttpContext context, ParameterInfo parameter)
     {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+
         try
         {
             // Manually invoke the default binding logic
-            var (boundValue, statusCode) = await DefaultBinder<TValue>.GetValueAsync(httpContext);
+            var (boundValue, statusCode) = await DefaultBinder<TValue>.GetValueAsync(context);
             return new SuppressDefaultResponse<TValue?>(boundValue, statusCode);
         }
         catch (Exception ex)

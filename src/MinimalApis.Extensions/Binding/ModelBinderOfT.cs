@@ -33,6 +33,8 @@ public class ModelBinder<TValue> : IProvideEndpointParameterMetadata
     /// <param name="modelState">The <see cref="ModelStateDictionary"/>.</param>
     public ModelBinder(TValue? model, ModelStateDictionary modelState)
     {
+        ArgumentNullException.ThrowIfNull(modelState, nameof(modelState));
+
         Model = model;
         ModelState = modelState;
     }

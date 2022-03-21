@@ -18,8 +18,8 @@ public class Ok : ResultBase, IProvideEndpointResponseMetadata
     /// <param name="message">An optional message to return in the response body.</param>
     public Ok(string? message = null)
     {
-        StatusCode = ResponseStatusCode;
         ResponseContent = message;
+        StatusCode = ResponseStatusCode;
     }
 
     /// <summary>

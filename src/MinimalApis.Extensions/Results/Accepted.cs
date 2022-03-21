@@ -16,9 +16,9 @@ public class Accepted : ResultBase, IProvideEndpointResponseMetadata
     /// <param name="message">An optional message to return in the response body.</param>
     public Accepted(string? location = null, string? message = null)
     {
-        StatusCode = ResponseStatusCode;
-        ResponseContent = message;
         Location = location;
+        ResponseContent = message;
+        StatusCode = ResponseStatusCode;
     }
 
     /// <summary>
@@ -33,6 +33,8 @@ public class Accepted : ResultBase, IProvideEndpointResponseMetadata
     /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
     public override Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+
         if (!string.IsNullOrEmpty(Location))
         {
             httpContext.Response.Headers.Location = Location;

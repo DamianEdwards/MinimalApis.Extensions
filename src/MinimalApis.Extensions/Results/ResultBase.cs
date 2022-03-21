@@ -32,6 +32,8 @@ public abstract class ResultBase : IResult
     /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
     public virtual async Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+
         var response = httpContext.Response;
 
         if (StatusCode != null)

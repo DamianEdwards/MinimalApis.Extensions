@@ -8,16 +8,17 @@ namespace MinimalApis.Extensions.Results;
 public class Html : ResultBase, IProvideEndpointResponseMetadata
 {
     private const string HtmlMediaType = "text/html";
+    private const int ResponseStatusCode = StatusCodes.Status200OK;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Html"/> class.
     /// </summary>
     /// <param name="html">The HTML to return in the response body.</param>
-    public Html(string html)
+    public Html(string? html)
     {
-        StatusCode = StatusCodes.Status200OK;
-        ContentType = HtmlMediaType;
         ResponseContent = html;
+        ContentType = HtmlMediaType;
+        StatusCode = ResponseStatusCode;
     }
 
     /// <summary>
@@ -28,6 +29,7 @@ public class Html : ResultBase, IProvideEndpointResponseMetadata
     /// <returns>The metadata.</returns>
     public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
     {
+        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
         yield return new Mvc.ProducesAttribute(HtmlMediaType);
     }
 }

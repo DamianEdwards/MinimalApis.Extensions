@@ -14,11 +14,11 @@ public class PlainText : ResultBase, IProvideEndpointResponseMetadata
     /// Initializes a new instance of the <see cref="PlainText"/> class.
     /// </summary>
     /// <param name="text">The text to write to the response body.</param>
-    public PlainText(string text)
+    public PlainText(string? text)
     {
-        StatusCode = ResponseStatusCode;
-        ContentType = PlainTextMediaType;
         ResponseContent = text;
+        ContentType = PlainTextMediaType;
+        StatusCode = ResponseStatusCode;
     }
 
     /// <summary>

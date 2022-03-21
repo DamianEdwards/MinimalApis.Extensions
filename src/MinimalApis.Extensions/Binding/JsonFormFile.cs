@@ -48,6 +48,9 @@ public class JsonFormFile<TValue> : JsonFormFile, IProvideEndpointParameterMetad
     /// deserialized from the posted file, otherwise <c>null</c>.</returns>
     public static new async ValueTask<JsonFormFile<TValue>?> BindAsync(HttpContext context, ParameterInfo parameter)
     {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+
         var jsonFile = await JsonFormFile.BindAsync(context, parameter);
 
         if (jsonFile is not null)

@@ -19,6 +19,8 @@ public class Created<TResult> : IResult, IProvideEndpointResponseMetadata
     /// <param name="value">An optional value representing the created entity.</param>
     public Created(string uri, TResult? value)
     {
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+
         Uri = uri;
         Value = value;
     }
@@ -45,10 +47,11 @@ public class Created<TResult> : IResult, IProvideEndpointResponseMetadata
     /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
     public async Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+
         var response = httpContext.Response;
 
         response.StatusCode = StatusCode;
-
         response.Headers.Location = Uri;
 
         if (Value is not null)

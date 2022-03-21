@@ -18,6 +18,8 @@ public class Ok<TResult> : IResult, IProvideEndpointResponseMetadata
     /// <param name="value">The object to serialize to the response body.</param>
     public Ok(TResult value)
     {
+        ArgumentNullException.ThrowIfNull(value, nameof(value));
+
         Value = value;
     }
 
@@ -38,6 +40,8 @@ public class Ok<TResult> : IResult, IProvideEndpointResponseMetadata
     /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
     public async Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+
         var response = httpContext.Response;
 
         response.StatusCode = StatusCode;

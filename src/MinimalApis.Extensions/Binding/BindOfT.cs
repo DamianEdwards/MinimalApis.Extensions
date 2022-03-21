@@ -46,6 +46,9 @@ public struct Bind<TValue> : IProvideEndpointParameterMetadata
     /// <exception cref="BadHttpRequestException">Thrown if the default binding logic results in a status code other than <see cref="StatusCodes.Status200OK"/>.</exception>
     public static async ValueTask<Bind<TValue?>> BindAsync(HttpContext context, ParameterInfo parameter)
     {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+
         var logger = context.RequestServices.GetRequiredService<ILogger<Bind<TValue>>>();
 
         var binder = LookupBinder(context.RequestServices, logger);

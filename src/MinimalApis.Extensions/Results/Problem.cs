@@ -20,6 +20,8 @@ public class Problem : IResult, IProvideEndpointResponseMetadata
     /// <param name="problemDetails">The <see cref="Mvc.ProblemDetails"/> that details the problem.</param>
     public Problem(Mvc.ProblemDetails problemDetails)
     {
+        ArgumentNullException.ThrowIfNull(problemDetails, nameof(problemDetails));
+
         ProblemDetails = problemDetails;
     }
 
@@ -51,6 +53,8 @@ public class Problem : IResult, IProvideEndpointResponseMetadata
     /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
     public async Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(() => httpContext, nameof(httpContext));
+
         var response = httpContext.Response;
 
         if (ProblemDetails.Status is null)

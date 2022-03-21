@@ -15,8 +15,8 @@ public class UnsupportedMediaType : ResultBase, IProvideEndpointResponseMetadata
     /// <param name="message">An optional message to return in the response body.</param>
     public UnsupportedMediaType(string? message = null)
     {
-        StatusCode = ResponseStatusCode;
         ResponseContent = message;
+        StatusCode = ResponseStatusCode;
     }
 
     /// <summary>

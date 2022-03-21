@@ -86,6 +86,9 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
     /// <exception cref="OperationCanceledException">Thrown when reading the request body is canceled.</exception>
     public static async ValueTask<Body<TBody>> BindAsync(HttpContext context, ParameterInfo parameter)
     {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+
         if (!IsSupportedTValue(typeof(TBody)))
         {
             throw new ArgumentException(_unsupportedTypeExceptionMessage, nameof(TBody));
