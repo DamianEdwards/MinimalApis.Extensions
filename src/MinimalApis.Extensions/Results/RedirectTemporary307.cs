@@ -5,29 +5,33 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status307TemporaryRedirect"/> redirect response.
 /// </summary>
-public class RedirectTemporary307 : StatusCode, IProvideEndpointResponseMetadata
+public class RedirectTemporary307 : ResultBase, IProvideEndpointResponseMetadata
 {
     private const int ResponseStatusCode = StatusCodes.Status307TemporaryRedirect;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RedirectTemporary307"/> class.
     /// </summary>
-    /// <param name="url">The URL to redirect to.</param>
-    public RedirectTemporary307(string url)
-        : base(ResponseStatusCode, null)
+    /// <param name="uri">The URI to redirect to.</param>
+    public RedirectTemporary307(string uri)
     {
-        Url = url;
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+
+        Uri = uri;
+        StatusCode = ResponseStatusCode;
     }
 
     /// <summary>
-    /// The URL to redirect to.
+    /// The URI to redirect to.
     /// </summary>
-    public string Url { get; init; }
+    public string Uri { get; init; }
 
     /// <inheritdoc />
     public override Task ExecuteAsync(HttpContext httpContext)
     {
-        httpContext.Response.Headers.Location = Url;
+        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+
+        httpContext.Response.Headers.Location = Uri;
 
         return base.ExecuteAsync(httpContext);
     }

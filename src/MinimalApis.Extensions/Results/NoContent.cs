@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status204NoContent"/> response.
 /// </summary>
-public class NoContent : StatusCode, IProvideEndpointResponseMetadata
+public class NoContent : ResultBase, IProvideEndpointResponseMetadata
 {
     private const int ResponseStatusCode = StatusCodes.Status204NoContent;
 
@@ -13,9 +13,8 @@ public class NoContent : StatusCode, IProvideEndpointResponseMetadata
     /// Initializes a new instance of the <see cref="NoContent"/> class.
     /// </summary>
     public NoContent()
-        : base(ResponseStatusCode, null)
     {
-
+        StatusCode = ResponseStatusCode;
     }
 
     /// <summary>

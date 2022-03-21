@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> that returns non-streamed content in the response body.
 /// </summary>
-public abstract class ContentResult : IResult
+public abstract class ResultBase : IResult
 {
     private const string DefaultContentType = "text/plain; charset=utf-8";
     private static readonly Encoding DefaultEncoding = Encoding.UTF8;
@@ -32,6 +32,8 @@ public abstract class ContentResult : IResult
     /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
     public virtual async Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+
         var response = httpContext.Response;
 
         if (StatusCode != null)
@@ -50,6 +52,7 @@ public abstract class ContentResult : IResult
                 out var resolvedContentTypeEncoding);
 
             response.ContentType = resolvedContentType;
+
             response.ContentLength = resolvedContentTypeEncoding.GetByteCount(ResponseContent);
             await response.WriteAsync(ResponseContent, resolvedContentTypeEncoding);
         }

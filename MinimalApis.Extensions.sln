@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		Directory.Build.props = Directory.Build.props
 		global.json = global.json
+		ThirdPartyNotices.txt = ThirdPartyNotices.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{A68B668C-5E11-40C1-89D8-E0F03AE5B46E}"
@@ -31,9 +32,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MinimalApis.Extensions.Unit
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{6EE14C7D-4E97-488B-A271-D96DE79B13B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodosApi.Dapper", "samples\TodosApi.Dapper\TodosApi.Dapper.csproj", "{A0C2B33F-9634-47B0-97EF-1D409B511AD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodosApi.Dapper", "samples\TodosApi.Dapper\TodosApi.Dapper.csproj", "{A0C2B33F-9634-47B0-97EF-1D409B511AD8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodosApi.Dapper.UnitTests", "tests\TodosApi.Dapper.UnitTests\TodosApi.Dapper.UnitTests.csproj", "{8E932EED-380C-4D06-989D-AF7FEC41FA60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodosApi.Dapper.UnitTests", "tests\TodosApi.Dapper.UnitTests\TodosApi.Dapper.UnitTests.csproj", "{8E932EED-380C-4D06-989D-AF7FEC41FA60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalApis.Examples", "samples\MinimalApis.Examples\MinimalApis.Examples.csproj", "{5A3256CE-6DE1-4753-8A3F-8B8AC6929C6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +60,10 @@ Global
 		{8E932EED-380C-4D06-989D-AF7FEC41FA60}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E932EED-380C-4D06-989D-AF7FEC41FA60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E932EED-380C-4D06-989D-AF7FEC41FA60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A3256CE-6DE1-4753-8A3F-8B8AC6929C6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A3256CE-6DE1-4753-8A3F-8B8AC6929C6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A3256CE-6DE1-4753-8A3F-8B8AC6929C6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A3256CE-6DE1-4753-8A3F-8B8AC6929C6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -68,6 +75,7 @@ Global
 		{55D2B60C-44E4-4DE5-B11E-61697AC58E2C} = {BFC56E58-C330-4F74-A3F3-5D5E05EDB576}
 		{A0C2B33F-9634-47B0-97EF-1D409B511AD8} = {6EE14C7D-4E97-488B-A271-D96DE79B13B6}
 		{8E932EED-380C-4D06-989D-AF7FEC41FA60} = {BFC56E58-C330-4F74-A3F3-5D5E05EDB576}
+		{5A3256CE-6DE1-4753-8A3F-8B8AC6929C6A} = {6EE14C7D-4E97-488B-A271-D96DE79B13B6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {72796434-AD5B-426F-A0BE-0B08B3B611D2}

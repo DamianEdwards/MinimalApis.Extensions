@@ -6,6 +6,7 @@ using Microsoft.Data.Sqlite;
 using Dapper;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using TodosApi.Dapper;
+using MinimalApis.Extensions.Binding;
 
 var builder = WebApplication.CreateBuilder(args);
 

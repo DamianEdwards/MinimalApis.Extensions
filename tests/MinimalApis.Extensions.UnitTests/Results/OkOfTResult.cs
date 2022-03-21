@@ -21,22 +21,4 @@ public class OkOfTResult
 
         Assert.Equal(resultObject, result.Value);
     }
-
-    [Fact]
-    public void Result_Is_OriginalObject()
-    {
-        var resultObject = new { };
-        var result = new Ok<object>(resultObject);
-
-        Assert.Equal(resultObject, result.Result);
-    }
-
-    [Fact]
-    public void DefaultContentType_Is_Json()
-    {
-        var resultObject = new { };
-        var result = new Ok<object>(resultObject);
-
-        Assert.Equal("application/json; charset=utf-8", result.DefaultContentType);
-    }
 }

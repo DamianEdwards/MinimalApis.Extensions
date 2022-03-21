@@ -3,21 +3,19 @@
 namespace MinimalApis.Extensions.Results;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status200OK"/> response with a plain text response body.
+/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status410Gone"/> response.
 /// </summary>
-public class PlainText : ResultBase, IProvideEndpointResponseMetadata
+public class Gone : ResultBase, IProvideEndpointResponseMetadata
 {
-    private const string PlainTextMediaType = "text/plain";
-    private const int ResponseStatusCode = StatusCodes.Status200OK;
+    private const int ResponseStatusCode = StatusCodes.Status410Gone;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PlainText"/> class.
+    /// Initializes a new instance of the <see cref="Gone"/> class.
     /// </summary>
-    /// <param name="text">The text to write to the response body.</param>
-    public PlainText(string? text)
+    /// <param name="message">An optional message to return in the response body.</param>
+    public Gone(string? message = null)
     {
-        ResponseContent = text;
-        ContentType = PlainTextMediaType;
+        ResponseContent = message;
         StatusCode = ResponseStatusCode;
     }
 
@@ -30,6 +28,5 @@ public class PlainText : ResultBase, IProvideEndpointResponseMetadata
     public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
     {
         yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
-        yield return new Mvc.ProducesAttribute(PlainTextMediaType);
     }
 }

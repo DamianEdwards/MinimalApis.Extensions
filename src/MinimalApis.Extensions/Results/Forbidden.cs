@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status403Forbidden"/> response.
 /// </summary>
-public class Forbidden : StatusCode, IProvideEndpointResponseMetadata
+public class Forbidden : ResultBase, IProvideEndpointResponseMetadata
 {
     private const int ResponseStatusCode = StatusCodes.Status403Forbidden;
 
@@ -14,9 +14,9 @@ public class Forbidden : StatusCode, IProvideEndpointResponseMetadata
     /// </summary>
     /// <param name="message">An optional message to return in the response body.</param>
     public Forbidden(string? message = null)
-        : base(ResponseStatusCode, message)
     {
-
+        ResponseContent = message;
+        StatusCode = ResponseStatusCode;
     }
 
     /// <summary>

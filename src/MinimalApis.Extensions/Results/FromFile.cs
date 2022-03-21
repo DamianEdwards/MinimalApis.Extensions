@@ -28,6 +28,8 @@ public class FromFile : IResult
     /// <param name="contentTypeProvider">An option <see cref="IContentTypeProvider"/> to use to lookup the content type from the file name extension. Defaults to <see cref="FileExtensionContentTypeProvider"/>.</param>
     public FromFile(string filePath, string? contentType, int? statusCode, IFileProvider? fileProvider = null, IContentTypeProvider? contentTypeProvider = null)
     {
+        ArgumentNullException.ThrowIfNull(filePath, nameof(filePath));
+
         _filePath = filePath;
         _contentType = contentType;
         _statusCode = statusCode;
@@ -42,6 +44,8 @@ public class FromFile : IResult
     /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
     public async Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+
         var fileProvider = _fileProvider ?? httpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().ContentRootFileProvider;
         var file = fileProvider.GetFileInfo(_filePath);
 

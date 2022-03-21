@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status201Created"/> response.
 /// </summary>
-public class Created : Json, IProvideEndpointResponseMetadata
+public class Created : ResultBase, IProvideEndpointResponseMetadata
 {
     /// <summary>
     /// The <see cref="StatusCodes.Status201Created"/> response status code.
@@ -18,9 +18,11 @@ public class Created : Json, IProvideEndpointResponseMetadata
     /// <param name="uri">The URI the location response header will be set to.</param>
     /// <param name="value">An optional value representing the created entity.</param>
     public Created(string uri, object? value)
-        : base(value)
     {
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+
         Uri = uri;
+        Value = value;
         StatusCode = ResponseStatusCode;
     }
 
@@ -30,12 +32,19 @@ public class Created : Json, IProvideEndpointResponseMetadata
     public string Uri { get; }
 
     /// <summary>
+    /// 
+    /// </summary>
+    public object? Value { get; }
+
+    /// <summary>
     /// Writes an HTTP response reflecting the result.
     /// </summary>
     /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
     /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
     public override Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+
         httpContext.Response.Headers.Location = Uri;
         return base.ExecuteAsync(httpContext);
     }

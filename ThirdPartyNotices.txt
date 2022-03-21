@@ -9,6 +9,7 @@ bring it to my attention. Post an issue or email me:
 The attached notices are provided for information only.
 
 License notice for ASP.NET Core (https://github.com/dotnet/aspnetcore/blob/main/LICENSE.txt)
+License notice for .NET Core (https://github.com/dotnet/runtime/blob/main/LICENSE.TXT)
 ------------------------------------
 
 The MIT License (MIT)

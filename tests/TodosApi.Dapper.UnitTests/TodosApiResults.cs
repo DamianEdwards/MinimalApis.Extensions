@@ -50,7 +50,7 @@ public class TodosApiResults
 
         var result = await TodosApi.GetAllTodos(db.Object);
 
-        Assert.Equal(0, result.Result?.Count());
+        Assert.Equal(0, result.Value?.Count());
     }
 
     [Fact]
@@ -68,9 +68,9 @@ public class TodosApiResults
           .ReturnsAsync(expected);
 
         var result = await TodosApi.GetAllTodos(db.Object);
-        var resultTodos = result.Result.ToList();
+        var resultTodos = result.Value.ToList();
 
-        Assert.Equal(expected.Length, resultTodos.Count());
+        Assert.Equal(expected.Length, resultTodos.Count);
         for (int i = 0; i < expected.Length; i++)
         {
             Assert.Equal(expected[i].Id, resultTodos[i].Id);

@@ -19,10 +19,11 @@ public static class EndpointProvidesMetadataApiDescriptionProviderExtensions
     /// <returns>The <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddEndpointsProvidesMetadataApiExplorer(this IServiceCollection services)
     {
+        ArgumentNullException.ThrowIfNull(services, nameof(services));
+
         services.AddEndpointsApiExplorer();
 
-        services.TryAddEnumerable(
-            ServiceDescriptor.Transient<IApiDescriptionProvider, EndpointProvidesMetadataApiDescriptionProvider>());
+        services.TryAddEnumerable(ServiceDescriptor.Transient<IApiDescriptionProvider, EndpointProvidesMetadataApiDescriptionProvider>());
 
         return services;
     }

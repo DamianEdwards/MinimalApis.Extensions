@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status409Conflict"/> response.
 /// </summary>
-public class Conflict : StatusCode, IProvideEndpointResponseMetadata
+public class Conflict : ResultBase, IProvideEndpointResponseMetadata
 {
     private const int ResponseStatusCode = StatusCodes.Status409Conflict;
 
@@ -14,9 +14,9 @@ public class Conflict : StatusCode, IProvideEndpointResponseMetadata
     /// </summary>
     /// <param name="message">An optional message to return in the response body.</param>
     public Conflict(string? message = null)
-        : base(ResponseStatusCode, message)
     {
-
+        ResponseContent = message;
+        StatusCode = ResponseStatusCode;
     }
 
     /// <summary>

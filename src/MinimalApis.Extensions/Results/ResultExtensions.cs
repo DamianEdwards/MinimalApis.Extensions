@@ -1,6 +1,4 @@
-﻿using MinimalApis.Extensions.Binding;
-
-namespace MinimalApis.Extensions.Results;
+﻿namespace MinimalApis.Extensions.Results;
 
 /// <summary>
 /// Contains extension methods for creating typed <see cref="IResult"/> objects to return from Minimal APIs.
@@ -15,6 +13,8 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.Ok"/> instance.</returns>
     public static Ok Ok(this IResultExtensions resultExtensions, string? message = null)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+
         return new Ok(message);
     }
 
@@ -28,6 +28,8 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.Ok{TResult}"/> instance.</returns>
     public static Ok<TResult> Ok<TResult>(this IResultExtensions resultExtensions, TResult result)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+
         return new Ok<TResult>(result);
     }
 
@@ -38,6 +40,8 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.Accepted"/> instance.</returns>
     public static Accepted Accepted(this IResultExtensions resultExtensions)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+
         return new Accepted();
     }
 
@@ -48,6 +52,8 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.NoContent"/> instance.</returns>
     public static NoContent NoContent(this IResultExtensions resultExtensions)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+
         return new NoContent();
     }
 
@@ -65,6 +71,9 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.Created"/> instance.</returns>
     public static Created Created(this IResultExtensions resultExtensions, string uri, object? result)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+
         return new Created(uri, result);
     }
 
@@ -78,6 +87,9 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.Created{TResult}"/> instance.</returns>
     public static Created<TResult> Created<TResult>(this IResultExtensions resultExtensions, string uri, TResult result)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+
         return new Created<TResult>(uri, result);
     }
 
@@ -89,6 +101,8 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.Conflict"/> instance.</returns>
     public static Conflict Conflict(this IResultExtensions resultExtensions, string? message = null)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+
         return new Conflict(message);
     }
 
@@ -100,6 +114,9 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.PlainText"/> instance.</returns>
     public static PlainText PlainText(this IResultExtensions resultExtensions, string text)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+        ArgumentNullException.ThrowIfNull(text, nameof(text));
+
         return new PlainText(text);
     }
 
@@ -111,6 +128,8 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.NotFound"/> instance.</returns>
     public static NotFound NotFound(this IResultExtensions resultExtensions, string? message = null)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+
         return new NotFound(message);
     }
 
@@ -122,6 +141,8 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.BadRequest"/> instance.</returns>
     public static BadRequest BadRequest(this IResultExtensions resultExtensions, string? message = null)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+
         return new BadRequest(message);
     }
 
@@ -129,44 +150,56 @@ public static class ResultExtensions
     /// Returns a <see cref="RedirectTemporary"/> <see cref="IResult"/> with <see cref="StatusCodes.Status302Found"/>.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
-    /// <param name="url">The URL to redirect to.</param>
+    /// <param name="uri">The URI to redirect to.</param>
     /// <returns>The <see cref="RedirectTemporary"/> instance.</returns>
-    public static RedirectTemporary Redirect(this IResultExtensions resultExtensions, string url)
+    public static RedirectTemporary Redirect(this IResultExtensions resultExtensions, string uri)
     {
-        return new RedirectTemporary(url);
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+
+        return new RedirectTemporary(uri);
     }
 
     /// <summary>
     /// Returns a <see cref="Results.RedirectPermanent"/> <see cref="IResult"/> with <see cref="StatusCodes.Status301MovedPermanently"/>.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
-    /// <param name="url">The URL to redirect to.</param>
+    /// <param name="uri">The URI to redirect to.</param>
     /// <returns>The <see cref="Results.RedirectPermanent"/> instance.</returns>
-    public static RedirectPermanent RedirectPermanent(this IResultExtensions resultExtensions, string url)
+    public static RedirectPermanent RedirectPermanent(this IResultExtensions resultExtensions, string uri)
     {
-        return new RedirectPermanent(url);
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+
+        return new RedirectPermanent(uri);
     }
 
     /// <summary>
     /// Returns a <see cref="Results.RedirectTemporary307"/> <see cref="IResult"/> with <see cref="StatusCodes.Status307TemporaryRedirect"/>.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
-    /// <param name="url">The URL to redirect to.</param>
+    /// <param name="uri">The URI to redirect to.</param>
     /// <returns>The <see cref="Results.RedirectTemporary307"/> instance.</returns>
-    public static RedirectTemporary307 RedirectTemporary307(this IResultExtensions resultExtensions, string url)
+    public static RedirectTemporary307 RedirectTemporary307(this IResultExtensions resultExtensions, string uri)
     {
-        return new RedirectTemporary307(url);
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+
+        return new RedirectTemporary307(uri);
     }
 
     /// <summary>
     /// Returns a <see cref="Results.RedirectPermanent308"/> <see cref="IResult"/> with <see cref="StatusCodes.Status308PermanentRedirect"/>.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
-    /// <param name="url">The URL to redirect to.</param>
+    /// <param name="uri">The URI to redirect to.</param>
     /// <returns>The <see cref="Results.RedirectPermanent308"/> instance.</returns>
-    public static RedirectPermanent308 RedirectPermanent308(this IResultExtensions resultExtensions, string url)
+    public static RedirectPermanent308 RedirectPermanent308(this IResultExtensions resultExtensions, string uri)
     {
-        return new RedirectPermanent308(url);
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+
+        return new RedirectPermanent308(uri);
     }
 
     /// <summary>
@@ -177,6 +210,8 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.Unauthorized"/> instance.</returns>
     public static Unauthorized Unauthorized(this IResultExtensions resultExtensions, string? message = null)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+
         return new Unauthorized(message);
     }
 
@@ -188,6 +223,8 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.Forbidden"/> instance.</returns>
     public static Forbidden Forbidden(this IResultExtensions resultExtensions, string? message = null)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+
         return new Forbidden(message);
     }
 
@@ -199,6 +236,8 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.UnprocessableEntity"/> instance.</returns>
     public static UnprocessableEntity UnprocessableEntity(this IResultExtensions resultExtensions, string? message = null)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+
         return new UnprocessableEntity(message);
     }
 
@@ -210,6 +249,8 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.UnsupportedMediaType"/> instance.</returns>
     public static UnsupportedMediaType UnsupportedMediaType(this IResultExtensions resultExtensions, string? message = null)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+
         return new UnsupportedMediaType(message);
     }
 
@@ -227,6 +268,8 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.StatusCode"/> instance.</returns>
     public static StatusCode StatusCode(this IResultExtensions resultExtensions, int statusCode, string? text, string? contentType = null)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+
         return new StatusCode(statusCode, text, contentType);
     }
 
@@ -268,6 +311,8 @@ public static class ResultExtensions
     /// <returns>The <see cref="Results.Problem"/> instance.</returns>
     public static Problem Problem(this IResultExtensions resultExtensions, Mvc.ProblemDetails problemDetails, Dictionary<string, object>? extensions = null)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+
         if (extensions != null)
         {
             foreach (var extension in extensions)
@@ -284,10 +329,12 @@ public static class ResultExtensions
     /// in HTTP API responses based on https://tools.ietf.org/html/rfc7807.JSON Problem Details due to validation errors.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
-    /// <param name="errors"></param>
+    /// <param name="errors">The validation errors.</param>
     /// <returns>The <see cref="Results.ValidationProblem"/> instance.</returns>
     public static ValidationProblem ValidationProblem(this IResultExtensions resultExtensions, Dictionary<string, string[]> errors)
     {
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
+
         return new ValidationProblem(errors);
     }
 
@@ -296,28 +343,13 @@ public static class ResultExtensions
     /// in HTTP API responses based on https://tools.ietf.org/html/rfc7807.JSON Problem Details due to validation errors.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
-    /// <param name="errors"></param>
+    /// <param name="errors">The validation errors.</param>
     /// <returns>The <see cref="Results.ValidationProblem"/> instance.</returns>
     public static ValidationProblem ValidationProblem(this IResultExtensions resultExtensions, IDictionary<string, string[]> errors)
     {
-        return new ValidationProblem(errors);
-    }
+        ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="TInput"></typeparam>
-    /// <param name="resultExtensions"></param>
-    /// <param name="validatedInput"></param>
-    /// <returns></returns>
-    public static Results<ValidationProblem, Problem> ValidationProblem<TInput>(this IResultExtensions resultExtensions, Validated<TInput> validatedInput)
-    {
-        return validatedInput.DefaultBindingResultStatusCode switch
-        {
-            null => new ValidationProblem(validatedInput.Errors),
-            int sc when sc >= 400 && sc < 500 => resultExtensions.Problem(statusCode: sc),
-            _ => resultExtensions.Problem()
-        };
+        return new ValidationProblem(errors);
     }
 
     /// <summary>

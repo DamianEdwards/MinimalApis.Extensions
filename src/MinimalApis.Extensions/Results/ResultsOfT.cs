@@ -13,6 +13,8 @@ public abstract class ResultsBase : IResult
     /// <param name="activeResult">The <see cref="IResult"/> returned.</param>
     protected ResultsBase(IResult activeResult)
     {
+        ArgumentNullException.ThrowIfNull(activeResult, nameof(activeResult));
+
         Result = activeResult;
     }
 
@@ -28,6 +30,8 @@ public abstract class ResultsBase : IResult
     /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
     public async Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+
         await Result.ExecuteAsync(httpContext);
     }
 
