@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using MinimalApis.Extensions.Metadata;
 
@@ -15,7 +16,7 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
 {
     // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap
     private const int MaxSizeLessThanLOH = 84999;
-    private static readonly ConcurrentDictionary<ParameterInfo, int> _paramMaxLengthCache = new();
+    private static readonly ConditionalWeakTable<ParameterInfo, MaxLengthAttribute?> _paramMaxLengthAttrCache = new();
 
     /// <summary>
     /// 
@@ -62,8 +63,8 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
             throw new ArgumentException(_unsupportedTypeExceptionMessage, nameof(TBody));
         }
 
-        var maxBodySize = _paramMaxLengthCache.GetOrAdd(parameter,
-            static pi => pi.GetCustomAttribute<MaxLengthAttribute>()?.Length ?? MaxSizeLessThanLOH);
+        var maxBodySize = _paramMaxLengthAttrCache.GetValue(parameter,
+            static pi => pi.GetCustomAttribute<MaxLengthAttribute>())?.Length ?? MaxSizeLessThanLOH;
 
         var contentLength = context.Request.Headers.ContentLength;
 
@@ -122,11 +123,7 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
     /// <returns></returns>
     public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services)
     {
-        if (typeof(TBody) == typeof(byte[]) || typeof(TBody) == typeof(ReadOnlyMemory<byte>))
-        {
-            yield return new Mvc.ConsumesAttribute("application/octet-stream");
-        }
-        if (IsSupportedTValue(typeof(TBody)))
+        if (typeof(TBody) == typeof(string))
         {
             yield return new Mvc.ConsumesAttribute("text/plain");
         }
