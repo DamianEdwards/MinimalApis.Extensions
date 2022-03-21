@@ -20,7 +20,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapPost("/bodyas/bytes", (Body<byte[]> body) => $"Received {body.Value.Length} bytes")
-    .Accepts<string>("application/octet-stream");
+    .Accepts<byte[]>("application/octet-stream");
 app.MapPost("/bodyas/rom", (Body<ReadOnlyMemory<byte>> body) => $"Received {body.Value.Length} bytes")
     .Accepts<string>("text/plain");
 app.MapPost("/bodyas/string", (Body<string> body) => $"Received: {body}");
