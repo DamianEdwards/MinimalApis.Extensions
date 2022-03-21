@@ -7,7 +7,7 @@ namespace MinimalApis.Extensions.Results;
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status200OK"/> response that serializes an object to JSON content
 /// in the response body.
 /// </summary>
-/// <typeparam name="TResult"></typeparam>
+/// <typeparam name="TResult">The type object to be JSON serialized to the response body.</typeparam>
 public class Ok<TResult> : IResult, IProvideEndpointResponseMetadata
 {
     private const string JsonContentType = "application/json";
@@ -22,7 +22,7 @@ public class Ok<TResult> : IResult, IProvideEndpointResponseMetadata
     }
 
     /// <summary>
-    /// Gets the object that will be serialized to the response body.
+    /// Gets the value to be JSON serialized to the response body.
     /// </summary>
     public TResult Value { get; init; }
 

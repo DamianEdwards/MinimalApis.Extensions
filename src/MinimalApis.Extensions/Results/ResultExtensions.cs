@@ -296,28 +296,11 @@ public static class ResultExtensions
     /// in HTTP API responses based on https://tools.ietf.org/html/rfc7807.JSON Problem Details due to validation errors.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
-    /// <param name="errors"></param>
+    /// <param name="errors">The validation errors.</param>
     /// <returns>The <see cref="Results.ValidationProblem"/> instance.</returns>
     public static ValidationProblem ValidationProblem(this IResultExtensions resultExtensions, IDictionary<string, string[]> errors)
     {
         return new ValidationProblem(errors);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="TInput"></typeparam>
-    /// <param name="resultExtensions"></param>
-    /// <param name="validatedInput"></param>
-    /// <returns></returns>
-    public static Results<ValidationProblem, Problem> ValidationProblem<TInput>(this IResultExtensions resultExtensions, Validated<TInput> validatedInput)
-    {
-        return validatedInput.DefaultBindingResultStatusCode switch
-        {
-            null => new ValidationProblem(validatedInput.Errors),
-            int sc when sc >= 400 && sc < 500 => resultExtensions.Problem(statusCode: sc),
-            _ => resultExtensions.Problem()
-        };
     }
 
     /// <summary>

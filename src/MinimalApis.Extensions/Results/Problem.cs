@@ -76,7 +76,8 @@ public class Problem : IResult, IProvideEndpointResponseMetadata
             response.StatusCode = code;
         }
 
-        await httpContext.Response.WriteAsJsonAsync(ProblemDetails, null, ProblemJsonContentType);
+        // Use the overload that takes a type to ensure JSON serialization is polymorphic
+        await httpContext.Response.WriteAsJsonAsync(ProblemDetails, ProblemDetails.GetType(), null, ProblemJsonContentType);
     }
 
     /// <summary>

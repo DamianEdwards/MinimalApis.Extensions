@@ -37,10 +37,10 @@ public static class TodosApi
             ? Results.Extensions.Ok(todo)
             : Results.Extensions.NotFound();
 
-    public static async Task<Results<ValidationProblem, Problem, Created<Todo>>> CreateTodo(Validated<NewTodo> inputTodo, IDbConnection db)
+    public static async Task<Results<ValidationProblem, Created<Todo>>> CreateTodo(Validated<NewTodo> inputTodo, IDbConnection db)
     {
         if (!inputTodo.IsValid)
-            return Results.Extensions.ValidationProblem(inputTodo);
+            return Results.Extensions.ValidationProblem(inputTodo.Errors);
 
         var todo = await db.QuerySingleAsync<Todo>(
             "INSERT INTO Todos(Title, IsComplete) Values(@Title, @IsComplete) RETURNING * ", inputTodo.Value);
@@ -48,10 +48,10 @@ public static class TodosApi
         return Results.Extensions.Created($"/todos/{todo.Id}", todo);
     }
 
-    public static async Task<Results<ValidationProblem, Problem, NoContent, NotFound>> UpdateTodo(int id, Validated<Todo> inputTodo, IDbConnection db)
+    public static async Task<Results<ValidationProblem, NoContent, NotFound>> UpdateTodo(int id, Validated<Todo> inputTodo, IDbConnection db)
     {
         if (!inputTodo.IsValid)
-            return Results.Extensions.ValidationProblem(inputTodo);
+            return Results.Extensions.ValidationProblem(inputTodo.Errors);
 
         return await db.ExecuteAsync("UPDATE Todos SET Title = @Title, IsComplete = @IsComplete WHERE Id = @Id", inputTodo.Value) == 1
             ? Results.Extensions.NoContent()

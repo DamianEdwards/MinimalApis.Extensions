@@ -7,15 +7,15 @@ namespace MinimalApis.Extensions.Results;
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status201Created"/> response for the creation
 /// of an entity represented by the <typeparamref name="TResult"/> type.
 /// </summary>
+/// <typeparam name="TResult">The type of the entity that was created and to be JSON serialized to the response body.</typeparam>
 public class Created<TResult> : IResult, IProvideEndpointResponseMetadata
 {
     private const string JsonContentType = "application/json";
-    private static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Created{TResult}"/> class.
     /// </summary>
-    /// <param name="uri">The URI the location response header will be set to.</param>
+    /// <param name="uri">The URI the location response header will be set to. This should be a URI that the created entity can be retrieved from.</param>
     /// <param name="value">An optional value representing the created entity.</param>
     public Created(string uri, TResult? value)
     {
@@ -29,7 +29,7 @@ public class Created<TResult> : IResult, IProvideEndpointResponseMetadata
     public string Uri { get; }
 
     /// <summary>
-    /// Gets the value to be serialized to the response body.
+    /// Gets the value to be JSON serialized to the response body.
     /// </summary>
     public TResult? Value { get; }
 
@@ -49,17 +49,11 @@ public class Created<TResult> : IResult, IProvideEndpointResponseMetadata
 
         response.StatusCode = StatusCode;
 
+        response.Headers.Location = Uri;
+
         if (Value is not null)
         {
-            ResponseContentTypeHelper.ResolveContentTypeAndEncoding(
-                null,
-                response.ContentType,
-                (JsonContentType, DefaultEncoding),
-                ResponseContentTypeHelper.GetEncoding,
-                out var resolvedContentType,
-                out var resolvedContentTypeEncoding);
-
-            await httpContext.Response.WriteAsJsonAsync(Value, null, resolvedContentType);
+            await httpContext.Response.WriteAsJsonAsync(Value, null, JsonContentType);
         }
     }
 
