@@ -21,13 +21,4 @@ public class OkOfTResult
 
         Assert.Equal(resultObject, result.Value);
     }
-
-    [Fact]
-    public void Result_Is_OriginalObject()
-    {
-        var resultObject = new { };
-        var result = new Ok<object>(resultObject);
-
-        Assert.Equal(resultObject, result.Value);
-    }
 }
