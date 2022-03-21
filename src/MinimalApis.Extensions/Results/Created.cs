@@ -19,9 +19,11 @@ public class Created : ResultBase, IProvideEndpointResponseMetadata
     /// <param name="value">An optional value representing the created entity.</param>
     public Created(string uri, object? value)
     {
-        StatusCode = ResponseStatusCode;
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+
         Uri = uri;
         Value = value;
+        StatusCode = ResponseStatusCode;
     }
 
     /// <summary>

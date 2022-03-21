@@ -66,15 +66,15 @@ public static class ResultExtensions
     /// overload instead.
     /// </remarks>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
-    /// <param name="url">The URI for the entity created, returned to the client in the <c>Location</c> response header.</param>
+    /// <param name="uri">The URI for the entity created, returned to the client in the <c>Location</c> response header.</param>
     /// <param name="result">The <see cref="Object"/> that represents the entity that was created.</param>
     /// <returns>The <see cref="Results.Created"/> instance.</returns>
-    public static Created Created(this IResultExtensions resultExtensions, string url, object? result)
+    public static Created Created(this IResultExtensions resultExtensions, string uri, object? result)
     {
         ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
-        ArgumentNullException.ThrowIfNull(url, nameof(url));
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
 
-        return new Created(url, result);
+        return new Created(uri, result);
     }
 
     /// <summary>
@@ -82,15 +82,15 @@ public static class ResultExtensions
     /// </summary>
     /// <typeparam name="TResult">The <see cref="Type"/> of the entity created.</typeparam>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
-    /// <param name="url">The URI for the entity created, returned to the client in the <c>Location</c> response header.</param>
+    /// <param name="uri">The URI for the entity created, returned to the client in the <c>Location</c> response header.</param>
     /// <param name="result">The <see cref="Object"/> that represents the entity that was created.</param>
     /// <returns>The <see cref="Results.Created{TResult}"/> instance.</returns>
-    public static Created<TResult> Created<TResult>(this IResultExtensions resultExtensions, string url, TResult result)
+    public static Created<TResult> Created<TResult>(this IResultExtensions resultExtensions, string uri, TResult result)
     {
         ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
-        ArgumentNullException.ThrowIfNull(url, nameof(url));
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
 
-        return new Created<TResult>(url, result);
+        return new Created<TResult>(uri, result);
     }
 
     /// <summary>
@@ -150,56 +150,56 @@ public static class ResultExtensions
     /// Returns a <see cref="RedirectTemporary"/> <see cref="IResult"/> with <see cref="StatusCodes.Status302Found"/>.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
-    /// <param name="url">The URL to redirect to.</param>
+    /// <param name="uri">The URI to redirect to.</param>
     /// <returns>The <see cref="RedirectTemporary"/> instance.</returns>
-    public static RedirectTemporary Redirect(this IResultExtensions resultExtensions, string url)
+    public static RedirectTemporary Redirect(this IResultExtensions resultExtensions, string uri)
     {
         ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
-        ArgumentNullException.ThrowIfNull(url, nameof(url));
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
 
-        return new RedirectTemporary(url);
+        return new RedirectTemporary(uri);
     }
 
     /// <summary>
     /// Returns a <see cref="Results.RedirectPermanent"/> <see cref="IResult"/> with <see cref="StatusCodes.Status301MovedPermanently"/>.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
-    /// <param name="url">The URL to redirect to.</param>
+    /// <param name="uri">The URI to redirect to.</param>
     /// <returns>The <see cref="Results.RedirectPermanent"/> instance.</returns>
-    public static RedirectPermanent RedirectPermanent(this IResultExtensions resultExtensions, string url)
+    public static RedirectPermanent RedirectPermanent(this IResultExtensions resultExtensions, string uri)
     {
         ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
-        ArgumentNullException.ThrowIfNull(url, nameof(url));
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
 
-        return new RedirectPermanent(url);
+        return new RedirectPermanent(uri);
     }
 
     /// <summary>
     /// Returns a <see cref="Results.RedirectTemporary307"/> <see cref="IResult"/> with <see cref="StatusCodes.Status307TemporaryRedirect"/>.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
-    /// <param name="url">The URL to redirect to.</param>
+    /// <param name="uri">The URI to redirect to.</param>
     /// <returns>The <see cref="Results.RedirectTemporary307"/> instance.</returns>
-    public static RedirectTemporary307 RedirectTemporary307(this IResultExtensions resultExtensions, string url)
+    public static RedirectTemporary307 RedirectTemporary307(this IResultExtensions resultExtensions, string uri)
     {
         ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
-        ArgumentNullException.ThrowIfNull(url, nameof(url));
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
 
-        return new RedirectTemporary307(url);
+        return new RedirectTemporary307(uri);
     }
 
     /// <summary>
     /// Returns a <see cref="Results.RedirectPermanent308"/> <see cref="IResult"/> with <see cref="StatusCodes.Status308PermanentRedirect"/>.
     /// </summary>
     /// <param name="resultExtensions">The <see cref="IResultExtensions"/>.</param>
-    /// <param name="url">The URL to redirect to.</param>
+    /// <param name="uri">The URI to redirect to.</param>
     /// <returns>The <see cref="Results.RedirectPermanent308"/> instance.</returns>
-    public static RedirectPermanent308 RedirectPermanent308(this IResultExtensions resultExtensions, string url)
+    public static RedirectPermanent308 RedirectPermanent308(this IResultExtensions resultExtensions, string uri)
     {
         ArgumentNullException.ThrowIfNull(resultExtensions, nameof(resultExtensions));
-        ArgumentNullException.ThrowIfNull(url, nameof(url));
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
 
-        return new RedirectPermanent308(url);
+        return new RedirectPermanent308(uri);
     }
 
     /// <summary>

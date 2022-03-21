@@ -12,22 +12,22 @@ public class RedirectTemporary : StatusCode, IProvideEndpointResponseMetadata
     /// <summary>
     /// Initializes a new instance of the <see cref="RedirectTemporary"/> class.
     /// </summary>
-    /// <param name="url">The URL to redirect to.</param>
-    public RedirectTemporary(string url)
+    /// <param name="uri">The URI to redirect to.</param>
+    public RedirectTemporary(string uri)
         : base(ResponseStatusCode, null)
     {
-        Url = url;
+        Uri = uri;
     }
 
     /// <summary>
-    /// The URL to redirect to.
+    /// The URI to redirect to.
     /// </summary>
-    public string Url { get; init; }
+    public string Uri { get; init; }
 
     /// <inheritdoc />
     public override Task ExecuteAsync(HttpContext httpContext)
     {
-        httpContext.Response.Headers.Location = Url;
+        httpContext.Response.Headers.Location = Uri;
 
         return base.ExecuteAsync(httpContext);
     }
