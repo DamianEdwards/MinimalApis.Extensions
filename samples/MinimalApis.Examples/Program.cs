@@ -21,9 +21,9 @@ app.UseHttpsRedirection();
 
 app.MapPost("/bodyas/bytes", (Body<byte[]> body) => $"Received {body.Value.Length} bytes")
     .Accepts<byte[]>("application/octet-stream");
-app.MapPost("/bodyas/rom", (Body<ReadOnlyMemory<byte>> body) => $"Received {body.Value.Length} bytes")
+app.MapPost("/bodyas/rom", (Body<ReadOnlyMemory<byte>> body) => $"Received {body.Value.Length} bytes. Request content type was {body.ContentType?.ToString() ?? "[null]"}. Request encoding was {body.Encoding?.ToString() ?? "[null]"}")
     .Accepts<string>("text/plain");
-app.MapPost("/bodyas/string", (Body<string> body) => $"Received: {body}");
-app.MapPost("/bodyas/string/max100", ([MaxLength(100)] Body<string> body) => $"Received: {body}");
+app.MapPost("/bodyas/string", (Body<string> body) => $"Received the following: {body}");
+app.MapPost("/bodyas/string/max100", ([MaxLength(100)] Body<string> body) => $"Received the following: {body}");
 
 app.Run();

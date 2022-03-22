@@ -42,13 +42,17 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
     // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap
     private const int MaxSizeLessThanLOH = 84999;
     private static readonly ConditionalWeakTable<ParameterInfo, MaxLengthAttribute?> _paramMaxLengthAttrCache = new();
+    private HttpContext _httpContext;
+    private MediaTypeHeaderValue? _requestContentType = null;
+    private bool _requestContentTypeSet = false;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Body{TBody}"/> class.
     /// </summary>
     /// <param name="value">The body value.</param>
+    /// <param name="httpContext">The <see cref="HttpContext"/>.</param>
     /// <exception cref="ArgumentException">Thrown when <typeparamref name="TBody"/> is not one of the supported types.</exception>
-    public Body(TBody value)
+    public Body(TBody value, HttpContext httpContext)
     {
         if (!IsSupportedTValue(typeof(TBody)))
         {
@@ -56,6 +60,21 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
         }
 
         Value = value;
+        _httpContext = httpContext;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Body{TBody}"/> class.
+    /// </summary>
+    /// <param name="value">The body value.</param>
+    /// <param name="httpContext">The <see cref="HttpContext"/>.</param>
+    /// <param name="contentType">The request body's content type.</param>
+    /// <exception cref="ArgumentException">Thrown when <typeparamref name="TBody"/> is not one of the supported types.</exception>
+    public Body(TBody value, HttpContext httpContext, MediaTypeHeaderValue? contentType = null)
+        : this(value, httpContext)
+    {
+        _requestContentType = contentType;
+        _requestContentTypeSet = true;
     }
 
     /// <summary>
@@ -66,12 +85,27 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
     /// <summary>
     /// Gets the request body's content type if the <c>Content-Type</c> header was set.
     /// </summary>
-    public MediaTypeHeaderValue? ContentType { get; init; } = null;
+    public MediaTypeHeaderValue? ContentType
+    {
+        get
+        {
+            if (!_requestContentTypeSet)
+            {
+                _requestContentType = _httpContext.Request.GetTypedHeaders().ContentType;
+                _requestContentTypeSet = true;
+            }
+            return _requestContentType;
+        }
+    }
 
     /// <summary>
     /// Gets the request body's <see cref="System.Text.Encoding"/> if the <c>Content-Type</c> header was set.
     /// </summary>
-    public Encoding? Encoding { get; init; } = null;
+    /// <remarks>
+    /// Note that if <typeparamref name="TBody"/> is <see cref="String"/> and the request did not specify an encoding via the <c>Content-Type</c>
+    /// header, the string is created using <see cref="Encoding.UTF8"/> and this property will be <c>null</c>.
+    /// </remarks>
+    public Encoding? Encoding => ContentType?.Encoding;
 
     /// <summary>
     /// Gets the result of calling <c><see cref="Value"/>.ToString()</c>.
@@ -131,23 +165,22 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
                 throw new BadHttpRequestException($"The request body was larger than the max allowed of {readSize} bytes.", StatusCodes.Status400BadRequest);
             }
 
-            var requestContentType = GetRequestContentType(context);
-
             if (typeof(TBody) == typeof(byte[]))
             {
-                return Create(result.Buffer.ToArray(), requestContentType);
+                return Create(result.Buffer.ToArray(), context);
             }
 
             if (typeof(TBody) == typeof(ReadOnlyMemory<byte>))
             {
-                return Create((ReadOnlyMemory<byte>)result.Buffer.ToArray(), requestContentType);
+                return Create((ReadOnlyMemory<byte>)result.Buffer.ToArray(), context);
             }
 
             if (typeof(TBody) == typeof(string))
             {
+                var requestContentType = GetRequestContentType(context);
                 var encoding = requestContentType?.Encoding ?? Encoding.UTF8;
                 var bodyAsString = encoding.GetString(result.Buffer);
-                return Create(bodyAsString, requestContentType);
+                return Create(bodyAsString, context, requestContentType);
             }
         }
         finally
@@ -193,7 +226,7 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
         return Array.IndexOf(_supportedTypes, type) != -1;
     }
 
-    private static Body<TBody> Create(byte[] value, MediaTypeHeaderValue? contentType) => new Body<TBody>((TBody)(object)value) { ContentType = contentType, Encoding = contentType?.Encoding };
-    private static Body<TBody> Create(string value, MediaTypeHeaderValue? contentType) => new Body<TBody>((TBody)(object)value) { ContentType = contentType, Encoding = contentType?.Encoding };
-    private static Body<TBody> Create(ReadOnlyMemory<byte> value, MediaTypeHeaderValue? contentType) => new Body<TBody>((TBody)(object)value) { ContentType = contentType, Encoding = contentType?.Encoding };
+    private static Body<TBody> Create(byte[] value, HttpContext httpContext) => new Body<TBody>((TBody)(object)value, httpContext);
+    private static Body<TBody> Create(ReadOnlyMemory<byte> value, HttpContext httpContext) => new Body<TBody>((TBody)(object)value, httpContext);
+    private static Body<TBody> Create(string value, HttpContext httpContext, MediaTypeHeaderValue? contentType) => new Body<TBody>((TBody)(object)value, httpContext, contentType);
 }
