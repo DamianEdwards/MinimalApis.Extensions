@@ -133,8 +133,7 @@ public record struct Body<TBody> : IProvideEndpointParameterMetadata
             if (typeof(TBody) == typeof(string))
             {
                 var encoding = GetRequestEncoding(context);
-                var bodyAsString = string.Create((int)result.Buffer.Length, (result, encoding),
-                    static (chars, state) => state.encoding.GetChars(state.result.Buffer, chars));
+                var bodyAsString = encoding.GetString(result.Buffer);
                 return Create(bodyAsString);
             }
         }
