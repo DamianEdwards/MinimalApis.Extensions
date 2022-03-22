@@ -18,7 +18,7 @@ This package is currently available in prerelease from nuget.org:
 1. In your project's `Program.cs`, call the `AddEndpointsProvidesMetadataApiExplorer()` method on `builder.Services` to enable enhanced endpoint metadata in `ApiExplorer`:
     ``` c#
     var builder = WebApplication.CreateBuilder(args);
-    builder.Services.AddEndpointsProvidesMetadataApiExplorer();
+    builder.Services.AddEndpointsProvidesMetadataApiExplorer(); // <-- Add this line
     builder.Services.AddSwaggerGen();
     ...
     ```
