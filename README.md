@@ -4,11 +4,15 @@ A set of extensions and helpers that extend the funcationality of ASP.NET Core M
 # Installation
 [![Nuget](https://img.shields.io/nuget/v/MinimalApis.Extensions)](https://www.nuget.org/packages/MinimalApis.Extensions/)
 
+## Prerelease Builds
 This package is currently available in prerelease from nuget.org:
 
 ``` console
 > dotnet add package MinimalApis.Extensions --prerelease
 ```
+
+## CI Builds
+If you wish to use builds from this repo's `main` branch you can install them from [this repo's package feed](https://github.com/DamianEdwards/MinimalApis.Extensions/packages/1064549). See [these instructions](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry) for further details about working with GitHub package feeds.
 
 # Getting Started
 1. [Install the NuGet package](#installation) into your ASP.NET Core project:
@@ -45,10 +49,10 @@ This library provides types that help extend the core functionality of ASP.NET C
 - Union `IResult` return types via `Results<TResult1, TResultN>` that enable route handler delegates to declare all the possible `IResult` types they can return, enabling compile-time type checking and automatic population of possible responses in Swagger/OpenAPI
 
 # Sample Projects
-## [TodoApis.Dapper](/samples/TodosApi.Dapper/)
+## [TodoApis.Dapper](https://github.com/DamianEdwards/MinimalApis.Extensions/tree/main/samples/TodosApi.Dapper)
 An example Todos application using ASP.NET Core Minimal APIs and the Dapper library for data storage in SQLite.
 
-## [MinimalApis.Examples](/samples/MinimalApis.Examples/)
+## [MinimalApis.Examples](https://github.com/DamianEdwards/MinimalApis.Extensions/tree/main/samples/MinimalApis.Examples)
 Contains small examples for other types in this library.
 
 ## [MinimalApiPlayground](https://github.com/DamianEdwards/MinimalApiPlayground)
