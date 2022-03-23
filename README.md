@@ -1,5 +1,5 @@
 # MinimalApis.Extensions
-A set of extensions and helpers that extend the funcationality of ASP.NET Core Minimal APIs.
+A set of extensions and helpers that extend the functionality of ASP.NET Core Minimal APIs.
 
 # Installation
 [![Nuget](https://img.shields.io/nuget/v/MinimalApis.Extensions)](https://www.nuget.org/packages/MinimalApis.Extensions/)
