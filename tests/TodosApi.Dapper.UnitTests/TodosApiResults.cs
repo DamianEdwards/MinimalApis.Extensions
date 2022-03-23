@@ -78,4 +78,68 @@ public class TodosApiResults
             Assert.Equal(expected[i].IsComplete, resultTodos[i].IsComplete);
         }
     }
+
+    [Fact]
+    public async Task DeleteAll_Returns_Ok_For_No_Todos()
+    {
+        var db = new Mock<DbConnection>();
+
+        db.SetupDapperAsync(x => x.ExecuteAsync(It.IsAny<string>(), null, null, null, null))
+            .ReturnsAsync(It.IsAny<int>());
+
+        var result = await TodosApi.DeleteAll(db.Object);
+
+        Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
+    }
+
+    [Fact]
+    public async Task DeleteAll_Returns_Ok_For_NonEmpty_Todos()
+    {
+        var db = new Mock<DbConnection>();
+
+        var expected = new[]
+        {
+            new Todo { Id = 1, Title = "First todo" },
+            new Todo { Id = 2, Title = "Second todo" }
+        };
+
+        db.SetupDapperAsync(x => x.ExecuteAsync(It.IsAny<string>(), null, null, null, null))
+            .ReturnsAsync(expected.Count());
+
+        var result = await TodosApi.DeleteAll(db.Object);
+
+        Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
+    }
+
+    [Fact]
+    public async Task DeleteAll_Returns_Zero_For_No_Todos()
+    {
+        var db = new Mock<DbConnection>();
+
+        db.SetupDapperAsync(x => x.ExecuteAsync(It.IsAny<string>(), null, null, null, null))
+            .ReturnsAsync(It.IsAny<int>());
+
+        var result = await TodosApi.DeleteAll(db.Object);
+
+        Assert.Equal(0, result.Value);
+    }
+
+    [Fact]
+    public async Task DeleteAll_Returns_Quantity_Of_Todos_Deleted()
+    {
+        var db = new Mock<DbConnection>();
+
+        var expected = new[]
+        {
+            new Todo { Id = 1, Title = "First todo" },
+            new Todo { Id = 2, Title = "Second todo" }
+        };
+
+        db.SetupDapperAsync(x => x.ExecuteAsync(It.IsAny<string>(), null, null, null, null))
+            .ReturnsAsync(expected.Count());
+
+        var result = await TodosApi.DeleteAll(db.Object);
+
+        Assert.Equal(expected.Count(), result.Value);
+    }
 }
