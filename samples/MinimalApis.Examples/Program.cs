@@ -30,4 +30,4 @@ app.MapPost("/form", (Form<Todo> todo) => todo.Value);
 
 app.Run();
 
-record Todo(int Id, string Name, bool IsComplete);
+record Todo(int Id, string Name, bool IsComplete, DateTime? CompleteBy);

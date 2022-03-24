@@ -118,60 +118,59 @@ public class Form<TValue> : IProvideEndpointParameterMetadata
 
             foreach (var key in keys)
             {
-                var squareBraceIndex = key.IndexOf('[');
-                if (squareBraceIndex >= 0)
-                {
-                    // TODO: Handle enumerables/dictionaries
-                    // Enumerables:
-                    //   Widgets[0].Name=Widget1&Widgets[1].Name=Widget2
-                    //   {"Widgets":[{"Name":"Widget1"},{"Name":"Widget2"}]}
-                    // Dictionaries:
-                    //   Widgets[id1].Name=Widget1&Widgets[id2].Name=Widget2
-                    //   {"Widgets":{"id1":{"Name":"Widget1"},"id2":{"Name":"Widget2"}}}
+                // TODO: Good golly supporting this stuff is going to be hard :\
+                //var squareBraceIndex = key.IndexOf('[');
+                //if (squareBraceIndex >= 0)
+                //{
+                //    // TODO: Handle enumerables/dictionaries
+                //    // Enumerables:
+                //    //   Widgets[0].Name=Widget1&Widgets[1].Name=Widget2
+                //    //   {"Widgets":[{"Name":"Widget1"},{"Name":"Widget2"}]}
+                //    // Dictionaries:
+                //    //   Widgets[id1].Name=Widget1&Widgets[id2].Name=Widget2
+                //    //   {"Widgets":{"id1":{"Name":"Widget1"},"id2":{"Name":"Widget2"}}}
                     
-                }
-                else if (key.Contains('.'))
+                //}
+                //else if (key.Contains('.'))
+                //{
+                //    // TODO: Handle objects
+                //    // Category.Id=42
+                //    // Category.Name=Thingamabobs
+                //    // {"Category":{"Id":42,"Name":"Thingamabobs"}}
+                //}
+
+                var values = form[key];
+                jsonWriter.WritePropertyName(key);
+
+                if (values.Count > 1)
                 {
-                    // TODO: Handle objects
-                    // Category.Id=42
-                    // Category.Name=Thingamabobs
-                    // {"Category":{"Id":42,"Name":"Thingamabobs"}}
+                    // TODO: Handle multi-value fields as array
+                }
+                else if (values.Count == 0 || values == "")
+                {
+                    jsonWriter.WriteNullValue();
+                }
+                // TODO: Handle different number types, e.g. long, double, etc.
+                else if (char.IsDigit(values, 0) && int.TryParse(values, out var number))
+                {
+                    jsonWriter.WriteNumberValue(number);
+                }
+                else if (string.Equals(values, bool.TrueString, StringComparison.OrdinalIgnoreCase)
+                         || string.Equals(values, bool.FalseString, StringComparison.OrdinalIgnoreCase))
+                {
+                    jsonWriter.WriteBooleanValue(bool.Parse(values));
+                }
+                else if (DateTime.TryParseExact(values, "O", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTime))
+                {
+                    jsonWriter.WriteStringValue(dateTime);
+                }
+                else if (DateTimeOffset.TryParseExact(values, "O", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTimeOffset))
+                {
+                    jsonWriter.WriteStringValue(dateTimeOffset);
                 }
                 else
                 {
-                    var values = form[key];
-                    jsonWriter.WritePropertyName(key);
-
-                    // TODO: Handle different number types, e.g. long, double, etc.
-                    if (values.Count > 1)
-                    {
-                        // TODO: Handle multi-value fields as array
-                    }
-                    else if (values.Count == 0 || values == "")
-                    {
-                        jsonWriter.WriteNullValue();
-                    }
-                    else if (char.IsDigit(values, 0) && int.TryParse(values, out var number))
-                    {
-                        jsonWriter.WriteNumberValue(number);
-                    }
-                    else if (string.Equals(values, bool.TrueString, StringComparison.OrdinalIgnoreCase)
-                             || string.Equals(values, bool.FalseString, StringComparison.OrdinalIgnoreCase))
-                    {
-                        jsonWriter.WriteBooleanValue(bool.Parse(values));
-                    }
-                    else if (DateTime.TryParseExact(values, "O", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTime))
-                    {
-                        jsonWriter.WriteStringValue(dateTime);
-                    }
-                    else if (DateTimeOffset.TryParseExact(values, "O", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTimeOffset))
-                    {
-                        jsonWriter.WriteStringValue(dateTimeOffset);
-                    }
-                    else
-                    {
-                        jsonWriter.WriteStringValue(values);
-                    }
+                    jsonWriter.WriteStringValue(values);
                 }
             }
 
