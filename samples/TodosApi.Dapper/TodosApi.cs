@@ -52,7 +52,7 @@ public static class TodosApi
         if (!inputTodo.IsValid)
             return Results.Extensions.ValidationProblem(inputTodo.Errors);
 
-        return await db.ExecuteAsync("UPDATE Todos SET Title = @Title, IsComplete = @IsComplete WHERE Id = @Id", inputTodo.Value) == 1
+        return await db.ExecuteAsync($"UPDATE Todos SET Title = @Title, IsComplete = @IsComplete WHERE Id = {id}", inputTodo.Value) == 1
             ? Results.Extensions.NoContent()
             : Results.Extensions.NotFound();
     }
