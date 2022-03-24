@@ -26,4 +26,8 @@ app.MapPost("/bodyas/rom", (Body<ReadOnlyMemory<byte>> body) => $"Received {body
 app.MapPost("/bodyas/string", (Body<string> body) => $"Received the following: {body}");
 app.MapPost("/bodyas/string/max100", ([MaxLength(100)] Body<string> body) => $"Received the following: {body}");
 
+app.MapPost("/form", (Form<Widget> widget) => widget.Value);
+
 app.Run();
+
+record Widget(string Name);
