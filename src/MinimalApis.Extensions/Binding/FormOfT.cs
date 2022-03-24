@@ -151,14 +151,13 @@ public class Form<TValue> : IProvideEndpointParameterMetadata
                     jsonWriter.WriteNullValue();
                 }
                 // TODO: Handle different number types, e.g. long, double, etc.
-                else if (char.IsDigit(values, 0) && int.TryParse(values, out var number))
+                else if (int.TryParse(values, out var number))
                 {
                     jsonWriter.WriteNumberValue(number);
                 }
-                else if (string.Equals(values, bool.TrueString, StringComparison.OrdinalIgnoreCase)
-                         || string.Equals(values, bool.FalseString, StringComparison.OrdinalIgnoreCase))
+                else if (bool.TryParse(values, out var boolean))
                 {
-                    jsonWriter.WriteBooleanValue(bool.Parse(values));
+                    jsonWriter.WriteBooleanValue(boolean);
                 }
                 else if (DateTime.TryParseExact(values, "O", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTime))
                 {
