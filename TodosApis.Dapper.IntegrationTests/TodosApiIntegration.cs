@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Xunit;
 
 namespace TodosApis.Dapper.IntegrationTests;
@@ -174,7 +173,7 @@ public class TodosApiIntegration
     }
 
     [Fact]
-    public async Task MarkComplete()
+    public async Task MarkComplete_Returns_NoContent()
     {
         using var application = new TodosApplication();
 
@@ -195,7 +194,9 @@ public class TodosApiIntegration
         Assert.Equal(newTodo.Title, todo.Title);
         Assert.False(todo.IsComplete);
 
-        await httpClient.PutAsJsonAsync($"/todos/{todo.Id}/mark-complete", todo);
+        var completeTodo = await httpClient.PutAsJsonAsync($"/todos/{todo.Id}/mark-complete", todo);
+
+        Assert.Equal(HttpStatusCode.NoContent, completeTodo.StatusCode);
 
         todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/complete");
 
@@ -205,7 +206,38 @@ public class TodosApiIntegration
     }
 
     [Fact]
-    public async Task MarkIncomplete()
+    public async Task MarkComplete_Returns_NotFound()
+    {
+        using var application = new TodosApplication();
+
+        var httpClient = application.CreateClient();
+
+        var newTodo = new NewTodo
+        {
+            Title = "Create Integration Tests"
+        };
+
+        var response = await httpClient.PostAsJsonAsync("/todos", newTodo);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
+
+        var todo = Assert.Single(todos);
+        Assert.Equal(newTodo.Title, todo.Title);
+        Assert.False(todo.IsComplete);
+
+        var completeTodo = await httpClient.PutAsJsonAsync($"/todos/2/mark-complete", todo);
+
+        Assert.Equal(HttpStatusCode.NotFound, completeTodo.StatusCode);
+
+        todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/complete");
+
+        Assert.Empty(todos);
+    }
+
+    [Fact]
+    public async Task MarkIncomplete_Returns_NotFound()
     {
         using var application = new TodosApplication();
 
@@ -234,7 +266,48 @@ public class TodosApiIntegration
         Assert.Equal(newTodo.Title, todo.Title);
         Assert.True(todo.IsComplete);
 
-        await httpClient.PutAsJsonAsync($"/todos/{todo.Id}/mark-incomplete", todo);
+        var incompleteTodo = await httpClient.PutAsJsonAsync($"/todos/2/mark-incomplete", todo);
+
+        Assert.Equal(HttpStatusCode.NotFound, incompleteTodo.StatusCode);
+
+        todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/incomplete");
+
+        Assert.Empty(todos);
+    }
+
+    [Fact]
+    public async Task MarkIncomplete_Returns_NoContent()
+    {
+        using var application = new TodosApplication();
+
+        var httpClient = application.CreateClient();
+
+        var newTodo = new NewTodo
+        {
+            Title = "Create Integration Tests"
+        };
+
+        var response = await httpClient.PostAsJsonAsync("/todos", newTodo);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
+
+        var todo = Assert.Single(todos);
+        Assert.Equal(newTodo.Title, todo.Title);
+        Assert.False(todo.IsComplete);
+
+        await httpClient.PutAsJsonAsync($"/todos/{todo.Id}/mark-complete", todo);
+
+        todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/complete");
+
+        todo = Assert.Single(todos);
+        Assert.Equal(newTodo.Title, todo.Title);
+        Assert.True(todo.IsComplete);
+
+        var incompleteTodo = await httpClient.PutAsJsonAsync($"/todos/{todo.Id}/mark-incomplete", todo);
+
+        Assert.Equal(HttpStatusCode.NoContent, incompleteTodo.StatusCode);
 
         todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/incomplete");
 
