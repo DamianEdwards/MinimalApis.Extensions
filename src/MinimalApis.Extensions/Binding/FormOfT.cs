@@ -108,13 +108,16 @@ public class Form<TValue> : IProvideEndpointParameterMetadata
         return size;
     }
 
-    private static void Transform(IFormCollection form, Utf8JsonWriter jsonWriter)
+    public static void Transform(IFormCollection form, Utf8JsonWriter jsonWriter)
     {
         if (form.Keys.Count > 0)
         {
             jsonWriter.WriteStartObject();
 
             var keys = new HashSet<string>(form.Keys, StringComparer.OrdinalIgnoreCase).OrderBy(key => key);
+            var currentDepth = 0;
+            var closedPrevObject = false;
+            ReadOnlySpan<char> prevKeySpan = default;
 
             foreach (var key in keys)
             {
@@ -124,24 +127,88 @@ public class Form<TValue> : IProvideEndpointParameterMetadata
                 //{
                 //    // TODO: Handle enumerables/dictionaries
                 //    // Enumerables:
-                //    //   Widgets[0].Name=Widget1&Widgets[1].Name=Widget2
+                //    //   Widgets[0].Name=Widget1
+                //    //   Widgets[1].Name=Widget2
                 //    //   {"Widgets":[{"Name":"Widget1"},{"Name":"Widget2"}]}
                 //    // Dictionaries:
-                //    //   Widgets[id1].Name=Widget1&Widgets[id2].Name=Widget2
+                //    //   Widgets[id1].Name=Widget1
+                //    //   Widgets[id2].Name=Widget2
                 //    //   {"Widgets":{"id1":{"Name":"Widget1"},"id2":{"Name":"Widget2"}}}
-                    
+
                 //}
                 //else if (key.Contains('.'))
                 //{
                 //    // TODO: Handle objects
+                //    // Title=The Title of the Thing
                 //    // Category.Id=42
                 //    // Category.Name=Thingamabobs
-                //    // {"Category":{"Id":42,"Name":"Thingamabobs"}}
+                //    // Category.Owner.Name=John+Smith
+                //    // {"Title:"The Title of the Thing","Category":{"Id":42,"Name":"Thingamabobs","Owner":{"Name":"John Smith"}}}
                 //}
 
-                var values = form[key];
-                jsonWriter.WritePropertyName(key);
+                // Write out member name
+                var keySpan = key.AsSpan();
+                var delimIndex = keySpan.IndexOf('.');
+                //var lastDelimIndex = keySpan.LastIndexOf('.');
 
+                if (delimIndex > 0)
+                {
+                    // Walk segments writing out opening object
+                    var startIndex = 0;
+                    while (delimIndex > 0)
+                    {
+                        var nextDelimIndex = keySpan.Slice(delimIndex + 1).IndexOf('.');
+                        var propertyNameLength = nextDelimIndex > 0
+                            ? nextDelimIndex
+                            : keySpan.Length - delimIndex - 1;
+                        var propertyName = keySpan.Slice(startIndex, propertyNameLength);
+
+                        // Check if we're still in the same object
+                        if (!prevKeySpan.StartsWith(keySpan.Slice(0, delimIndex + 1)))
+                        {
+                            if (!closedPrevObject)
+                            {
+                                // Close prev object
+                                while (currentDepth > 0)
+                                {
+                                    jsonWriter.WriteEndObject();
+                                    currentDepth--;
+                                }
+                                closedPrevObject = true;
+                            }
+
+                            jsonWriter.WriteStartObject(propertyName);
+                            currentDepth++;
+                        }
+
+                        startIndex = delimIndex + 1;
+                        delimIndex = nextDelimIndex > 0 ? delimIndex + nextDelimIndex + 1 : -1;
+                    }
+
+                    // Write leaf property name
+                    var leafName = keySpan.Slice(startIndex);
+                    jsonWriter.WritePropertyName(leafName);
+                }
+                else if (delimIndex == 0)
+                {
+                    throw new InvalidDataException("Yeah, nah");
+                }
+                else
+                {
+                    // Top level property
+                    while (currentDepth > 0)
+                    {
+                        jsonWriter.WriteEndObject();
+                        currentDepth--;
+                    }
+
+                    jsonWriter.WritePropertyName(key);
+                }
+                prevKeySpan = keySpan;
+                closedPrevObject = false;
+
+                // Write out value
+                var values = form[key];
                 if (values.Count > 1)
                 {
                     // TODO: Handle multi-value fields as array
@@ -171,6 +238,13 @@ public class Form<TValue> : IProvideEndpointParameterMetadata
                 {
                     jsonWriter.WriteStringValue(values);
                 }
+            }
+
+            // Close open bjects
+            while (currentDepth > 0)
+            {
+                jsonWriter.WriteEndObject();
+                currentDepth--;
             }
 
             jsonWriter.WriteEndObject();
