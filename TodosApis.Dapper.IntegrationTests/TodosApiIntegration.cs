@@ -118,7 +118,7 @@ public class TodosApiIntegration
 
         todo = await httpClient.GetFromJsonAsync<Todo>($"/todos/{todo.Id}");
 
-        Assert.Equal(newTitle, todo.Title);
+        Assert.Equal(newTitle, todo?.Title);
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class TodosApiIntegration
 
         todo = await httpClient.GetFromJsonAsync<Todo>($"/todos/{todo.Id}");
 
-        Assert.Equal(newTodoExpected.Title, todo.Title);
+        Assert.Equal(newTodoExpected.Title, todo?.Title);
     }
 
     [Fact]
@@ -161,27 +161,27 @@ public class TodosApiIntegration
 
         var httpClient = application.CreateClient();
 
-        var expectedTodos = new[]
+        var newTodo = new Todo { Id = 1, Title = "First todo" };
         {
             new Todo { Id = 1, Title = "First todo" },
             new Todo { Id = 2, Title = "Second todo" },
             new Todo { Id = 3, Title = "Third todo" }
         };
 
-        foreach (var newTodo in expectedTodos)
+        var response = await httpClient.PostAsJsonAsync("/todos", newTodo);
         {
             var newTodos = await httpClient.PostAsJsonAsync("/todos", newTodo);
 
-            Assert.Equal(HttpStatusCode.Created, newTodos.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
-        var todoTobeUpdated = todos?.FirstOrDefault();
+        var todoTobeUpdated = Assert.Single(todos);
 
         todoTobeUpdated.Title = "New Title";
 
-        var response = await httpClient.PutAsJsonAsync($"/todos/4", todoTobeUpdated);
+        response = await httpClient.PutAsJsonAsync($"/todos/4", todoTobeUpdated);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
 
@@ -191,7 +191,7 @@ public class TodosApiIntegration
 
         var todo = await httpClient.GetFromJsonAsync<Todo>($"/todos/{todoTobeUpdated.Id}");
 
-        Assert.Equal(todoWithOldTitle.Title, todo.Title);
+        Assert.Equal(todoWithOldTitle?.Title, todo?.Title);
     }
 
     [Fact]
@@ -322,7 +322,7 @@ public class TodosApiIntegration
 
         var completedTodos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/complete");
 
-        Assert.Equal(expectedTodos.Where(x => x.IsComplete == true).Count(), completedTodos.Count());
+        Assert.Equal(expectedTodos.Where(x => x.IsComplete == true).Count(), completedTodos?.Count());
     }
 
     [Fact]
@@ -362,7 +362,7 @@ public class TodosApiIntegration
 
         var completedTodos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/incomplete");
 
-        Assert.Equal(expectedTodos.Where(x => x.IsComplete == false).Count(), completedTodos.Count());
+        Assert.Equal(expectedTodos.Where(x => x.IsComplete == false).Count(), completedTodos?.Count());
     }
 
     [Fact]
