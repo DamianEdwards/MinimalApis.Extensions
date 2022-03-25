@@ -162,18 +162,10 @@ public class TodosApiIntegration
         var httpClient = application.CreateClient();
 
         var newTodo = new Todo { Id = 1, Title = "First todo" };
-        {
-            new Todo { Id = 1, Title = "First todo" },
-            new Todo { Id = 2, Title = "Second todo" },
-            new Todo { Id = 3, Title = "Third todo" }
-        };
 
         var response = await httpClient.PostAsJsonAsync("/todos", newTodo);
-        {
-            var newTodos = await httpClient.PostAsJsonAsync("/todos", newTodo);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        }
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
@@ -283,18 +275,15 @@ public class TodosApiIntegration
 
         todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
-        Assert.Equal(expectedTodos.Length, todos.Count);
-
-        for (int i = 0; i < expectedTodos.Length; i++)
-        {
-            Assert.Equal(expectedTodos[i].Id, todos[i].Id);
-            Assert.Equal(expectedTodos[i].Title, todos[i].Title);
-            Assert.Equal(expectedTodos[i].IsComplete, todos[i].IsComplete);
-        }
+        Assert.Equal(expectedTodos.Length, todos?.Count);
 
         var deletedTodos = await httpClient.DeleteAsync($"/todos/delete-all");
 
         Assert.Equal(HttpStatusCode.OK, deletedTodos.StatusCode);
+
+        todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
+
+        Assert.Empty(todos);
     }
 
     [Fact]
