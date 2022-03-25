@@ -122,34 +122,26 @@ public class Form<TValue> : IProvideEndpointParameterMetadata
             foreach (var key in keys)
             {
                 // TODO: Good golly supporting this stuff is going to be hard :\
-                //var squareBraceIndex = key.IndexOf('[');
-                //if (squareBraceIndex >= 0)
-                //{
-                //    // TODO: Handle enumerables/dictionaries
-                //    // Enumerables:
-                //    //   Widgets[0].Name=Widget1
-                //    //   Widgets[1].Name=Widget2
-                //    //   {"Widgets":[{"Name":"Widget1"},{"Name":"Widget2"}]}
-                //    // Dictionaries:
-                //    //   Widgets[id1].Name=Widget1
-                //    //   Widgets[id2].Name=Widget2
-                //    //   {"Widgets":{"id1":{"Name":"Widget1"},"id2":{"Name":"Widget2"}}}
-
-                //}
-                //else if (key.Contains('.'))
-                //{
-                //    // TODO: Handle objects
-                //    // Title=The Title of the Thing
-                //    // Category.Id=42
-                //    // Category.Name=Thingamabobs
-                //    // Category.Owner.Name=John+Smith
-                //    // {"Title:"The Title of the Thing","Category":{"Id":42,"Name":"Thingamabobs","Owner":{"Name":"John Smith"}}}
-                //}
+                // Handle objects
+                // Title=The Title of the Thing
+                // Category.Id=42
+                // Category.Name=Thingamabobs
+                // Category.Owner.Name=John+Smith
+                // {"Title:"The Title of the Thing","Category":{"Id":42,"Name":"Thingamabobs","Owner":{"Name":"John Smith"}}}
+                // 
+                // TODO: Handle enumerables/dictionaries
+                // Enumerables:
+                //   Widgets[0].Name=Widget1
+                //   Widgets[1].Name=Widget2
+                //   {"Widgets":[{"Name":"Widget1"},{"Name":"Widget2"}]}
+                // Dictionaries:
+                //   Widgets[id1].Name=Widget1
+                //   Widgets[id2].Name=Widget2
+                //   {"Widgets":{"id1":{"Name":"Widget1"},"id2":{"Name":"Widget2"}}}
 
                 // Write out member name
                 var keySpan = key.AsSpan();
                 var delimIndex = keySpan.IndexOf('.');
-                //var lastDelimIndex = keySpan.LastIndexOf('.');
 
                 if (delimIndex > 0)
                 {
