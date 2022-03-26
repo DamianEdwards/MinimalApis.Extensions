@@ -49,7 +49,7 @@ public static class TodosApi
 
     public static async Task<Results<ValidationProblem, NoContent, NotFound>> UpdateTodo(int id, Validated<Todo> inputTodo, IDbConnection db)
     {
-        if (!inputTodo.IsValid)
+        if (!inputTodo.IsValid || inputTodo.Value is null)
             return Results.Extensions.ValidationProblem(inputTodo.Errors);
 
         inputTodo.Value.Id = id;
