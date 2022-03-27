@@ -43,7 +43,7 @@ public class TodosApiIntegration
     }
 
     [Fact]
-    public async Task PostTodo_Returns_Created()
+    public async Task PostTodo_Returns_Created_For_Valid_Todo()
     {
         using var application = new TodosApplication();
 
@@ -66,7 +66,7 @@ public class TodosApiIntegration
     }
     
     [Fact]
-    public async Task PostTodo_Returns_BadRequest()
+    public async Task PostTodo_Returns_BadRequest_For_Invalid_Todo()
     {
         using var application = new TodosApplication();
 
@@ -87,7 +87,7 @@ public class TodosApiIntegration
     }
 
     [Fact]
-    public async Task UpdateTodo_Returns_NoContent()
+    public async Task UpdateTodo_Returns_NoContent_For_Valid_Todo()
     {
         await using var application = new TodosApplication();
 
@@ -122,7 +122,7 @@ public class TodosApiIntegration
     }
 
     [Fact]
-    public async Task UpdateTodo_Returns_BadRequest()
+    public async Task UpdateTodo_Returns_BadRequest_For_Invalid_Todo()
     {
         await using var application = new TodosApplication();
 
@@ -155,7 +155,7 @@ public class TodosApiIntegration
     }
 
     [Fact]
-    public async Task UpdateTodo_Returns_NotFound()
+    public async Task UpdateTodo_Returns_NotFound_For_Todo_That_Not_Exists()
     {
         await using var application = new TodosApplication();
 
@@ -187,7 +187,7 @@ public class TodosApiIntegration
     }
 
     [Fact]
-    public async Task DeleteTodo_Returns_NoContent()
+    public async Task DeleteTodo_Returns_NoContent_For_Todo_Deleted()
     {
         await using var application = new TodosApplication();
 
@@ -218,7 +218,7 @@ public class TodosApiIntegration
     }
 
     [Fact]
-    public async Task DeleteTodo_Returns_NotFound()
+    public async Task DeleteTodo_Returns_NotFound_For_Todo_That_Not_Exists()
     {
         await using var application = new TodosApplication();
 
@@ -249,7 +249,7 @@ public class TodosApiIntegration
     }
 
     [Fact]
-    public async Task DeleteAllTodos_Returns_Ok()
+    public async Task DeleteAllTodos_Returns_Ok_For_Successfully_Deleted()
     {
         using var application = new TodosApplication();
 
