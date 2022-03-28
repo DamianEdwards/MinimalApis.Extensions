@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\samples\TodosApi.Dapper\TodosApi.Dapper.csproj" />
+    <ProjectReference Include="..\..\samples\TodosApi.Dapper\TodosApi.Dapper.csproj" />
   </ItemGroup>
 
 </Project>
