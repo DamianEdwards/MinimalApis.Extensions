@@ -367,7 +367,7 @@ public class TodosApiIntegration
     }
 
     [Fact]
-    public async Task MarkComplete_Returns_NoContent()
+    public async Task MarkComplete_Returns_NoContent_For_Valid_Todo()
     {
         using var application = new TodosApplication();
 
@@ -400,7 +400,7 @@ public class TodosApiIntegration
     }
 
     [Fact]
-    public async Task MarkComplete_Returns_NotFound()
+    public async Task MarkComplete_Returns_NotFound_For_Invalid_Todo()
     {
         using var application = new TodosApplication();
 
@@ -431,7 +431,7 @@ public class TodosApiIntegration
     }
 
     [Fact]
-    public async Task MarkIncomplete_Returns_NotFound()
+    public async Task MarkIncomplete_Returns_NotFound_For_Invalid_Todo()
     {
         using var application = new TodosApplication();
 
@@ -470,7 +470,7 @@ public class TodosApiIntegration
     }
 
     [Fact]
-    public async Task MarkIncomplete_Returns_NoContent()
+    public async Task MarkIncomplete_Returns_NoContent_For_Valid_Todo()
     {
         using var application = new TodosApplication();
 
@@ -511,7 +511,7 @@ public class TodosApiIntegration
     }
 
     [Fact]
-    public async Task GetTodoById_Returns_Ok()
+    public async Task GetTodoById_Returns_Ok_For_Valid_Todo()
     {
         using var application = new TodosApplication();
 
@@ -536,7 +536,7 @@ public class TodosApiIntegration
     }
 
     [Fact]
-    public async Task GetTodoById_Returns_NotFound()
+    public async Task GetTodoById_Returns_NotFound_For_Invalid_Todo()
     {
         using var application = new TodosApplication();
 
