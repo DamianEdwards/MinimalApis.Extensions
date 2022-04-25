@@ -16,7 +16,7 @@ public class FormOfT
             { "Abc", "123" },
             { "Baz.Bar", "String value" },
             { "Cat", "String value" },
-            { "Dog.Fur.Sit", "false" },
+            { "Dog.Furp.Sit", "false" },
             { "Elk", "String value" },
             { "Fab.Boo", "456" },
             { "Fab.Cod", "true" },
@@ -36,7 +36,7 @@ public class FormOfT
               "}," +
               "\"Cat\":\"String value\"," +
               "\"Dog\":{" +
-                "\"Fur\":{" +
+                "\"Furp\":{" +
                   "\"Sit\":false" +
                 "}" +
               "}," +
