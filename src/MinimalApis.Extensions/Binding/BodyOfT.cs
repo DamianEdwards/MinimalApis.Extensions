@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.Net.Http.Headers;
-using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Binding;
 
@@ -54,6 +54,9 @@ public record struct Body<TBody> : IEndpointParameterMetadataProvider
     /// <exception cref="ArgumentException">Thrown when <typeparamref name="TBody"/> is not one of the supported types.</exception>
     public Body(TBody value, HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(value);
+        ArgumentNullException.ThrowIfNull(httpContext);
+
         if (!IsSupportedTValue(typeof(TBody)))
         {
             throw new ArgumentException(_unsupportedTypeExceptionMessage, nameof(TBody));
@@ -131,8 +134,8 @@ public record struct Body<TBody> : IEndpointParameterMetadataProvider
     /// <exception cref="OperationCanceledException">Thrown when reading the request body is canceled.</exception>
     public static async ValueTask<Body<TBody>> BindAsync(HttpContext context, ParameterInfo parameter)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(parameter);
 
         if (!IsSupportedTValue(typeof(TBody)))
         {
@@ -195,14 +198,15 @@ public record struct Body<TBody> : IEndpointParameterMetadataProvider
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="parameter">The parameter to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <param name="context">The <see cref="EndpointParameterMetadataContext"/>.</param>
     /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services)
+    public static void PopulateMetadata(EndpointParameterMetadataContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         if (typeof(TBody) == typeof(string))
         {
-            yield return new Mvc.ConsumesAttribute(typeof(string), "text/plain");
+            context.EndpointMetadata.Add(new Mvc.ConsumesAttribute(typeof(string), "text/plain"));
         }
     }
 

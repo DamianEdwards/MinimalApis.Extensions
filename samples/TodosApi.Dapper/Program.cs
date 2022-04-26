@@ -6,14 +6,17 @@ using Microsoft.Data.Sqlite;
 using Dapper;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using TodosApi.Dapper;
-using MinimalApis.Extensions.Binding;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("TodosDb") ?? "Data Source=todos-default.db;Cache=Shared";
 builder.Services.AddScoped<IDbConnection>(_ => new SqliteConnection(connectionString));
+#if NET6_0
 builder.Services.AddEndpointsProvidesMetadataApiExplorer();
+#else
+builder.Services.AddEndpointsApiExplorer();
+#endif
 builder.Services.AddSwaggerGen(ConfigureSwaggerGen);
 
 var app = builder.Build();

@@ -31,10 +31,7 @@ public sealed class AcceptedAtRoute<TValue> : IResult, IEndpointMetadataProvider
     /// <param name="routeName">The name of the route to use for generating the URL.</param>
     /// <param name="routeValues">The route data to use for generating the URL.</param>
     /// <param name="value">The value to format in the entity body.</param>
-    internal AcceptedAtRoute(
-        string? routeName,
-        object? routeValues,
-        TValue? value)
+    internal AcceptedAtRoute(string? routeName, object? routeValues, TValue? value)
     {
         Value = value;
         RouteName = routeName;
@@ -64,6 +61,8 @@ public sealed class AcceptedAtRoute<TValue> : IResult, IEndpointMetadataProvider
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext);
+
         var linkGenerator = httpContext.RequestServices.GetRequiredService<LinkGenerator>();
         var url = linkGenerator.GetUriByAddress(
             httpContext,
@@ -88,6 +87,8 @@ public sealed class AcceptedAtRoute<TValue> : IResult, IEndpointMetadataProvider
     /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     public static void PopulateMetadata(EndpointMetadataContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(typeof(TValue), StatusCodes.Status202Accepted, "application/json"));
     }
 }

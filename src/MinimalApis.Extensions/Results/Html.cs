@@ -1,35 +1,60 @@
-﻿using MinimalApis.Extensions.Metadata;
+﻿using Microsoft.AspNetCore.Http.Metadata;
 
 namespace MinimalApis.Extensions.Results;
 
 /// <summary>
 /// Represents an <see cref="IResult"/> that returns HTML content in the response body.
 /// </summary>
-public class Html : ResultBase, IEndpointMetadataProvider
+public sealed class Html : IResult, IEndpointMetadataProvider
 {
-    private const string HtmlMediaType = "text/html";
-    private const int ResponseStatusCode = StatusCodes.Status200OK;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="Html"/> class.
     /// </summary>
     /// <param name="html">The HTML to return in the response body.</param>
-    public Html(string? html)
+    internal Html(string? html)
     {
-        ResponseContent = html;
-        ContentType = HtmlMediaType;
-        StatusCode = ResponseStatusCode;
+        Content = html;
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Gets the status code: <see cref="StatusCodes.Status200OK"/>
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    public int StatusCode => StatusCodes.Status200OK;
+
+    /// <summary>
+    /// Gets the content type: <c>text/html</c>
+    /// </summary>
+    public string ContentType => "text/html";
+
+    /// <summary>
+    /// Gets the HTML content to render in the response body.
+    /// </summary>
+    public string? Content { get; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="httpContext"></param>
+    /// <returns></returns>
+    public async Task ExecuteAsync(HttpContext httpContext)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
-        yield return new Mvc.ProducesAttribute(HtmlMediaType);
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        httpContext.Response.StatusCode = StatusCode;
+        httpContext.Response.ContentType = ContentType;
+        if (Content is not null)
+        {
+            await httpContext.Response.WriteAsync(Content);
+        }
+    }
+
+    /// <summary>
+    /// Populates metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// </summary>
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    public static void PopulateMetadata(EndpointMetadataContext context)
+    {
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status200OK));
+        context.EndpointMetadata.Add(new Mvc.ProducesAttribute("text/html"));
     }
 }

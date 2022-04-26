@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http.Metadata;
 
-namespace Microsoft.AspNetCore.Http.HttpResults;
+namespace MinimalApis.Extensions.Results;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status410Gone"/> response.
+/// An <see cref="IResult"/> that returns a Gone (410) status code.
 /// </summary>
 public sealed class Gone : IResult, IEndpointMetadataProvider
 {
@@ -15,25 +15,30 @@ public sealed class Gone : IResult, IEndpointMetadataProvider
 
     }
 
-    // <summary>
-    /// Gets the HTTP status code: <see cref="StatusCodes.Status201Created"/>
+    /// <summary>
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status410Gone"/>
     /// </summary>
     public int StatusCode => StatusCodes.Status410Gone;
 
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        httpContext.Response.StatusCode = StatusCode;
+
+        return Task.CompletedTask;
     }
 
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <param name="context">The <see cref="EndpointMetadataContext"/> to provide metadata for.</param>
     /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    public static void PopulateMetadata(EndpointMetadataContext context)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status410Gone);
+        ArgumentNullException.ThrowIfNull(context);
+
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status410Gone));
     }
 }

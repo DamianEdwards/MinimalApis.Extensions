@@ -1,13 +1,11 @@
 ﻿#if NET6_0
 using Microsoft.AspNetCore.Http.Metadata;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
 /// An <see cref="IResult"/> that on execution will write an object to the response
-/// with Ok (200) status code.
+/// with an Ok (200) status code.
 /// </summary>
 /// <typeparam name="TValue">The type of object that will be JSON serialized to the response body.</typeparam>
 public sealed class Ok<TValue> : IResult, IEndpointMetadataProvider
@@ -34,6 +32,8 @@ public sealed class Ok<TValue> : IResult, IEndpointMetadataProvider
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext);
+
         httpContext.Response.StatusCode = StatusCode;
 
         return httpContext.Response.WriteAsJsonAsync(Value);
@@ -45,6 +45,8 @@ public sealed class Ok<TValue> : IResult, IEndpointMetadataProvider
     /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     public static void PopulateMetadata(EndpointMetadataContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(typeof(TValue), StatusCodes.Status200OK, "application/json"));
     }
 }

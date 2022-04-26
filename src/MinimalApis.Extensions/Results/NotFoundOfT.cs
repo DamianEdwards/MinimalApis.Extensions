@@ -1,36 +1,33 @@
 ﻿#if NET6_0
 using Microsoft.AspNetCore.Http.Metadata;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
 /// An <see cref="IResult"/> that on execution will write an object to the response
-/// with Conflict (409) status code.
+/// with Not Found (404) status code.
 /// </summary>
 /// <typeparam name="TValue">The type of object that will be JSON serialized to the response body.</typeparam>
-public sealed class Conflict<TValue> : IResult, IEndpointMetadataProvider
+public sealed class NotFound<TValue> : IResult, IEndpointMetadataProvider
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Conflict"/> class with the values
-    /// provided.
+    /// Initializes a new instance of the <see cref="NotFound"/> class with the values.
     /// </summary>
-    /// <param name="error">The error content to format in the entity body.</param>
-    internal Conflict(TValue? error)
+    /// <param name="value">The value to format in the entity body.</param>
+    internal NotFound(TValue? value)
     {
-        Value = error;
+        Value = value;
     }
 
     /// <summary>
     /// Gets the object result.
     /// </summary>
-    public TValue? Value { get; }
+    public TValue? Value { get; internal init; }
 
     /// <summary>
-    /// Gets the HTTP status code: <see cref="StatusCodes.Status409Conflict"/>
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status404NotFound"/>
     /// </summary>
-    public int StatusCode => StatusCodes.Status409Conflict;
+    public int StatusCode => StatusCodes.Status404NotFound;
 
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)
@@ -48,9 +45,7 @@ public sealed class Conflict<TValue> : IResult, IEndpointMetadataProvider
     /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     public static void PopulateMetadata(EndpointMetadataContext context)
     {
-        ArgumentNullException.ThrowIfNull(context);
-
-        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(typeof(TValue), StatusCodes.Status409Conflict, "application/json"));
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(typeof(TValue), StatusCodes.Status404NotFound, "application/json"));
     }
 }
 #endif

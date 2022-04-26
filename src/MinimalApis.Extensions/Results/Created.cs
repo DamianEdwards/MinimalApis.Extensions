@@ -16,6 +16,8 @@ public sealed class Created : IResult, IEndpointMetadataProvider
     /// <param name="location">The location at which the content has been created.</param>
     internal Created(string location)
     {
+        ArgumentNullException.ThrowIfNull(location);
+
         Location = location;
     }
 
@@ -26,10 +28,7 @@ public sealed class Created : IResult, IEndpointMetadataProvider
     /// <param name="locationUri">The location at which the content has been created.</param>
     internal Created(Uri locationUri)
     {
-        if (locationUri == null)
-        {
-            throw new ArgumentNullException(nameof(locationUri));
-        }
+        ArgumentNullException.ThrowIfNull(locationUri);
 
         if (locationUri.IsAbsoluteUri)
         {
@@ -46,12 +45,16 @@ public sealed class Created : IResult, IEndpointMetadataProvider
     /// </summary>
     public int StatusCode => StatusCodes.Status201Created;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the value that will be set for the <c>Location</c> header.
+    /// </summary>
     public string? Location { get; }
 
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext);
+
         if (!string.IsNullOrEmpty(Location))
         {
             httpContext.Response.Headers.Location = Location;
@@ -68,6 +71,8 @@ public sealed class Created : IResult, IEndpointMetadataProvider
     /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     public static void PopulateMetadata(EndpointMetadataContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status201Created));
     }
 }

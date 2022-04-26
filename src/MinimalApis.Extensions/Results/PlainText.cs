@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http.Metadata;
 
-namespace Microsoft.AspNetCore.Http.HttpResults;
+namespace MinimalApis.Extensions.Results;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status200OK"/> response with a plain text response body.
+/// An <see cref="IResult"/> that returns an Ok (200) status code response with a plain text response body.
 /// </summary>
 public sealed class PlainText : IResult, IEndpointMetadataProvider
 {
@@ -36,6 +36,8 @@ public sealed class PlainText : IResult, IEndpointMetadataProvider
     /// <inheritdoc/>
     public async Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext);
+
         httpContext.Response.StatusCode = StatusCode;
         httpContext.Response.ContentType = ContentType;
 
@@ -51,6 +53,8 @@ public sealed class PlainText : IResult, IEndpointMetadataProvider
     /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     public static void PopulateMetadata(EndpointMetadataContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode));
         context.EndpointMetadata.Add(new Mvc.ProducesAttribute("text/plain"));
     }

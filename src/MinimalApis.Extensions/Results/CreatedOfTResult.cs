@@ -1,74 +1,91 @@
-﻿using System.Text;
-using System.Text.Json;
-using MinimalApis.Extensions.Metadata;
+﻿#if NET6_0
+using Microsoft.AspNetCore.Http.Metadata;
 
-namespace MinimalApis.Extensions.Results;
+namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status201Created"/> response for the creation
-/// of an entity represented by the <typeparamref name="TResult"/> type.
+/// An <see cref="IResult"/> that on execution will write an object to the response
+/// with status code Created (201) and Location header.
 /// </summary>
-/// <typeparam name="TResult">The type of the entity that was created and to be JSON serialized to the response body.</typeparam>
-public class Created<TResult> : IResult, IEndpointMetadataProvider
+/// <typeparam name="TValue">The type of object that will be JSON serialized to the response body.</typeparam>
+public sealed class Created<TValue> : IResult, IEndpointMetadataProvider
 {
-    private const string JsonContentType = "application/json";
-
     /// <summary>
-    /// Initializes a new instance of the <see cref="Created{TResult}"/> class.
+    /// Initializes a new instance of the <see cref="Created"/> class with the values
+    /// provided.
     /// </summary>
-    /// <param name="uri">The URI the location response header will be set to. This should be a URI that the created entity can be retrieved from.</param>
-    /// <param name="value">An optional value representing the created entity.</param>
-    public Created(string uri, TResult? value)
+    /// <param name="location">The location at which the content has been created.</param>
+    /// <param name="value">The value to format in the entity body.</param>
+    internal Created(string location, TValue? value)
     {
-        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+        ArgumentNullException.ThrowIfNull(location);
 
-        Uri = uri;
         Value = value;
+        Location = location;
     }
 
     /// <summary>
-    /// Gets the URI that the location response header will be set to.
+    /// Initializes a new instance of the <see cref="Created"/> class with the values
+    /// provided.
     /// </summary>
-    public string Uri { get; }
-
-    /// <summary>
-    /// Gets the value to be JSON serialized to the response body.
-    /// </summary>
-    public TResult? Value { get; }
-
-    /// <summary>
-    /// Gets the HTTP status code.
-    /// </summary>
-    public int StatusCode => StatusCodes.Status201Created;
-
-    /// <summary>
-    /// Writes an HTTP response reflecting the result.
-    /// </summary>
-    /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
-    /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
-    public async Task ExecuteAsync(HttpContext httpContext)
+    /// <param name="locationUri">The location at which the content has been created.</param>
+    /// <param name="value">The value to format in the entity body.</param>
+    internal Created(Uri locationUri, TValue? value)
     {
-        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+        Value = value;
 
-        var response = httpContext.Response;
-
-        response.StatusCode = StatusCode;
-        response.Headers.Location = Uri;
-
-        if (Value is not null)
+        if (locationUri == null)
         {
-            await httpContext.Response.WriteAsJsonAsync(Value, (JsonSerializerOptions?)null, JsonContentType);
+            throw new ArgumentNullException(nameof(locationUri));
+        }
+
+        if (locationUri.IsAbsoluteUri)
+        {
+            Location = locationUri.AbsoluteUri;
+        }
+        else
+        {
+            Location = locationUri.GetComponents(UriComponents.SerializationInfoString, UriFormat.UriEscaped);
         }
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Gets the object result.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    public TValue? Value { get; }
+
+    /// <summary>
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status201Created"/>
+    /// </summary>
+    public int StatusCode => StatusCodes.Status201Created;
+
+    /// <inheritdoc/>
+    public string? Location { get; }
+
+    /// <inheritdoc/>
+    public Task ExecuteAsync(HttpContext httpContext)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(typeof(TResult), StatusCodes.Status201Created, JsonContentType);
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        if (!string.IsNullOrEmpty(Location))
+        {
+            httpContext.Response.Headers.Location = Location;
+        }
+
+        httpContext.Response.StatusCode = StatusCode;
+
+        return httpContext.Response.WriteAsJsonAsync(Value);
+    }
+
+    /// <summary>
+    /// Populates metadata for the related <see cref="Endpoint"/>.
+    /// </summary>
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    public static void PopulateMetadata(EndpointMetadataContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(typeof(TValue), StatusCodes.Status201Created, "application/json"));
     }
 }
+#endif

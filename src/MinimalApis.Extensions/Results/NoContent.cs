@@ -4,8 +4,7 @@ using Microsoft.AspNetCore.Http.Metadata;
 namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> that when executed will
-/// produce an HTTP response with the No Content (204) status code.
+/// An <see cref="IResult"/> that returns an No Content (204) status code.
 /// </summary>
 public class NoContent : IResult, IEndpointMetadataProvider
 {
@@ -16,6 +15,8 @@ public class NoContent : IResult, IEndpointMetadataProvider
     {
     }
 
+    internal static NoContent Instance { get; } = new();
+
     /// <summary>
     /// Gets the HTTP status code: <see cref="StatusCodes.Status204NoContent"/>
     /// </summary>
@@ -24,6 +25,7 @@ public class NoContent : IResult, IEndpointMetadataProvider
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext);
 
         httpContext.Response.StatusCode = StatusCode;
 
@@ -36,6 +38,8 @@ public class NoContent : IResult, IEndpointMetadataProvider
     /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     public static void IEndpointMetadataProviderPopulateMetadata(EndpointMetadataContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status204NoContent));
     }
 }

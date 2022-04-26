@@ -1,32 +1,48 @@
-﻿using MinimalApis.Extensions.Metadata;
+﻿#if NET6_0
+using Microsoft.AspNetCore.Http.Metadata;
 
-namespace MinimalApis.Extensions.Results;
+namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status422UnprocessableEntity"/> response.
+/// An <see cref="IResult"/> that on execution will write an object to the response
+/// with Unprocessable Entity (422) status code.
 /// </summary>
-public class UnprocessableEntity : ResultBase, IEndpointMetadataProvider
+public sealed class UnprocessableEntity : IResult, IEndpointMetadataProvider
 {
-    private const int ResponseStatusCode = StatusCodes.Status422UnprocessableEntity;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UnprocessableEntity"/> class with the values
+    /// provided.
+    /// </summary>
+    internal UnprocessableEntity()
+    {
+    }
+
+    internal static UnprocessableEntity Instance { get; } = new();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="UnprocessableEntity"/> class.
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status422UnprocessableEntity"/>
     /// </summary>
-    /// <param name="message">An optional message to return in the response body.</param>
-    public UnprocessableEntity(string? message = null)
+    public int StatusCode => StatusCodes.Status422UnprocessableEntity;
+
+    /// <inheritdoc />
+    public Task ExecuteAsync(HttpContext httpContext)
     {
-        ResponseContent = message;
-        StatusCode = ResponseStatusCode;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        httpContext.Response.StatusCode = StatusCode;
+
+        return Task.CompletedTask;
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Populates metadata for the related <see cref="Endpoint"/>.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    public static void PopulateMetadata(EndpointMetadataContext context)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
+        ArgumentNullException.ThrowIfNull(context);
+
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status422UnprocessableEntity));
     }
 }
+#endif

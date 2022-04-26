@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.Extensions.DependencyInjection;
-using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Binding;
 
@@ -131,9 +131,9 @@ public class JsonFormFile : IEndpointParameterMetadataProvider
     /// <paramref name="jsonOptions"/>.
     /// </summary>
     /// <typeparam name="TValue">The type to deserialize the JSON file to.</typeparam>
-    /// <param name="jsonOptions"></param>
+    /// <param name="jsonOptions">The options to use when deserializing the JSON file.</param>
     /// <returns>An instance of <typeparamref name="TValue"/> if the contents can be deserialized, otherwise <c>null</c>.</returns>
-    public async ValueTask<TValue?> DeserializeAsync<TValue>(JsonSerializerOptions jsonOptions)
+    public async ValueTask<TValue?> DeserializeAsync<TValue>(JsonSerializerOptions? jsonOptions)
     {
         using var fileStream = OpenReadStream();
         return await JsonSerializer.DeserializeAsync<TValue>(fileStream, jsonOptions);
@@ -151,6 +151,9 @@ public class JsonFormFile : IEndpointParameterMetadataProvider
     /// </returns>
     public static async ValueTask<JsonFormFile?> BindAsync(HttpContext context, ParameterInfo parameter)
     {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(parameter);
+
         if (!context.Request.HasFormContentType)
         {
             return null;
@@ -172,16 +175,16 @@ public class JsonFormFile : IEndpointParameterMetadataProvider
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Populates metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="parameter">The parameter to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services)
+    /// <param name="context">The <see cref="EndpointParameterMetadataContext"/>.</param>
+    public static void PopulateMetadata(EndpointParameterMetadataContext context)
     {
-        yield return new Mvc.ConsumesAttribute("multipart/form-data");
+        ArgumentNullException.ThrowIfNull(context);
+
+        context.EndpointMetadata.Add(new Mvc.ConsumesAttribute("multipart/form-data"));
         // TODO: Ensure this metadata is consumed by EndpointProvidesMetadataApiDescriptionProvider to configure the parameter
         //       such that the Swagger UI will render the file upload UI automatically.
-        yield return new Mvc.ApiExplorer.ApiParameterDescription { Name = parameter.Name ?? "file", Source = Mvc.ModelBinding.BindingSource.FormFile };
+        context.EndpointMetadata.Add(new Mvc.ApiExplorer.ApiParameterDescription { Name = context.Parameter.Name ?? "file", Source = Mvc.ModelBinding.BindingSource.FormFile });
     }
 }

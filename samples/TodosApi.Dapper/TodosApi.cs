@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using MinimalApis.Extensions.Results;
+using Microsoft.AspNetCore.Http.HttpResults;
 using MinimalApis.Extensions.Binding;
 using Dapper;
 
@@ -22,58 +22,58 @@ public static class TodosApi
     }
 
     public static async Task<Ok<IEnumerable<Todo>>> GetAllTodos(IDbConnection db) =>
-        Results.Extensions.Ok(await db.QueryAsync<Todo>("SELECT * FROM Todos"));
+        TypedResults.Ok(await db.QueryAsync<Todo>("SELECT * FROM Todos"));
 
     public static async Task<Ok<IEnumerable<Todo>>> GetCompleteTodos(IDbConnection db) =>
-        Results.Extensions.Ok(await db.QueryAsync<Todo>("SELECT * FROM Todos WHERE IsComplete = true"));
+        TypedResults.Ok(await db.QueryAsync<Todo>("SELECT * FROM Todos WHERE IsComplete = true"));
 
     public static async Task<Ok<IEnumerable<Todo>>> GetIncompleteTodos(IDbConnection db) =>
-        Results.Extensions.Ok(await db.QueryAsync<Todo>("SELECT * FROM Todos WHERE IsComplete = false"));
+        TypedResults.Ok(await db.QueryAsync<Todo>("SELECT * FROM Todos WHERE IsComplete = false"));
 
     public static async Task<Results<Ok<Todo>, NotFound>> GetTodoById(int id, IDbConnection db) =>
         await db.QuerySingleOrDefaultAsync<Todo>("SELECT * FROM Todos WHERE Id = @id", new { id })
         is Todo todo
-            ? Results.Extensions.Ok(todo)
-            : Results.Extensions.NotFound();
+            ? TypedResults.Ok(todo)
+            : TypedResults.NotFound();
 
     public static async Task<Results<ValidationProblem, Created<Todo>>> CreateTodo(Validated<NewTodo> inputTodo, IDbConnection db)
     {
         if (!inputTodo.IsValid)
-            return Results.Extensions.ValidationProblem(inputTodo.Errors);
+            return TypedResults.ValidationProblem(inputTodo.Errors);
 
         var todo = await db.QuerySingleAsync<Todo>(
             "INSERT INTO Todos(Title, IsComplete) Values(@Title, @IsComplete) RETURNING * ", inputTodo.Value);
 
-        return Results.Extensions.Created($"/todos/{todo.Id}", todo);
+        return TypedResults.Created($"/todos/{todo.Id}", todo);
     }
 
     public static async Task<Results<ValidationProblem, NoContent, NotFound>> UpdateTodo(int id, Validated<Todo> inputTodo, IDbConnection db)
     {
         if (!inputTodo.IsValid || inputTodo.Value is null)
-            return Results.Extensions.ValidationProblem(inputTodo.Errors);
+            return TypedResults.ValidationProblem(inputTodo.Errors);
 
         inputTodo.Value.Id = id;
 
         return await db.ExecuteAsync("UPDATE Todos SET Title = @Title, IsComplete = @IsComplete WHERE Id = @Id", inputTodo.Value) == 1
-            ? Results.Extensions.NoContent()
-            : Results.Extensions.NotFound();
+            ? TypedResults.NoContent()
+            : TypedResults.NotFound();
     }
 
     public static async Task<Results<NoContent, NotFound>> MarkComplete(int id, IDbConnection db) =>
         await db.ExecuteAsync("UPDATE Todos SET IsComplete = true WHERE Id = @id", new { id }) == 1
-        ? Results.Extensions.NoContent()
-        : Results.Extensions.NotFound();
+        ? TypedResults.NoContent()
+        : TypedResults.NotFound();
 
     public static async Task<Results<NoContent, NotFound>> MarkIncomplete(int id, IDbConnection db) =>
         await db.ExecuteAsync("UPDATE Todos SET IsComplete = false WHERE Id = @id", new { id }) == 1
-            ? Results.Extensions.NoContent()
-            : Results.Extensions.NotFound();
+            ? TypedResults.NoContent()
+            : TypedResults.NotFound();
 
     public static async Task<Results<NoContent, NotFound>> DeleteTodo(int id, IDbConnection db) =>
     await db.ExecuteAsync("DELETE FROM Todos WHERE Id = @id", new { id }) == 1
-        ? Results.Extensions.NoContent()
-        : Results.Extensions.NotFound();
+        ? TypedResults.NoContent()
+        : TypedResults.NotFound();
 
     public static async Task<Ok<int>> DeleteAll(IDbConnection db) =>
-        Results.Extensions.Ok(await db.ExecuteAsync("DELETE FROM Todos"));
+        TypedResults.Ok(await db.ExecuteAsync("DELETE FROM Todos"));
 }

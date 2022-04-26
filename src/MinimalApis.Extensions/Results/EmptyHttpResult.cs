@@ -19,6 +19,8 @@ public sealed class EmptyHttpResult : IResult
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext);
+
         return Task.CompletedTask;
     }
 }

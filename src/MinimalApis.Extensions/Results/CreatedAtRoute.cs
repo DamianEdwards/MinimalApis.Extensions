@@ -54,6 +54,8 @@ public sealed class CreatedAtRoute : IResult, IEndpointMetadataProvider
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext);
+
         var linkGenerator = httpContext.RequestServices.GetRequiredService<LinkGenerator>();
         var url = linkGenerator.GetUriByRouteValues(
             httpContext,
@@ -79,6 +81,8 @@ public sealed class CreatedAtRoute : IResult, IEndpointMetadataProvider
     /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     public static void PopulateMetadata(EndpointMetadataContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status201Created));
     }
 }

@@ -17,6 +17,8 @@ public sealed class Conflict : IResult, IEndpointMetadataProvider
     {
     }
 
+    internal static readonly Conflict Instance = new();
+
     /// <summary>
     /// Gets the HTTP status code: <see cref="StatusCodes.Status409Conflict"/>
     /// </summary>
@@ -25,6 +27,8 @@ public sealed class Conflict : IResult, IEndpointMetadataProvider
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext);
+
         httpContext.Response.StatusCode = StatusCode;
 
         return Task.CompletedTask;
@@ -36,6 +40,8 @@ public sealed class Conflict : IResult, IEndpointMetadataProvider
     /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     public static void PopulateMetadata(EndpointMetadataContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status409Conflict));
     }
 }

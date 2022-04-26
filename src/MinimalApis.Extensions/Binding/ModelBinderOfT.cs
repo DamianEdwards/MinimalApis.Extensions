@@ -1,12 +1,12 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
+using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Binding;
 
@@ -33,7 +33,7 @@ public class ModelBinder<TValue> : IEndpointParameterMetadataProvider
     /// <param name="modelState">The <see cref="ModelStateDictionary"/>.</param>
     public ModelBinder(TValue? model, ModelStateDictionary modelState)
     {
-        ArgumentNullException.ThrowIfNull(modelState, nameof(modelState));
+        ArgumentNullException.ThrowIfNull(modelState);
 
         Model = model;
         ModelState = modelState;
@@ -69,6 +69,9 @@ public class ModelBinder<TValue> : IEndpointParameterMetadataProvider
     /// <returns>An instance of <see cref="ModelBinder{TValue}"/>.</returns>
     public static async ValueTask<ModelBinder<TValue>> BindAsync(HttpContext context, ParameterInfo parameter)
     {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(parameter);
+
         var modelBinderFactory = context.RequestServices.GetRequiredService<IModelBinderFactory>();
         var modelMetadataProvider = context.RequestServices.GetRequiredService<IModelMetadataProvider>();
         var parameterBinder = context.RequestServices.GetRequiredService<ParameterBinder>();
@@ -114,15 +117,13 @@ public class ModelBinder<TValue> : IEndpointParameterMetadataProvider
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="parameter">The parameter to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <param name="context">The <see cref="EndpointParameterMetadataContext"/>.</param>
     /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services)
+    public static void PopulateMetadata(EndpointParameterMetadataContext context)
     {
         if (typeof(TValue).IsAssignableTo(typeof(IEndpointParameterMetadataProvider)))
         {
-            return IEndpointParameterMetadataProvider.PopulateMetadataLateBound(parameter, services);
+            EndpointParameterMetadataHelpers.PopulateMetadataLateBound(context);
         }
-        return Enumerable.Empty<object>();
     }
 }

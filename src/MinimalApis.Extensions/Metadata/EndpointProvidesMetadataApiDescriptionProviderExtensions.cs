@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.ApiExplorer;
+﻿#if NET6_0
+using Microsoft.AspNetCore.Http.Metadata;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MinimalApis.Extensions.Metadata;
 
@@ -28,3 +30,4 @@ public static class EndpointProvidesMetadataApiDescriptionProviderExtensions
         return services;
     }
 }
+#endif

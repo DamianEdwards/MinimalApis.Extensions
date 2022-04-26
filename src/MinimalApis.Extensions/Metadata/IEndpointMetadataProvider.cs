@@ -1,9 +1,9 @@
-﻿#if NET6_0
-using System.Reflection;
+﻿using System.Reflection;
 using MinimalApis.Extensions.Infrastructure;
 
 namespace Microsoft.AspNetCore.Http.Metadata;
 
+#if NET6_0
 /// <summary>
 /// Marker interface that indicates a type provides a static method that returns <see cref="Endpoint"/> metadata for the
 /// returned value from a given <see cref="Endpoint"/> route handler delegate. The method must be of the form:
@@ -11,12 +11,20 @@ namespace Microsoft.AspNetCore.Http.Metadata;
 /// </summary>
 public interface IEndpointMetadataProvider
 {
-    private static readonly string PopulateMetadataMethodName = "PopulateMetadata";
-    //static abstract IEnumerable<object> PopulateMetadata(Endpoint endpoint, IServiceProvider services);
+    //static abstract void PopulateMetadata(EndpointMetadataContext context);
+}
+#endif
 
-    internal static void PopulateMetadataLateBound(Type type, IList<object> metadata, IServiceProvider services)
+internal static class EndpointMetadataHelpers
+{
+    private static readonly string PopulateMetadataMethodName = "PopulateMetadata";
+
+    public static void PopulateMetadataLateBound(Type type, EndpointMetadataContext context)
     {
-        var routeHandlerMethod = metadata.OfType<MethodInfo>().SingleOrDefault();
+        ArgumentNullException.ThrowIfNull(type);
+        ArgumentNullException.ThrowIfNull(context);
+
+        var routeHandlerMethod = context.EndpointMetadata.OfType<MethodInfo>().SingleOrDefault();
         if (routeHandlerMethod is null || type is null)
         {
             return;
@@ -36,10 +44,8 @@ public interface IEndpointMetadataProvider
             return;
         }
 
-        // IEnumerable<object> PopulateMetadata(Endpoint endpoint, IServiceProvider services)
+        // void PopulateMetadata(EndpointMetadataContext context)
         var populateMetadata = method.CreateDelegate<Action<EndpointMetadataContext>>();
-        var context = new EndpointMetadataContext(routeHandlerMethod, metadata, services);
         populateMetadata(context);
     }
 }
-#endif

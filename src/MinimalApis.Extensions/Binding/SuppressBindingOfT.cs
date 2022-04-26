@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using MinimalApis.Extensions.Metadata;
+using Microsoft.AspNetCore.Http.Metadata;
 
 namespace MinimalApis.Extensions.Binding;
 
@@ -33,11 +33,10 @@ public class SuppressBinding<TValue> : IEndpointParameterMetadataProvider
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Populates metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="parameter">The parameter to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <param name="context">The <see cref="EndpointParameterMetadataContext"/>.</param>
     /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services) =>
-        IEndpointParameterMetadataProvider.GetDefaultMetadataForWrapperType<TValue>(parameter, services);
+    public static void PopulateMetadata(EndpointParameterMetadataContext context) =>
+        EndpointParameterMetadataHelpers.PopulateDefaultMetadataForWrapperType<TValue>(context);
 }

@@ -31,6 +31,8 @@ public sealed class Accepted<TValue> : IResult, IEndpointMetadataProvider
     /// <param name="value">The value to format in the entity body.</param>
     internal Accepted(Uri locationUri, TValue? value)
     {
+        ArgumentNullException.ThrowIfNull(locationUri);
+
         Value = value;
 
         if (locationUri == null)
@@ -66,6 +68,8 @@ public sealed class Accepted<TValue> : IResult, IEndpointMetadataProvider
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext);
+
         if (!string.IsNullOrEmpty(Location))
         {
             httpContext.Response.Headers.Location = Location;
@@ -82,6 +86,8 @@ public sealed class Accepted<TValue> : IResult, IEndpointMetadataProvider
     /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     public static void PopulateMetadata(EndpointMetadataContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(typeof(TValue), StatusCodes.Status202Accepted, "application/json"));
     }
 }

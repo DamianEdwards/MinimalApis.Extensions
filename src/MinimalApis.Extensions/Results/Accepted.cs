@@ -26,10 +26,7 @@ public sealed class Accepted : IEndpointMetadataProvider
     /// <param name="locationUri">The location at which the status of requested content can be monitored.</param>
     internal Accepted(Uri locationUri)
     {
-        if (locationUri == null)
-        {
-            throw new ArgumentNullException(nameof(locationUri));
-        }
+        ArgumentNullException.ThrowIfNull(locationUri);
 
         if (locationUri.IsAbsoluteUri)
         {
@@ -76,6 +73,8 @@ public sealed class Accepted : IEndpointMetadataProvider
     /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     public static void PopulateMetadata(EndpointMetadataContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status202Accepted));
     }
 }

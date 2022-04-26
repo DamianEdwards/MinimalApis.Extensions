@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿#if NET6_0
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using MinimalApis.Extensions.Results;
 
 namespace MinimalApis.Extensions.UnitTests.Results;
@@ -22,3 +24,4 @@ public class OkOfTResult
         Assert.Equal(resultObject, result.Value);
     }
 }
+#endif

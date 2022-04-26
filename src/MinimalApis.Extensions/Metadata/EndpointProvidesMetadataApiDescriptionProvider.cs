@@ -91,7 +91,8 @@ public class EndpointProvidesMetadataApiDescriptionProvider : IApiDescriptionPro
 
             if (returnTypeProvidesMetadata)
             {
-                IEndpointMetadataProvider.PopulateMetadataLateBound(returnType, apiDescription.ActionDescriptor.EndpointMetadata, _services);
+                var endpointMetadataContext = new EndpointMetadataContext(method, apiDescription.ActionDescriptor.EndpointMetadata, _services);
+                EndpointMetadataHelpers.PopulateMetadataLateBound(returnType, endpointMetadataContext);
 
                 var responseMetadata = apiDescription.ActionDescriptor.EndpointMetadata.OfType<IApiResponseMetadataProvider>().ToList();
 
@@ -142,7 +143,8 @@ public class EndpointProvidesMetadataApiDescriptionProvider : IApiDescriptionPro
                         continue;
                     }
 
-                    IEndpointParameterMetadataProvider.PopulateMetadataLateBound(parameter, apiDescription.ActionDescriptor.EndpointMetadata, _services);
+                    var endpointParameterMetadataContext = new EndpointParameterMetadataContext(parameter, apiDescription.ActionDescriptor.EndpointMetadata, _services);
+                    EndpointParameterMetadataHelpers.PopulateMetadataLateBound(endpointParameterMetadataContext);
 
                     var acceptsMetadata = apiDescription.ActionDescriptor.EndpointMetadata.OfType<IAcceptsMetadata>().FirstOrDefault();
                     if (acceptsMetadata is null)
