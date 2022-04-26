@@ -1,13 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="6.0.*" Condition="'$(TargetFramework)'=='net6.0'" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="7.0.0-preview.4.*" Condition="'$(TargetFramework)'=='net7.0'" />
   </ItemGroup>
 
   <ItemGroup>

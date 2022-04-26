@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json;
 using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Results;
@@ -48,7 +49,7 @@ public class Ok<TResult> : IResult, IProvideEndpointResponseMetadata
 
         if (Value is not null)
         {
-            await httpContext.Response.WriteAsJsonAsync(Value, null, JsonContentType);
+            await httpContext.Response.WriteAsJsonAsync(Value, (JsonSerializerOptions?)null, JsonContentType);
         }
     }
 

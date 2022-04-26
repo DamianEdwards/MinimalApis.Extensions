@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text.Json;
 using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Results;
@@ -81,7 +82,7 @@ public class Problem : IResult, IProvideEndpointResponseMetadata
         }
 
         // Use the overload that takes a type to ensure JSON serialization is polymorphic
-        await httpContext.Response.WriteAsJsonAsync(ProblemDetails, ProblemDetails.GetType(), null, ProblemJsonContentType);
+        await httpContext.Response.WriteAsJsonAsync(ProblemDetails, ProblemDetails.GetType(), (JsonSerializerOptions?)null, ProblemJsonContentType);
     }
 
     /// <summary>

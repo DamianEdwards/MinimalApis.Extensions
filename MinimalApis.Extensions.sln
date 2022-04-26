@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		Directory.Build.props = Directory.Build.props
 		global.json = global.json
+		nuget.config = nuget.config
 		ThirdPartyNotices.txt = ThirdPartyNotices.txt
 	EndProjectSection
 EndProject
@@ -38,7 +39,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodosApi.Dapper.UnitTests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MinimalApis.Examples", "samples\MinimalApis.Examples\MinimalApis.Examples.csproj", "{5A3256CE-6DE1-4753-8A3F-8B8AC6929C6A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodosApis.Dapper.IntegrationTests", "tests\TodosApis.Dapper.IntegrationTests\TodosApis.Dapper.IntegrationTests.csproj", "{B1A8F4F8-E6F6-42B3-8305-D54B96E1A597}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodosApis.Dapper.IntegrationTests", "tests\TodosApis.Dapper.IntegrationTests\TodosApis.Dapper.IntegrationTests.csproj", "{B1A8F4F8-E6F6-42B3-8305-D54B96E1A597}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
