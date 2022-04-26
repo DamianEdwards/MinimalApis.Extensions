@@ -8,7 +8,7 @@ namespace MinimalApis.Extensions.Binding;
 /// Represents a validated object of the type specified by <typeparamref name="TValue"/> as a parameter to an ASP.NET Core route handler delegate.
 /// </summary>
 /// <typeparam name="TValue">The type of the object being validated.</typeparam>
-public struct Validated<TValue> : IProvideEndpointParameterMetadata
+public struct Validated<TValue> : IEndpointParameterMetadataProvider
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Validated{TValue}"/> class.
@@ -117,5 +117,5 @@ public struct Validated<TValue> : IProvideEndpointParameterMetadata
     /// <param name="services">The <see cref="IServiceProvider"/>.</param>
     /// <returns>The metadata.</returns>
     public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services) =>
-        IProvideEndpointParameterMetadata.GetDefaultMetadataForWrapperType<TValue>(parameter, services);
+        IEndpointParameterMetadataProvider.GetDefaultMetadataForWrapperType<TValue>(parameter, services);
 }

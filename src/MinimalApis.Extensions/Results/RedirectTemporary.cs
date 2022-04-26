@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status302Found"/> redirect response.
 /// </summary>
-public class RedirectTemporary : ResultBase, IProvideEndpointResponseMetadata
+public class RedirectTemporary : ResultBase, IEndpointMetadataProvider
 {
     private const int ResponseStatusCode = StatusCodes.Status302Found;
 

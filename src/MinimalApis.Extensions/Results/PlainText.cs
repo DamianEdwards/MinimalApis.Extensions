@@ -1,35 +1,57 @@
-﻿using MinimalApis.Extensions.Metadata;
+﻿using Microsoft.AspNetCore.Http.Metadata;
 
-namespace MinimalApis.Extensions.Results;
+namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status200OK"/> response with a plain text response body.
 /// </summary>
-public class PlainText : ResultBase, IProvideEndpointResponseMetadata
+public sealed class PlainText : IResult, IEndpointMetadataProvider
 {
-    private const string PlainTextMediaType = "text/plain";
     private const int ResponseStatusCode = StatusCodes.Status200OK;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PlainText"/> class.
     /// </summary>
     /// <param name="text">The text to write to the response body.</param>
-    public PlainText(string? text)
+    internal PlainText(string? text)
     {
-        ResponseContent = text;
-        ContentType = PlainTextMediaType;
-        StatusCode = ResponseStatusCode;
+        Text = text;
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status200OK"/>
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    public int StatusCode => StatusCodes.Status200OK;
+
+    /// <summary>
+    /// Gets the value that will be set on the <c>Content-Type</c> header.
+    /// </summary>
+    public string ContentType => "text/plain";
+
+    /// <summary>
+    /// Gets the text that will be written to the response.
+    /// </summary>
+    public string? Text { get; }
+
+    /// <inheritdoc/>
+    public async Task ExecuteAsync(HttpContext httpContext)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
-        yield return new Mvc.ProducesAttribute(PlainTextMediaType);
+        httpContext.Response.StatusCode = StatusCode;
+        httpContext.Response.ContentType = ContentType;
+
+        if (!string.IsNullOrEmpty(Text))
+        {
+            await httpContext.Response.WriteAsync(Text);
+        }
+    }
+
+    /// <summary>
+    /// Populates metadata for the related <see cref="Endpoint"/>.
+    /// </summary>
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    public static void PopulateMetadata(EndpointMetadataContext context)
+    {
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode));
+        context.EndpointMetadata.Add(new Mvc.ProducesAttribute("text/plain"));
     }
 }

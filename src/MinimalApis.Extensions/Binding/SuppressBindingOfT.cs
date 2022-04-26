@@ -7,7 +7,7 @@ namespace MinimalApis.Extensions.Binding;
 /// Suprresses the default binding logic of RequestDelegateFactory when accepted as a parameter to a route handler.
 /// </summary>
 /// <typeparam name="TValue">The <see cref="Type"/> of the parameter to suppress binding for.</typeparam>
-public class SuppressBinding<TValue> : IProvideEndpointParameterMetadata
+public class SuppressBinding<TValue> : IEndpointParameterMetadataProvider
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="SuppressBinding{TValue}"/> class.
@@ -39,5 +39,5 @@ public class SuppressBinding<TValue> : IProvideEndpointParameterMetadata
     /// <param name="services">The <see cref="IServiceProvider"/>.</param>
     /// <returns>The metadata.</returns>
     public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services) =>
-        IProvideEndpointParameterMetadata.GetDefaultMetadataForWrapperType<TValue>(parameter, services);
+        IEndpointParameterMetadataProvider.GetDefaultMetadataForWrapperType<TValue>(parameter, services);
 }

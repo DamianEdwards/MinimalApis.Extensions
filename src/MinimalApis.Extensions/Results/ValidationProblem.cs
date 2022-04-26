@@ -6,7 +6,7 @@ namespace MinimalApis.Extensions.Results;
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status400BadRequest"/> response with a machine-readable format
 /// for specifying validation errors in HTTP API responses based on https://tools.ietf.org/html/rfc7807.JSON Problem Details response body.
 /// </summary>
-public class ValidationProblem : Problem, IProvideEndpointResponseMetadata
+public class ValidationProblem : ProblemHttpResult, IEndpointMetadataProvider
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidationProblem"/> class.

@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status415UnsupportedMediaType"/> response.
 /// </summary>
-public class UnsupportedMediaType : ResultBase, IProvideEndpointResponseMetadata
+public class UnsupportedMediaType : ResultBase, IEndpointMetadataProvider
 {
     private const int ResponseStatusCode = StatusCodes.Status415UnsupportedMediaType;
 

@@ -2,6 +2,7 @@
 
 namespace MinimalApis.Extensions.Results;
 
+#if NET6_0
 /// <summary>
 /// Represents the result of an <see cref="Endpoint"/> route handler delegate that can return more than one <see cref="IResult"/> type.
 /// </summary>
@@ -49,9 +50,9 @@ public abstract class ResultsBase : IResult
 
         foreach (var resultType in resultTypes)
         {
-            if (resultType.IsAssignableTo(typeof(IProvideEndpointResponseMetadata)))
+            if (resultType.IsAssignableTo(typeof(IEndpointMetadataProvider)))
             {
-                metadata.AddRange(IProvideEndpointResponseMetadata.GetMetadataLateBound(resultType, endpoint, services));
+                metadata.AddRange(IEndpointMetadataProvider.PopulateMetadataLateBound(resultType, endpoint, services));
             }
         }
 
@@ -64,7 +65,7 @@ public abstract class ResultsBase : IResult
 /// </summary>
 /// <typeparam name="TResult1">The first result type.</typeparam>
 /// <typeparam name="TResult2">The second result type.</typeparam>
-public sealed class Results<TResult1, TResult2> : ResultsBase, IProvideEndpointResponseMetadata
+public sealed class Results<TResult1, TResult2> : ResultsBase, IEndpointMetadataProvider
     where TResult1 : IResult
     where TResult2 : IResult
 {
@@ -101,7 +102,7 @@ public sealed class Results<TResult1, TResult2> : ResultsBase, IProvideEndpointR
 /// <typeparam name="TResult1">The first result type.</typeparam>
 /// <typeparam name="TResult2">The second result type.</typeparam>
 /// <typeparam name="TResult3">The third result type.</typeparam>
-public sealed class Results<TResult1, TResult2, TResult3> : ResultsBase, IProvideEndpointResponseMetadata
+public sealed class Results<TResult1, TResult2, TResult3> : ResultsBase, IEndpointMetadataProvider
     where TResult1 : IResult
     where TResult2 : IResult
     where TResult3 : IResult
@@ -181,7 +182,7 @@ public sealed class Results<TResult1, TResult2, TResult3> : ResultsBase, IProvid
 /// <typeparam name="TResult2">The second result type.</typeparam>
 /// <typeparam name="TResult3">The third result type.</typeparam>
 /// <typeparam name="TResult4">The fourth result type.</typeparam>
-public sealed class Results<TResult1, TResult2, TResult3, TResult4> : ResultsBase, IProvideEndpointResponseMetadata
+public sealed class Results<TResult1, TResult2, TResult3, TResult4> : ResultsBase, IEndpointMetadataProvider
     where TResult1 : IResult
     where TResult2 : IResult
     where TResult3 : IResult
@@ -307,7 +308,7 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4> : ResultsBas
 /// <typeparam name="TResult3">The third result type.</typeparam>
 /// <typeparam name="TResult4">The fourth result type.</typeparam>
 /// <typeparam name="TResult5">The fifth result type.</typeparam>
-public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5> : ResultsBase, IProvideEndpointResponseMetadata
+public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5> : ResultsBase, IEndpointMetadataProvider
     where TResult1 : IResult
     where TResult2 : IResult
     where TResult3 : IResult
@@ -367,7 +368,7 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5> : 
 /// <typeparam name="TResult4">The fourth result type.</typeparam>
 /// <typeparam name="TResult5">The fifth result type.</typeparam>
 /// <typeparam name="TResult6">The sixth result type.</typeparam>
-public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5, TResult6> : ResultsBase, IProvideEndpointResponseMetadata
+public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5, TResult6> : ResultsBase, IEndpointMetadataProvider
     where TResult1 : IResult
     where TResult2 : IResult
     where TResult3 : IResult
@@ -424,3 +425,4 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5, TR
     /// <returns>The metadata.</returns>
     public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services) => GetMetadata(endpoint, services, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4));
 }
+#endif

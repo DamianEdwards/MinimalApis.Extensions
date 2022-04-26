@@ -37,7 +37,7 @@ namespace MinimalApis.Extensions.Binding;
 /// </list>
 /// </para>
 /// </typeparam>
-public record struct Body<TBody> : IProvideEndpointParameterMetadata
+public record struct Body<TBody> : IEndpointParameterMetadataProvider
 {
     // https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap
     private const int MaxSizeLessThanLOH = 84999;

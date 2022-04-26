@@ -8,14 +8,18 @@ namespace Microsoft.AspNetCore.Http.HttpResults;
 /// with status code Accepted (202) and Location header.
 /// Targets a registered route.
 /// </summary>
-public sealed class Accepted : IEndpointMetadataProvider
+/// <typeparam name="TValue">The type of value object that will be JSON serialized to the response body.</typeparam>
+public sealed class Accepted<TValue> : IResult, IEndpointMetadataProvider
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Accepted"/> class.
+    /// Initializes a new instance of the <see cref="Accepted"/> class with the values
+    /// provided.
     /// </summary>
     /// <param name="location">The location at which the status of requested content can be monitored.</param>
-    internal Accepted(string? location = null)
+    /// <param name="value">The value to format in the entity body.</param>
+    internal Accepted(string? location, TValue? value)
     {
+        Value = value;
         Location = location;
     }
 
@@ -24,8 +28,11 @@ public sealed class Accepted : IEndpointMetadataProvider
     /// provided.
     /// </summary>
     /// <param name="locationUri">The location at which the status of requested content can be monitored.</param>
-    internal Accepted(Uri locationUri)
+    /// <param name="value">The value to format in the entity body.</param>
+    internal Accepted(Uri locationUri, TValue? value)
     {
+        Value = value;
+
         if (locationUri == null)
         {
             throw new ArgumentNullException(nameof(locationUri));
@@ -42,6 +49,11 @@ public sealed class Accepted : IEndpointMetadataProvider
     }
 
     /// <summary>
+    /// Gets the object result.
+    /// </summary>
+    public TValue? Value { get; }
+
+    /// <summary>
     /// Gets the HTTP status code: <see cref="StatusCodes.Status202Accepted"/>
     /// </summary>
     public int StatusCode => StatusCodes.Status202Accepted;
@@ -51,15 +63,9 @@ public sealed class Accepted : IEndpointMetadataProvider
     /// </summary>
     public string? Location { get; }
 
-    /// <summary>
-    /// Writes an HTTP response reflecting the result.
-    /// </summary>
-    /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
-    /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
+    /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)
     {
-        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
-
         if (!string.IsNullOrEmpty(Location))
         {
             httpContext.Response.Headers.Location = Location;
@@ -67,7 +73,7 @@ public sealed class Accepted : IEndpointMetadataProvider
 
         httpContext.Response.StatusCode = StatusCode;
 
-        return Task.CompletedTask;
+        return httpContext.Response.WriteAsJsonAsync(Value);
     }
 
     /// <summary>
@@ -76,7 +82,7 @@ public sealed class Accepted : IEndpointMetadataProvider
     /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     public static void PopulateMetadata(EndpointMetadataContext context)
     {
-        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status202Accepted));
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(typeof(TValue), StatusCodes.Status202Accepted, "application/json"));
     }
 }
 #endif

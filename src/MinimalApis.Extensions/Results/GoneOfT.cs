@@ -1,22 +1,20 @@
-﻿#if NET6_0
-using Microsoft.AspNetCore.Http.Metadata;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Http.Metadata;
 
 namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
 /// An <see cref="IResult"/> that on execution will write an object to the response
-/// with Ok (200) status code.
+/// with Gone (410) status code.
 /// </summary>
-/// <typeparam name="TValue">The type of object that will be JSON serialized to the response body.</typeparam>
-public sealed class Ok<TValue> : IResult, IEndpointMetadataProvider
+/// <typeparam name="TValue">The type of value object that will be JSON serialized to the response body.</typeparam>
+public sealed class Gone<TValue> : IResult, IEndpointMetadataProvider
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Ok"/> class with the values.
+    /// Initializes a new instance of the <see cref="Gone"/> class with the values
+    /// provided.
     /// </summary>
     /// <param name="value">The value to format in the entity body.</param>
-    internal Ok(TValue? value)
+    internal Gone(TValue? value)
     {
         Value = value;
     }
@@ -27,9 +25,9 @@ public sealed class Ok<TValue> : IResult, IEndpointMetadataProvider
     public TValue? Value { get; }
 
     /// <summary>
-    /// Gets the HTTP status code: <see cref="StatusCodes.Status200OK"/>
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status400BadRequest"/>
     /// </summary>
-    public int StatusCode => StatusCodes.Status200OK;
+    public int StatusCode => StatusCodes.Status410Gone;
 
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)
@@ -45,7 +43,6 @@ public sealed class Ok<TValue> : IResult, IEndpointMetadataProvider
     /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     public static void PopulateMetadata(EndpointMetadataContext context)
     {
-        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(typeof(TValue), StatusCodes.Status200OK, "application/json"));
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(typeof(TValue), StatusCodes.Status410Gone, "application/json"));
     }
 }
-#endif

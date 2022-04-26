@@ -1,5 +1,7 @@
 ﻿#if NET6_0
 using Microsoft.AspNetCore.Http.Metadata;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.Http.HttpResults;
 
@@ -7,15 +9,23 @@ namespace Microsoft.AspNetCore.Http.HttpResults;
 /// An <see cref="IResult"/> that on execution will write an object to the response
 /// with Conflict (409) status code.
 /// </summary>
-public sealed class Conflict : IResult, IEndpointMetadataProvider
+/// <typeparam name="TValue">The type of object that will be JSON serialized to the response body.</typeparam>
+public sealed class Conflict<TValue> : IResult, IEndpointMetadataProvider
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Conflict"/> class with the values
     /// provided.
     /// </summary>
-    internal Conflict()
+    /// <param name="error">The error content to format in the entity body.</param>
+    internal Conflict(TValue? error)
     {
+        Value = error;
     }
+
+    /// <summary>
+    /// Gets the object result.
+    /// </summary>
+    public TValue? Value { get; }
 
     /// <summary>
     /// Gets the HTTP status code: <see cref="StatusCodes.Status409Conflict"/>
@@ -27,7 +37,7 @@ public sealed class Conflict : IResult, IEndpointMetadataProvider
     {
         httpContext.Response.StatusCode = StatusCode;
 
-        return Task.CompletedTask;
+        return httpContext.Response.WriteAsJsonAsync(Value);
     }
 
     /// <summary>
@@ -36,7 +46,7 @@ public sealed class Conflict : IResult, IEndpointMetadataProvider
     /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     public static void PopulateMetadata(EndpointMetadataContext context)
     {
-        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status409Conflict));
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(typeof(TValue), StatusCodes.Status409Conflict, "application/json"));
     }
 }
 #endif

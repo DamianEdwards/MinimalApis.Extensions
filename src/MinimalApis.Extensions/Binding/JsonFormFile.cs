@@ -10,7 +10,7 @@ namespace MinimalApis.Extensions.Binding;
 /// Represents a JSON file in a multipart/form-data request (i.e. a form upload).
 /// </summary>
 /// <typeparam name="TValue">The <see cref="Type"/> to deserialize the JSON payload into.</typeparam>
-public class JsonFormFile<TValue> : JsonFormFile, IProvideEndpointParameterMetadata
+public class JsonFormFile<TValue> : JsonFormFile, IEndpointParameterMetadataProvider
 {
     /// <summary>
     /// Creates a new <see cref="JsonFormFile{TValue}"/>.
@@ -69,7 +69,7 @@ public class JsonFormFile<TValue> : JsonFormFile, IProvideEndpointParameterMetad
 /// <summary>
 /// Represents a JSON file in a multipart/form-data request (i.e. a form-based file upload).
 /// </summary>
-public class JsonFormFile : IProvideEndpointParameterMetadata
+public class JsonFormFile : IEndpointParameterMetadataProvider
 {
     internal static readonly JsonSerializerOptions DefaultSerializerOptions = new(JsonSerializerDefaults.Web);
 

@@ -5,6 +5,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Extension methods", Scope = "type", Target = "~T:MinimalApis.Extensions.Results.ResultExtensions")]
+[assembly: SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Extension methods", Scope = "type", Target = "~T:MinimalApis.Extensions.Results.TypedResults")]
 [assembly: SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Method called by reflection and must have this signature", Scope = "namespaceanddescendants", Target = "~N:MinimalApis.Extensions.Results")]
 [assembly: SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Method called by reflection and must have this signature", Scope = "namespaceanddescendants", Target = "~N:MinimalApis.Extensions.Binding")] 

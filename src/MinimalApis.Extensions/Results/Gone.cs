@@ -1,22 +1,29 @@
-﻿using MinimalApis.Extensions.Metadata;
+﻿using Microsoft.AspNetCore.Http.Metadata;
 
-namespace MinimalApis.Extensions.Results;
+namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status410Gone"/> response.
 /// </summary>
-public class Gone : ResultBase, IProvideEndpointResponseMetadata
+public sealed class Gone : IResult, IEndpointMetadataProvider
 {
-    private const int ResponseStatusCode = StatusCodes.Status410Gone;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="Gone"/> class.
     /// </summary>
-    /// <param name="message">An optional message to return in the response body.</param>
-    public Gone(string? message = null)
+    internal Gone()
     {
-        ResponseContent = message;
-        StatusCode = ResponseStatusCode;
+
+    }
+
+    // <summary>
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status201Created"/>
+    /// </summary>
+    public int StatusCode => StatusCodes.Status410Gone;
+
+    /// <inheritdoc/>
+    public Task ExecuteAsync(HttpContext httpContext)
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -27,6 +34,6 @@ public class Gone : ResultBase, IProvideEndpointResponseMetadata
     /// <returns>The metadata.</returns>
     public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
+        yield return new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status410Gone);
     }
 }

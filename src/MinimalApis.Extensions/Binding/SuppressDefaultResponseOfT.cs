@@ -8,7 +8,7 @@ namespace MinimalApis.Extensions.Binding;
 /// Default binding of the <typeparamref name="TValue"/> will still occur.
 /// </summary>
 /// <typeparam name="TValue">The <see cref="Type"/> of the parameter.</typeparam>
-public class SuppressDefaultResponse<TValue> : IProvideEndpointParameterMetadata
+public class SuppressDefaultResponse<TValue> : IEndpointParameterMetadataProvider
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="SuppressDefaultResponse{TValue}"/>.
@@ -79,5 +79,5 @@ public class SuppressDefaultResponse<TValue> : IProvideEndpointParameterMetadata
     /// <param name="services">The <see cref="IServiceProvider"/>.</param>
     /// <returns>The metadata.</returns>
     public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services) =>
-        IProvideEndpointParameterMetadata.GetDefaultMetadataForWrapperType<TValue>(parameter, services);
+        IEndpointParameterMetadataProvider.GetDefaultMetadataForWrapperType<TValue>(parameter, services);
 }

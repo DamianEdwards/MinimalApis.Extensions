@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status422UnprocessableEntity"/> response.
 /// </summary>
-public class UnprocessableEntity : ResultBase, IProvideEndpointResponseMetadata
+public class UnprocessableEntity : ResultBase, IEndpointMetadataProvider
 {
     private const int ResponseStatusCode = StatusCodes.Status422UnprocessableEntity;
 

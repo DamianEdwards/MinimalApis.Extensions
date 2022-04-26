@@ -10,7 +10,7 @@ namespace MinimalApis.Extensions.Binding;
 /// parameter of type <typeparamref name="TValue"/> of a route handler delegate.
 /// </summary>
 /// <typeparam name="TValue">The parameter type.</typeparam>
-public struct Bind<TValue> : IProvideEndpointParameterMetadata
+public struct Bind<TValue> : IEndpointParameterMetadataProvider
 {
     private readonly TValue? _value;
 
@@ -83,7 +83,7 @@ public struct Bind<TValue> : IProvideEndpointParameterMetadata
 
         return binder switch
         {
-            IProvideEndpointParameterMetadata => IProvideEndpointParameterMetadata.GetMetadataLateBound(parameter, services),
+            IEndpointParameterMetadataProvider => IEndpointParameterMetadataProvider.PopulateMetadataLateBound(parameter, services),
             _ => new[] { new Mvc.ConsumesAttribute(typeof(TValue), "application/json") }
         };
     }

@@ -9,7 +9,7 @@ namespace MinimalApis.Extensions.Results;
 /// of an entity represented by the <typeparamref name="TResult"/> type.
 /// </summary>
 /// <typeparam name="TResult">The type of the entity that was created and to be JSON serialized to the response body.</typeparam>
-public class Created<TResult> : IResult, IProvideEndpointResponseMetadata
+public class Created<TResult> : IResult, IEndpointMetadataProvider
 {
     private const string JsonContentType = "application/json";
 

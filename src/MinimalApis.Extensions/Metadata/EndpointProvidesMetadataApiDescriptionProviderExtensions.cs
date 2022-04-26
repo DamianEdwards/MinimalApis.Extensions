@@ -6,14 +6,14 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
 /// Extension methods for adding an <see cref="IApiDescriptionProvider"/> so that <see cref="Endpoint"/> metadata
-/// provided by <see cref="IProvideEndpointParameterMetadata"/> and <see cref="IProvideEndpointResponseMetadata"/>
+/// provided by <see cref="IEndpointParameterMetadataProvider"/> and <see cref="IEndpointMetadataProvider"/>
 /// appear in ApiExplorer and thus OpenAPI/Swagger documents and UI.
 /// </summary>
 public static class EndpointProvidesMetadataApiDescriptionProviderExtensions
 {
     /// <summary>
-    /// Configures ApiExplorer using <see cref="Endpoint"/> metadata, <see cref="IProvideEndpointParameterMetadata"/>
-    /// and <see cref="IProvideEndpointResponseMetadata"/>. 
+    /// Configures ApiExplorer using <see cref="Endpoint"/> metadata, <see cref="IEndpointParameterMetadataProvider"/>
+    /// and <see cref="IEndpointMetadataProvider"/>. 
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/>.</param>
     /// <returns>The <see cref="IServiceCollection"/>.</returns>

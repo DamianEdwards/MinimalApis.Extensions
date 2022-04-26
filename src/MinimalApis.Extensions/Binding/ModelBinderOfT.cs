@@ -20,7 +20,7 @@ namespace MinimalApis.Extensions.Binding;
 /// </para>
 /// </summary>
 /// <typeparam name="TValue">The type to model bind</typeparam>
-public class ModelBinder<TValue> : IProvideEndpointParameterMetadata
+public class ModelBinder<TValue> : IEndpointParameterMetadataProvider
 {
     // This caches the model binding information so we don't need to create one from a factory every time
     private static readonly ConcurrentDictionary<(ParameterInfo, IModelBinderFactory, IModelMetadataProvider),
@@ -119,9 +119,9 @@ public class ModelBinder<TValue> : IProvideEndpointParameterMetadata
     /// <returns>The metadata.</returns>
     public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services)
     {
-        if (typeof(TValue).IsAssignableTo(typeof(IProvideEndpointParameterMetadata)))
+        if (typeof(TValue).IsAssignableTo(typeof(IEndpointParameterMetadataProvider)))
         {
-            return IProvideEndpointParameterMetadata.GetMetadataLateBound(parameter, services);
+            return IEndpointParameterMetadataProvider.PopulateMetadataLateBound(parameter, services);
         }
         return Enumerable.Empty<object>();
     }
