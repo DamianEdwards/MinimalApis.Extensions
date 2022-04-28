@@ -26,6 +26,11 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
 
+    - name: Setup .NET SDK 6.0.x
+      uses: actions/setup-dotnet@v1
+      with:
+          dotnet-version: 6.0.x
+
     - name: Restore dependencies
       run: dotnet restore
 
