@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using TodosApi.Dapper;
 using Xunit;
 
 namespace TodosApis.Dapper.IntegrationTests;
@@ -311,7 +312,7 @@ public class TodosApiIntegration
 
         var completedTodos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/complete");
 
-        Assert.Equal(expectedTodos.Where(x => x.IsComplete == true).Count(), completedTodos?.Count());
+        Assert.Equal(expectedTodos.Where(x => x.IsComplete == true).Count(), completedTodos?.Count);
     }
 
     [Fact]
@@ -351,7 +352,7 @@ public class TodosApiIntegration
 
         var completedTodos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/incomplete");
 
-        Assert.Equal(expectedTodos.Where(x => x.IsComplete == false).Count(), completedTodos?.Count());
+        Assert.Equal(expectedTodos.Where(x => x.IsComplete == false).Count(), completedTodos?.Count);
     }
 
     [Fact]

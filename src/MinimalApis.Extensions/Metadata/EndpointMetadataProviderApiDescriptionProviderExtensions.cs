@@ -11,7 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 /// provided by <see cref="IEndpointParameterMetadataProvider"/> and <see cref="IEndpointMetadataProvider"/>
 /// appear in ApiExplorer and thus OpenAPI/Swagger documents and UI.
 /// </summary>
-public static class EndpointProvidesMetadataApiDescriptionProviderExtensions
+public static class EndpointMetadataProviderApiDescriptionProviderExtensions
 {
     /// <summary>
     /// Configures ApiExplorer using <see cref="Endpoint"/> metadata, <see cref="IEndpointParameterMetadataProvider"/>
@@ -19,13 +19,13 @@ public static class EndpointProvidesMetadataApiDescriptionProviderExtensions
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/>.</param>
     /// <returns>The <see cref="IServiceCollection"/>.</returns>
-    public static IServiceCollection AddEndpointsProvidesMetadataApiExplorer(this IServiceCollection services)
+    public static IServiceCollection AddEndpointsMetadataProviderApiExplorer(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services, nameof(services));
 
         services.AddEndpointsApiExplorer();
 
-        services.TryAddEnumerable(ServiceDescriptor.Transient<IApiDescriptionProvider, EndpointProvidesMetadataApiDescriptionProvider>());
+        services.TryAddEnumerable(ServiceDescriptor.Transient<IApiDescriptionProvider, EndpointMetadataProviderApiDescriptionProvider>());
 
         return services;
     }

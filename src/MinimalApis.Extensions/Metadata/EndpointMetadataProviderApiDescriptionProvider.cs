@@ -16,17 +16,17 @@ namespace MinimalApis.Extensions.Metadata;
 /// <see cref="IEndpointParameterMetadataProvider"/> and <see cref="IEndpointMetadataProvider"/>
 /// too ApiExplorer and thus OpenAPI/Swagger documents and UI.
 /// </summary>
-public class EndpointProvidesMetadataApiDescriptionProvider : IApiDescriptionProvider
+public class EndpointMetadataProviderApiDescriptionProvider : IApiDescriptionProvider
 {
     private readonly IServiceProvider _services;
     private readonly EndpointDataSource _endpointDataSource;
 
     /// <summary>
-    /// Creates an instance of <see cref="EndpointProvidesMetadataApiDescriptionProvider"/>.
+    /// Creates an instance of <see cref="EndpointMetadataProviderApiDescriptionProvider"/>.
     /// </summary>
     /// <param name="services">The <see cref="IServiceProvider"/>.</param>
     /// <param name="endpointDataSource">The <see cref="EndpointDataSource"/>.</param>
-    public EndpointProvidesMetadataApiDescriptionProvider(IServiceProvider services, EndpointDataSource endpointDataSource)
+    public EndpointMetadataProviderApiDescriptionProvider(IServiceProvider services, EndpointDataSource endpointDataSource)
     {
         ArgumentNullException.ThrowIfNull(services, nameof(services));
         ArgumentNullException.ThrowIfNull(endpointDataSource, nameof(endpointDataSource));

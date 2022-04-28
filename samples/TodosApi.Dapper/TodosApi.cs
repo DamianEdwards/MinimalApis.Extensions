@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using MinimalApis.Extensions.Binding;
 using Dapper;
+using System.ComponentModel.DataAnnotations;
 
 namespace TodosApi.Dapper;
 
@@ -70,10 +71,30 @@ public static class TodosApi
             : TypedResults.NotFound();
 
     public static async Task<Results<NoContent, NotFound>> DeleteTodo(int id, IDbConnection db) =>
-    await db.ExecuteAsync("DELETE FROM Todos WHERE Id = @id", new { id }) == 1
-        ? TypedResults.NoContent()
-        : TypedResults.NotFound();
+        await db.ExecuteAsync("DELETE FROM Todos WHERE Id = @id", new { id }) == 1
+            ? TypedResults.NoContent()
+            : TypedResults.NotFound();
 
     public static async Task<Ok<int>> DeleteAll(IDbConnection db) =>
         TypedResults.Ok(await db.ExecuteAsync("DELETE FROM Todos"));
+}
+
+public class NewTodo
+{
+    [Required]
+    public string? Title { get; set; }
+
+    public bool IsComplete { get; set; }
+
+    public static implicit operator Todo(NewTodo todo) => new() { Title = todo.Title, IsComplete = todo.IsComplete };
+}
+
+public class Todo
+{
+    public int Id { get; set; }
+
+    [Required]
+    public string? Title { get; set; }
+
+    public bool IsComplete { get; set; }
 }

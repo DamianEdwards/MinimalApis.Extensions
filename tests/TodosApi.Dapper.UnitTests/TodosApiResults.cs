@@ -68,14 +68,15 @@ public class TodosApiResults
           .ReturnsAsync(expected);
 
         var result = await TodosApi.GetAllTodos(db.Object);
-        var resultTodos = result.Value.ToList();
+        var resultTodos = result.Value?.ToList();
 
-        Assert.Equal(expected.Length, resultTodos.Count);
+        Assert.NotNull(resultTodos);
+        Assert.Equal(expected.Length, resultTodos?.Count);
         for (int i = 0; i < expected.Length; i++)
         {
-            Assert.Equal(expected[i].Id, resultTodos[i].Id);
-            Assert.Equal(expected[i].Title, resultTodos[i].Title);
-            Assert.Equal(expected[i].IsComplete, resultTodos[i].IsComplete);
+            Assert.Equal(expected[i].Id, resultTodos?[i].Id);
+            Assert.Equal(expected[i].Title, resultTodos?[i].Title);
+            Assert.Equal(expected[i].IsComplete, resultTodos?[i].IsComplete);
         }
     }
 
@@ -104,7 +105,7 @@ public class TodosApiResults
         };
 
         db.SetupDapperAsync(x => x.ExecuteAsync(It.IsAny<string>(), null, null, null, null))
-            .ReturnsAsync(expected.Count());
+            .ReturnsAsync(expected.Length);
 
         var result = await TodosApi.DeleteAll(db.Object);
 
@@ -136,10 +137,10 @@ public class TodosApiResults
         };
 
         db.SetupDapperAsync(x => x.ExecuteAsync(It.IsAny<string>(), null, null, null, null))
-            .ReturnsAsync(expected.Count());
+            .ReturnsAsync(expected.Length);
 
         var result = await TodosApi.DeleteAll(db.Object);
 
-        Assert.Equal(expected.Count(), result.Value);
+        Assert.Equal(expected.Length, result.Value);
     }
 }

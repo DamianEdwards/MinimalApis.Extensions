@@ -6,6 +6,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TodosApi.Dapper;
 
 namespace TodosApis.Dapper.IntegrationTests;
 
@@ -17,23 +18,23 @@ class TodosApplication : WebApplicationFactory<Program>
         {
             services.AddScoped<IDbConnection>(_ => new SqliteConnection("Data Source=todos-default.db;Cache=Shared"));
 
-            EnsureDbRecreated(services).Wait();
+            TodosApplication.EnsureDbRecreated(services).Wait();
         });
 
         return base.CreateHost(builder);
     }
 
-    private async Task EnsureDbRecreated(IServiceCollection services)
+    private static async Task EnsureDbRecreated(IServiceCollection services)
     {
         var serviceProvider = services.BuildServiceProvider();
 
         using var db = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IDbConnection>();
 
-        await EnsureTableDeleted(db);
+        await TodosApplication.EnsureTableDeleted(db);
         await EnsureTableCreated(db);
     }
 
-    private async Task EnsureTableCreated(IDbConnection db)
+    private static async Task EnsureTableCreated(IDbConnection db)
     {
         var sql = $@"CREATE TABLE IF NOT EXISTS Todos (
                 {nameof(Todo.Id)} INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -44,7 +45,7 @@ class TodosApplication : WebApplicationFactory<Program>
         await db.ExecuteAsync(sql);
     }
 
-    private async Task EnsureTableDeleted(IDbConnection db)
+    private static async Task EnsureTableDeleted(IDbConnection db)
     {
         var sql = $@"DROP TABLE IF EXISTS Todos";
 
