@@ -1,32 +1,48 @@
-﻿using MinimalApis.Extensions.Metadata;
+﻿#if NET6_0
+using Microsoft.AspNetCore.Http.Metadata;
 
-namespace MinimalApis.Extensions.Results;
+namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status409Conflict"/> response.
+/// An <see cref="IResult"/> that on execution will write an object to the response
+/// with Conflict (409) status code.
 /// </summary>
-public class Conflict : ResultBase, IProvideEndpointResponseMetadata
+public sealed class Conflict : IResult, IEndpointMetadataProvider
 {
-    private const int ResponseStatusCode = StatusCodes.Status409Conflict;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Conflict"/> class with the values
+    /// provided.
+    /// </summary>
+    internal Conflict()
+    {
+    }
+
+    internal static readonly Conflict Instance = new();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Conflict"/> class.
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status409Conflict"/>
     /// </summary>
-    /// <param name="message">An optional message to return in the response body.</param>
-    public Conflict(string? message = null)
+    public int StatusCode => StatusCodes.Status409Conflict;
+
+    /// <inheritdoc/>
+    public Task ExecuteAsync(HttpContext httpContext)
     {
-        ResponseContent = message;
-        StatusCode = ResponseStatusCode;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        httpContext.Response.StatusCode = StatusCode;
+
+        return Task.CompletedTask;
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Populates metadata for the related <see cref="Endpoint"/>.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    public static void PopulateMetadata(EndpointMetadataContext context)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
+        ArgumentNullException.ThrowIfNull(context);
+
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status409Conflict));
     }
 }
+#endif

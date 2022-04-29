@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using MinimalApis.Extensions.Metadata;
+using Microsoft.AspNetCore.Http.Metadata;
 
 namespace MinimalApis.Extensions.Binding;
 
@@ -8,7 +8,7 @@ namespace MinimalApis.Extensions.Binding;
 /// Default binding of the <typeparamref name="TValue"/> will still occur.
 /// </summary>
 /// <typeparam name="TValue">The <see cref="Type"/> of the parameter.</typeparam>
-public class SuppressDefaultResponse<TValue> : IProvideEndpointParameterMetadata
+public class SuppressDefaultResponse<TValue> : IEndpointParameterMetadataProvider
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="SuppressDefaultResponse{TValue}"/>.
@@ -73,11 +73,9 @@ public class SuppressDefaultResponse<TValue> : IProvideEndpointParameterMetadata
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Populates metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="parameter">The parameter to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services) =>
-        IProvideEndpointParameterMetadata.GetDefaultMetadataForWrapperType<TValue>(parameter, services);
+    /// <param name="context">The <see cref="EndpointParameterMetadataContext"/>.</param>
+    public static void PopulateMetadata(EndpointParameterMetadataContext context) =>
+        EndpointParameterMetadataHelpers.PopulateDefaultMetadataForWrapperType<TValue>(context);
 }

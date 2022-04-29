@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <Description>A set of extensions and helpers for working with ASP.NET Core Minimal APIs.</Description>
     <PackageTags>ASP.NET Web MinimalApis Apis REST Binding IResult</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -11,12 +11,13 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <Using Include="Microsoft.AspNetCore.Http" />
     <Using Alias="Mvc" Include="Microsoft.AspNetCore.Mvc" />
+    <InternalsVisibleTo Include="MinimalApis.Extensions.UnitTests" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="../../README.md" Pack="true" PackagePath="\" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <PackageReference Include="MiniValidation" Version="0.5.0-pre.20220315.50" />
+    <PackageReference Include="MiniValidation" Version="0.5.1-pre.20220429.53" />
   </ItemGroup>
 
 </Project>

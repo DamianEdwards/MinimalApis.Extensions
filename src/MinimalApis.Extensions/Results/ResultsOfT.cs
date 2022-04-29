@@ -1,6 +1,7 @@
-﻿using MinimalApis.Extensions.Metadata;
+﻿#if NET6_0
+using Microsoft.AspNetCore.Http.Metadata;
 
-namespace MinimalApis.Extensions.Results;
+namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
 /// Represents the result of an <see cref="Endpoint"/> route handler delegate that can return more than one <see cref="IResult"/> type.
@@ -39,23 +40,20 @@ public abstract class ResultsBase : IResult
     /// Gets the <see cref="Endpoint"/> metadata for the set of result types that the given
     /// <see cref="Endpoint"/> route handler delegate delclares it can return.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/>.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     /// <param name="resultTypes">The different result types the route handler delegate can return.</param>
     /// <returns></returns>
-    protected static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services, params Type[] resultTypes)
+    protected static void PopulateMetadata(EndpointMetadataContext context, params Type[] resultTypes)
     {
-        var metadata = new List<object>();
+        ArgumentNullException.ThrowIfNull(context);
 
         foreach (var resultType in resultTypes)
         {
-            if (resultType.IsAssignableTo(typeof(IProvideEndpointResponseMetadata)))
+            if (resultType.IsAssignableTo(typeof(IEndpointMetadataProvider)))
             {
-                metadata.AddRange(IProvideEndpointResponseMetadata.GetMetadataLateBound(resultType, endpoint, services));
+                EndpointMetadataHelpers.PopulateMetadataLateBound(resultType, context);
             }
         }
-
-        return metadata;
     }
 }
 
@@ -64,7 +62,7 @@ public abstract class ResultsBase : IResult
 /// </summary>
 /// <typeparam name="TResult1">The first result type.</typeparam>
 /// <typeparam name="TResult2">The second result type.</typeparam>
-public sealed class Results<TResult1, TResult2> : ResultsBase, IProvideEndpointResponseMetadata
+public sealed class Results<TResult1, TResult2> : ResultsBase, IEndpointMetadataProvider
     where TResult1 : IResult
     where TResult2 : IResult
 {
@@ -89,10 +87,9 @@ public sealed class Results<TResult1, TResult2> : ResultsBase, IProvideEndpointR
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services) => GetMetadata(endpoint, services, typeof(TResult1), typeof(TResult2));
+    public static void PopulateMetadata(EndpointMetadataContext context) => PopulateMetadata(context, typeof(TResult1), typeof(TResult2));
 }
 
 /// <summary>
@@ -101,7 +98,7 @@ public sealed class Results<TResult1, TResult2> : ResultsBase, IProvideEndpointR
 /// <typeparam name="TResult1">The first result type.</typeparam>
 /// <typeparam name="TResult2">The second result type.</typeparam>
 /// <typeparam name="TResult3">The third result type.</typeparam>
-public sealed class Results<TResult1, TResult2, TResult3> : ResultsBase, IProvideEndpointResponseMetadata
+public sealed class Results<TResult1, TResult2, TResult3> : ResultsBase, IEndpointMetadataProvider
     where TResult1 : IResult
     where TResult2 : IResult
     where TResult3 : IResult
@@ -168,10 +165,9 @@ public sealed class Results<TResult1, TResult2, TResult3> : ResultsBase, IProvid
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services) => GetMetadata(endpoint, services, typeof(TResult1), typeof(TResult2), typeof(TResult3));
+    public static void PopulateMetadata(EndpointMetadataContext context) => PopulateMetadata(context, typeof(TResult1), typeof(TResult2), typeof(TResult3));
 }
 
 /// <summary>
@@ -181,7 +177,7 @@ public sealed class Results<TResult1, TResult2, TResult3> : ResultsBase, IProvid
 /// <typeparam name="TResult2">The second result type.</typeparam>
 /// <typeparam name="TResult3">The third result type.</typeparam>
 /// <typeparam name="TResult4">The fourth result type.</typeparam>
-public sealed class Results<TResult1, TResult2, TResult3, TResult4> : ResultsBase, IProvideEndpointResponseMetadata
+public sealed class Results<TResult1, TResult2, TResult3, TResult4> : ResultsBase, IEndpointMetadataProvider
     where TResult1 : IResult
     where TResult2 : IResult
     where TResult3 : IResult
@@ -217,84 +213,11 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4> : ResultsBas
     public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(TResult4 result) => new(result);
 
     /// <summary>
-    /// Converts the <see cref="Results{TResult1, TResult2}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
-    /// </summary>
-    /// <param name="result">The result.</param>
-    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult1, TResult2> result) => new(result);
-
-    /// <summary>
-    /// Converts the <see cref="Results{TResult2, TResult1}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
-    /// </summary>
-    /// <param name="result">The result.</param>
-    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult2, TResult1> result) => new(result);
-
-    /// <summary>
-    /// Converts the <see cref="Results{TResult2, TResult3}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
-    /// </summary>
-    /// <param name="result">The result.</param>
-    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult2, TResult3> result) => new(result);
-
-    /// <summary>
-    /// Converts the <see cref="Results{TResult3, TResult2}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
-    /// </summary>
-    /// <param name="result">The result.</param>
-    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult3, TResult2> result) => new(result.Result);
-
-    /// <summary>
-    /// Converts the <see cref="Results{TResult1, TResult3}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
-    /// </summary>
-    /// <param name="result">The result.</param>
-    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult1, TResult3> result) => new(result);
-
-    /// <summary>
-    /// Converts the <see cref="Results{TResult3, TResult1}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
-    /// </summary>
-    /// <param name="result">The result.</param>
-    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult3, TResult1> result) => new(result);
-
-    /// <summary>
-    /// Converts the <see cref="Results{TResult1, TResult2, TResult3}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
-    /// </summary>
-    /// <param name="result">The result.</param>
-    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult1, TResult2, TResult3> result) => new(result);
-
-    /// <summary>
-    /// Converts the <see cref="Results{TResult1, TResult3, TResult2}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
-    /// </summary>
-    /// <param name="result">The result.</param>
-    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult1, TResult3, TResult2> result) => new(result);
-
-    /// <summary>
-    /// Converts the <see cref="Results{TResult2, TResult1, TResult3}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
-    /// </summary>
-    /// <param name="result">The result.</param>
-    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult2, TResult1, TResult3> result) => new(result);
-
-    /// <summary>
-    /// Converts the <see cref="Results{TResult2, TResult3, TResult1}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
-    /// </summary>
-    /// <param name="result">The result.</param>
-    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult2, TResult3, TResult1> result) => new(result);
-
-    /// <summary>
-    /// Converts the <see cref="Results{TResult3, TResult1, TResult1}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
-    /// </summary>
-    /// <param name="result">The result.</param>
-    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult3, TResult1, TResult2> result) => new(result);
-
-    /// <summary>
-    /// Converts the <see cref="Results{TResult3, TResult2, TResult1}"/> to a <see cref="Results{TResult1, TResult2, TResult3, TResult4}"/>.
-    /// </summary>
-    /// <param name="result">The result.</param>
-    public static implicit operator Results<TResult1, TResult2, TResult3, TResult4>(Results<TResult3, TResult2, TResult1> result) => new(result);
-
-    /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services) => GetMetadata(endpoint, services, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4));
+    public static void PopulateMetadata(EndpointMetadataContext context) => PopulateMetadata(context, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4));
 }
 
 // TODO: Add the rest of the implicit operators to convert every Results combo to every other Results combo, should likely code-gen this :\
@@ -307,7 +230,7 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4> : ResultsBas
 /// <typeparam name="TResult3">The third result type.</typeparam>
 /// <typeparam name="TResult4">The fourth result type.</typeparam>
 /// <typeparam name="TResult5">The fifth result type.</typeparam>
-public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5> : ResultsBase, IProvideEndpointResponseMetadata
+public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5> : ResultsBase, IEndpointMetadataProvider
     where TResult1 : IResult
     where TResult2 : IResult
     where TResult3 : IResult
@@ -352,10 +275,9 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5> : 
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services) => GetMetadata(endpoint, services, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4));
+    public static void PopulateMetadata(EndpointMetadataContext context) => PopulateMetadata(context, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4), typeof(TResult5));
 }
 
 /// <summary>
@@ -367,7 +289,7 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5> : 
 /// <typeparam name="TResult4">The fourth result type.</typeparam>
 /// <typeparam name="TResult5">The fifth result type.</typeparam>
 /// <typeparam name="TResult6">The sixth result type.</typeparam>
-public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5, TResult6> : ResultsBase, IProvideEndpointResponseMetadata
+public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5, TResult6> : ResultsBase, IEndpointMetadataProvider
     where TResult1 : IResult
     where TResult2 : IResult
     where TResult3 : IResult
@@ -419,8 +341,8 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5, TR
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services) => GetMetadata(endpoint, services, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4));
+    public static void PopulateMetadata(EndpointMetadataContext context) => PopulateMetadata(context, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4), typeof(TResult5), typeof(TResult6));
 }
+#endif

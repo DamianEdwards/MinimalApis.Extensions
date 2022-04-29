@@ -1,62 +1,79 @@
-﻿using MinimalApis.Extensions.Metadata;
+﻿#if NET6_0
+using Microsoft.AspNetCore.Http.Metadata;
 
-namespace MinimalApis.Extensions.Results;
+namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status201Created"/> response.
+/// An <see cref="IResult"/> that on execution will write an object to the response
+/// with status code Created (201) and Location header.
 /// </summary>
-public class Created : ResultBase, IProvideEndpointResponseMetadata
+public sealed class Created : IResult, IEndpointMetadataProvider
 {
     /// <summary>
-    /// The <see cref="StatusCodes.Status201Created"/> response status code.
+    /// Initializes a new instance of the <see cref="Created"/> class with the values
+    /// provided.
     /// </summary>
-    protected const int ResponseStatusCode = StatusCodes.Status201Created;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Created"/> class.
-    /// </summary>
-    /// <param name="uri">The URI the location response header will be set to.</param>
-    /// <param name="value">An optional value representing the created entity.</param>
-    public Created(string uri, object? value)
+    /// <param name="location">The location at which the content has been created.</param>
+    internal Created(string location)
     {
-        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+        ArgumentNullException.ThrowIfNull(location);
 
-        Uri = uri;
-        Value = value;
-        StatusCode = ResponseStatusCode;
+        Location = location;
     }
 
     /// <summary>
-    /// Gets the URI that the location response header will be set to.
+    /// Initializes a new instance of the <see cref="Created"/> class with the values
+    /// provided.
     /// </summary>
-    public string Uri { get; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public object? Value { get; }
-
-    /// <summary>
-    /// Writes an HTTP response reflecting the result.
-    /// </summary>
-    /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
-    /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
-    public override Task ExecuteAsync(HttpContext httpContext)
+    /// <param name="locationUri">The location at which the content has been created.</param>
+    internal Created(Uri locationUri)
     {
-        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+        ArgumentNullException.ThrowIfNull(locationUri);
 
-        httpContext.Response.Headers.Location = Uri;
-        return base.ExecuteAsync(httpContext);
+        if (locationUri.IsAbsoluteUri)
+        {
+            Location = locationUri.AbsoluteUri;
+        }
+        else
+        {
+            Location = locationUri.GetComponents(UriComponents.SerializationInfoString, UriFormat.UriEscaped);
+        }
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status201Created"/>
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    public int StatusCode => StatusCodes.Status201Created;
+
+    /// <summary>
+    /// Gets the value that will be set for the <c>Location</c> header.
+    /// </summary>
+    public string? Location { get; }
+
+    /// <inheritdoc/>
+    public Task ExecuteAsync(HttpContext httpContext)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        if (!string.IsNullOrEmpty(Location))
+        {
+            httpContext.Response.Headers.Location = Location;
+        }
+
+        httpContext.Response.StatusCode = StatusCode;
+
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Populates metadata for the related <see cref="Endpoint"/>.
+    /// </summary>
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    public static void PopulateMetadata(EndpointMetadataContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status201Created));
     }
 }
+#endif

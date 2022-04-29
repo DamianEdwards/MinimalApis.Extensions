@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿#if NET6_0
+using System.Collections.Immutable;
 using System.Reflection;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -12,20 +13,20 @@ namespace MinimalApis.Extensions.Metadata;
 
 /// <summary>
 /// An <see cref="IApiDescriptionProvider"/> that adds <see cref="Endpoint"/> metadata provided by
-/// <see cref="IProvideEndpointParameterMetadata"/> and <see cref="IProvideEndpointResponseMetadata"/>
+/// <see cref="IEndpointParameterMetadataProvider"/> and <see cref="IEndpointMetadataProvider"/>
 /// too ApiExplorer and thus OpenAPI/Swagger documents and UI.
 /// </summary>
-public class EndpointProvidesMetadataApiDescriptionProvider : IApiDescriptionProvider
+public class EndpointMetadataProviderApiDescriptionProvider : IApiDescriptionProvider
 {
     private readonly IServiceProvider _services;
     private readonly EndpointDataSource _endpointDataSource;
 
     /// <summary>
-    /// Creates an instance of <see cref="EndpointProvidesMetadataApiDescriptionProvider"/>.
+    /// Creates an instance of <see cref="EndpointMetadataProviderApiDescriptionProvider"/>.
     /// </summary>
     /// <param name="services">The <see cref="IServiceProvider"/>.</param>
     /// <param name="endpointDataSource">The <see cref="EndpointDataSource"/>.</param>
-    public EndpointProvidesMetadataApiDescriptionProvider(IServiceProvider services, EndpointDataSource endpointDataSource)
+    public EndpointMetadataProviderApiDescriptionProvider(IServiceProvider services, EndpointDataSource endpointDataSource)
     {
         ArgumentNullException.ThrowIfNull(services, nameof(services));
         ArgumentNullException.ThrowIfNull(endpointDataSource, nameof(endpointDataSource));
@@ -75,8 +76,8 @@ public class EndpointProvidesMetadataApiDescriptionProvider : IApiDescriptionPro
 
             var returnType = AwaitableInfo.GetMethodReturnType(method);
             var parameters = method.GetParameters();
-            var returnTypeProvidesMetadata = returnType.IsAssignableTo(typeof(IProvideEndpointResponseMetadata));
-            var parametersProvideMetadata = parameters.Any(p => p.ParameterType.IsAssignableTo(typeof(IProvideEndpointParameterMetadata)));
+            var returnTypeProvidesMetadata = returnType.IsAssignableTo(typeof(IEndpointMetadataProvider));
+            var parametersProvideMetadata = parameters.Any(p => p.ParameterType.IsAssignableTo(typeof(IEndpointParameterMetadataProvider)));
 
             if (!returnTypeProvidesMetadata && !parametersProvideMetadata)
             {
@@ -90,13 +91,10 @@ public class EndpointProvidesMetadataApiDescriptionProvider : IApiDescriptionPro
 
             if (returnTypeProvidesMetadata)
             {
-                var returnTypeMetadata = IProvideEndpointResponseMetadata.GetMetadataLateBound(returnType, endpoint, _services);
-                foreach (var item in returnTypeMetadata)
-                {
-                    apiDescription.ActionDescriptor.EndpointMetadata.Add(item);
-                }
+                var endpointMetadataContext = new EndpointMetadataContext(method, apiDescription.ActionDescriptor.EndpointMetadata, _services);
+                EndpointMetadataHelpers.PopulateMetadataLateBound(returnType, endpointMetadataContext);
 
-                var responseMetadata = returnTypeMetadata.OfType<IApiResponseMetadataProvider>().ToList();
+                var responseMetadata = apiDescription.ActionDescriptor.EndpointMetadata.OfType<IApiResponseMetadataProvider>().ToList();
 
                 if (apiDescription.SupportedResponseTypes.Count == 1 && responseMetadata.Count > 0)
                 {
@@ -140,25 +138,22 @@ public class EndpointProvidesMetadataApiDescriptionProvider : IApiDescriptionPro
                 {
                     var parameterType = parameter.ParameterType;
 
-                    if (!parameterType.IsAssignableTo(typeof(IProvideEndpointParameterMetadata)))
+                    if (!parameterType.IsAssignableTo(typeof(IEndpointParameterMetadataProvider)))
                     {
                         continue;
                     }
 
-                    var parameterTypeMetadata = IProvideEndpointParameterMetadata.GetMetadataLateBound(parameter, _services);
-                    foreach (var item in parameterTypeMetadata)
-                    {
-                        apiDescription.ActionDescriptor.EndpointMetadata.Add(item);
-                    }
+                    var endpointParameterMetadataContext = new EndpointParameterMetadataContext(parameter, apiDescription.ActionDescriptor.EndpointMetadata, _services);
+                    EndpointParameterMetadataHelpers.PopulateMetadataLateBound(endpointParameterMetadataContext);
 
-                    var parameterAcceptsMetadata = IProvideEndpointParameterMetadata.GetMetadataLateBound(parameter, _services).OfType<IAcceptsMetadata>().FirstOrDefault();
-                    if (parameterAcceptsMetadata is null)
+                    var acceptsMetadata = apiDescription.ActionDescriptor.EndpointMetadata.OfType<IAcceptsMetadata>().FirstOrDefault();
+                    if (acceptsMetadata is null)
                     {
                         continue;
                     }
 
-                    var acceptsRequestType = parameterAcceptsMetadata.RequestType;
-                    var isOptional = parameterAcceptsMetadata.IsOptional;
+                    var acceptsRequestType = acceptsMetadata.RequestType;
+                    var isOptional = acceptsMetadata.IsOptional;
                     var parameterDescription = new ApiParameterDescription
                     {
                         Name = acceptsRequestType is not null ? acceptsRequestType.Name : typeof(void).Name,
@@ -170,7 +165,7 @@ public class EndpointProvidesMetadataApiDescriptionProvider : IApiDescriptionPro
                     apiDescription.ParameterDescriptions.Add(parameterDescription);
 
                     var supportedRequestFormats = apiDescription.SupportedRequestFormats;
-                    foreach (var contentType in parameterAcceptsMetadata.ContentTypes)
+                    foreach (var contentType in acceptsMetadata.ContentTypes)
                     {
                         supportedRequestFormats.Add(new ApiRequestFormat
                         {
@@ -232,3 +227,4 @@ internal class EndpointModelMetadata : ModelMetadata
     public override bool ValidateChildren { get; }
     public override IReadOnlyList<object> ValidatorMetadata { get; } = Array.Empty<object>();
 }
+#endif

@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using MinimalApis.Extensions.Metadata;
+using Microsoft.AspNetCore.Http.Metadata;
 
 namespace MinimalApis.Extensions.Binding;
 
@@ -7,7 +7,7 @@ namespace MinimalApis.Extensions.Binding;
 /// Suprresses the default binding logic of RequestDelegateFactory when accepted as a parameter to a route handler.
 /// </summary>
 /// <typeparam name="TValue">The <see cref="Type"/> of the parameter to suppress binding for.</typeparam>
-public class SuppressBinding<TValue> : IProvideEndpointParameterMetadata
+public class SuppressBinding<TValue> : IEndpointParameterMetadataProvider
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="SuppressBinding{TValue}"/> class.
@@ -33,11 +33,10 @@ public class SuppressBinding<TValue> : IProvideEndpointParameterMetadata
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Populates metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="parameter">The parameter to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <param name="context">The <see cref="EndpointParameterMetadataContext"/>.</param>
     /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services) =>
-        IProvideEndpointParameterMetadata.GetDefaultMetadataForWrapperType<TValue>(parameter, services);
+    public static void PopulateMetadata(EndpointParameterMetadataContext context) =>
+        EndpointParameterMetadataHelpers.PopulateDefaultMetadataForWrapperType<TValue>(context);
 }

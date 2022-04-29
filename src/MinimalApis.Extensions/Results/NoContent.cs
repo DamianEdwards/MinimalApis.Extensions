@@ -1,30 +1,46 @@
-﻿using MinimalApis.Extensions.Metadata;
+﻿#if NET6_0
+using Microsoft.AspNetCore.Http.Metadata;
 
-namespace MinimalApis.Extensions.Results;
+namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status204NoContent"/> response.
+/// An <see cref="IResult"/> that returns an No Content (204) status code.
 /// </summary>
-public class NoContent : ResultBase, IProvideEndpointResponseMetadata
+public class NoContent : IResult, IEndpointMetadataProvider
 {
-    private const int ResponseStatusCode = StatusCodes.Status204NoContent;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="NoContent"/> class.
     /// </summary>
-    public NoContent()
+    internal NoContent()
     {
-        StatusCode = ResponseStatusCode;
+    }
+
+    internal static NoContent Instance { get; } = new();
+
+    /// <summary>
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status204NoContent"/>
+    /// </summary>
+    public int StatusCode => StatusCodes.Status204NoContent;
+
+    /// <inheritdoc/>
+    public Task ExecuteAsync(HttpContext httpContext)
+    {
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        httpContext.Response.StatusCode = StatusCode;
+
+        return Task.CompletedTask;
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Populates metadata for the related <see cref="Endpoint"/>.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    public static void IEndpointMetadataProviderPopulateMetadata(EndpointMetadataContext context)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
+        ArgumentNullException.ThrowIfNull(context);
+
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status204NoContent));
     }
 }
+#endif

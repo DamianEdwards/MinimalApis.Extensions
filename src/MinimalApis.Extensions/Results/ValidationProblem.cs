@@ -1,35 +1,72 @@
-﻿using MinimalApis.Extensions.Metadata;
+﻿#if NET6_0
+using Microsoft.AspNetCore.Http.Metadata;
+using MinimalApis.Extensions.Results;
 
-namespace MinimalApis.Extensions.Results;
+namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status400BadRequest"/> response with a machine-readable format
-/// for specifying validation errors in HTTP API responses based on https://tools.ietf.org/html/rfc7807.JSON Problem Details response body.
+/// An <see cref="IResult"/> that on execution will write Problem Details
+/// HTTP API responses based on https://tools.ietf.org/html/rfc7807
 /// </summary>
-public class ValidationProblem : Problem, IProvideEndpointResponseMetadata
+public sealed class ValidationProblem : IResult, IEndpointMetadataProvider
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ValidationProblem"/> class.
-    /// </summary>
-    /// <param name="errors">The validation errors.</param>
-    public ValidationProblem(IDictionary<string, string[]> errors)
-        : base(new HttpValidationProblemDetails(errors)
-        {
-            Title = "One or more validation errors occurred.",
-            Status = StatusCodes.Status400BadRequest
-        })
+    internal ValidationProblem(HttpValidationProblemDetails problemDetails)
     {
+        ArgumentNullException.ThrowIfNull(problemDetails, nameof(problemDetails));
 
+        if (problemDetails is { Status: not null and not StatusCodes.Status400BadRequest })
+        {
+            throw new ArgumentException($"{nameof(ValidationProblem)} only supports a 400 Bad Request response status code.", nameof(problemDetails));
+        }
+
+        ProblemDetails = problemDetails;
+
+        if (ProblemDetails.Status is null)
+        {
+            ProblemDetails.Status = StatusCode;
+        }
+
+        if (ProblemDetailsDefaults.Defaults.TryGetValue(ProblemDetails.Status.Value, out var defaults))
+        {
+            ProblemDetails.Title ??= defaults.Title;
+            ProblemDetails.Type ??= defaults.Type;
+        }
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Gets the <see cref="HttpValidationProblemDetails"/> instance.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static new IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    public HttpValidationProblemDetails ProblemDetails { get; }
+
+    /// <summary>
+    /// Gets the value for the <c>Content-Type</c> header: <c>application/problem+json</c>.
+    /// </summary>
+    public string ContentType => "application/problem+json";
+
+    /// <summary>
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status400BadRequest"/>
+    /// </summary>
+    public int StatusCode => StatusCodes.Status400BadRequest;
+
+    /// <inheritdoc/>
+    public Task ExecuteAsync(HttpContext httpContext)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(typeof(HttpValidationProblemDetails), StatusCodes.Status400BadRequest, ProblemJsonContentType);
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        httpContext.Response.StatusCode = StatusCode;
+
+        return httpContext.Response.WriteAsJsonAsync(ProblemDetails, null, ContentType);
+    }
+
+    /// <summary>
+    /// Populates metadata for the related <see cref="Endpoint"/>.
+    /// </summary>
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    public static void PopulateMetadata(EndpointMetadataContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(typeof(HttpValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json"));
     }
 }
+#endif

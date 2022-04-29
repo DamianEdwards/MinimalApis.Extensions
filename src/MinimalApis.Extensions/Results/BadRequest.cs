@@ -1,32 +1,48 @@
-﻿using MinimalApis.Extensions.Metadata;
+﻿#if NET6_0
+using Microsoft.AspNetCore.Http.Metadata;
 
-namespace MinimalApis.Extensions.Results;
+namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status400BadRequest"/> response.
+/// An <see cref="IResult"/> that on execution will write an object to the response
+/// with Bad Request (400) status code.
 /// </summary>
-public class BadRequest : ResultBase, IProvideEndpointResponseMetadata
+public sealed class BadRequest : IResult, IEndpointMetadataProvider
 {
-    private const int ResponseStatusCode = StatusCodes.Status400BadRequest;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BadRequest"/> class with the values
+    /// provided.
+    /// </summary>
+    internal BadRequest()
+    {
+    }
+
+    internal static BadRequest Instance { get; } = new();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="BadRequest"/> class.
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status400BadRequest"/>
     /// </summary>
-    /// <param name="message">An optional message to return in the response body.</param>
-    public BadRequest(string? message = null)
+    public int StatusCode => StatusCodes.Status400BadRequest;
+
+    /// <inheritdoc/>
+    public Task ExecuteAsync(HttpContext httpContext)
     {
-        ResponseContent = message;
-        StatusCode = ResponseStatusCode;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        httpContext.Response.StatusCode = StatusCode;
+
+        return Task.CompletedTask;
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Populates metadata for the related <see cref="Endpoint"/>.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    public static void PopulateMetadata(EndpointMetadataContext context)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
+        ArgumentNullException.ThrowIfNull(context);
+
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status400BadRequest));
     }
 }
+#endif

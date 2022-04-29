@@ -1,25 +1,47 @@
-﻿using MinimalApis.Extensions.Metadata;
+﻿#if NET6_0
+using Microsoft.AspNetCore.Http.Metadata;
 
-namespace MinimalApis.Extensions.Results;
+namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status202Accepted"/> response.
+/// An <see cref="IResult"/> that on execution will write an object to the response
+/// with status code Accepted (202) and Location header.
+/// Targets a registered route.
 /// </summary>
-public class Accepted : ResultBase, IProvideEndpointResponseMetadata
+public sealed class Accepted : IEndpointMetadataProvider
 {
-    private const int ResponseStatusCode = StatusCodes.Status202Accepted;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="Accepted"/> class.
     /// </summary>
     /// <param name="location">The location at which the status of requested content can be monitored.</param>
-    /// <param name="message">An optional message to return in the response body.</param>
-    public Accepted(string? location = null, string? message = null)
+    internal Accepted(string? location = null)
     {
         Location = location;
-        ResponseContent = message;
-        StatusCode = ResponseStatusCode;
     }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Accepted"/> class with the values
+    /// provided.
+    /// </summary>
+    /// <param name="locationUri">The location at which the status of requested content can be monitored.</param>
+    internal Accepted(Uri locationUri)
+    {
+        ArgumentNullException.ThrowIfNull(locationUri);
+
+        if (locationUri.IsAbsoluteUri)
+        {
+            Location = locationUri.AbsoluteUri;
+        }
+        else
+        {
+            Location = locationUri.GetComponents(UriComponents.SerializationInfoString, UriFormat.UriEscaped);
+        }
+    }
+
+    /// <summary>
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status202Accepted"/>
+    /// </summary>
+    public int StatusCode => StatusCodes.Status202Accepted;
 
     /// <summary>
     /// Gets the location at which the status of the requested content can be monitored.
@@ -31,7 +53,7 @@ public class Accepted : ResultBase, IProvideEndpointResponseMetadata
     /// </summary>
     /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
     /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
-    public override Task ExecuteAsync(HttpContext httpContext)
+    public Task ExecuteAsync(HttpContext httpContext)
     {
         ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
 
@@ -40,17 +62,20 @@ public class Accepted : ResultBase, IProvideEndpointResponseMetadata
             httpContext.Response.Headers.Location = Location;
         }
 
-        return base.ExecuteAsync(httpContext);
+        httpContext.Response.StatusCode = StatusCode;
+
+        return Task.CompletedTask;
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Populates metadata for the related <see cref="Endpoint"/>.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    public static void PopulateMetadata(EndpointMetadataContext context)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
+        ArgumentNullException.ThrowIfNull(context);
+
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status202Accepted));
     }
 }
+#endif

@@ -1,32 +1,35 @@
-﻿using MinimalApis.Extensions.Metadata;
+﻿#if NET6_0
 
-namespace MinimalApis.Extensions.Results;
+namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status401Unauthorized"/> response.
+/// Represents an <see cref="IResult"/> that when executed will
+/// produce an HTTP response with the No Unauthorized (401) status code.
 /// </summary>
-public class Unauthorized : ResultBase, IProvideEndpointResponseMetadata
+public sealed class UnauthorizedHttpResult : IResult
 {
-    private const int ResponseStatusCode = StatusCodes.Status401Unauthorized;
-
     /// <summary>
-    /// Initializes a new instance of the <see cref="Unauthorized"/> class.
+    /// Initializes a new instance of the <see cref="UnauthorizedHttpResult"/> class.
     /// </summary>
-    /// <param name="message">An optional message to return in the response body.</param>
-    public Unauthorized(string? message = null)
+    internal UnauthorizedHttpResult()
     {
-        ResponseContent = message;
-        StatusCode = ResponseStatusCode;
     }
 
+    internal static UnauthorizedHttpResult Instance { get; } = new();
+
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status401Unauthorized"/>
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    public int StatusCode => StatusCodes.Status401Unauthorized;
+
+    /// <inheritdoc />
+    public Task ExecuteAsync(HttpContext httpContext)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        httpContext.Response.StatusCode = StatusCode;
+
+        return Task.CompletedTask;
     }
 }
+#endif

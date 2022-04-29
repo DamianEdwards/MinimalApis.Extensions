@@ -5,7 +5,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsProvidesMetadataApiExplorer();
+#if NET6_0
+builder.Services.AddEndpointsMetadataProviderApiExplorer();
+#else
+builder.Services.AddEndpointsApiExplorer();
+#endif
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();

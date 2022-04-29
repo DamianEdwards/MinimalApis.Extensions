@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
+using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Binding;
 
@@ -10,7 +10,7 @@ namespace MinimalApis.Extensions.Binding;
 /// parameter of type <typeparamref name="TValue"/> of a route handler delegate.
 /// </summary>
 /// <typeparam name="TValue">The parameter type.</typeparam>
-public struct Bind<TValue> : IProvideEndpointParameterMetadata
+public struct Bind<TValue> : IEndpointParameterMetadataProvider
 {
     private readonly TValue? _value;
 
@@ -46,8 +46,8 @@ public struct Bind<TValue> : IProvideEndpointParameterMetadata
     /// <exception cref="BadHttpRequestException">Thrown if the default binding logic results in a status code other than <see cref="StatusCodes.Status200OK"/>.</exception>
     public static async ValueTask<Bind<TValue?>> BindAsync(HttpContext context, ParameterInfo parameter)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(parameter);
 
         var logger = context.RequestServices.GetRequiredService<ILogger<Bind<TValue>>>();
 
@@ -73,36 +73,40 @@ public struct Bind<TValue> : IProvideEndpointParameterMetadata
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="parameter">The parameter to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
     /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(ParameterInfo parameter, IServiceProvider services)
+    public static void PopulateMetadata(EndpointParameterMetadataContext context)
     {
-        var logger = services.GetRequiredService<ILogger<Bind<TValue>>>();
-        var binder = LookupBinder(services, logger);
+        ArgumentNullException.ThrowIfNull(context);
 
-        return binder switch
+        var logger = context.Services?.GetRequiredService<ILogger<Bind<TValue>>>();
+        var binder = LookupBinder(context.Services, logger);
+
+        if (binder is IEndpointParameterMetadataProvider)
         {
-            IProvideEndpointParameterMetadata => IProvideEndpointParameterMetadata.GetMetadataLateBound(parameter, services),
-            _ => new[] { new Mvc.ConsumesAttribute(typeof(TValue), "application/json") }
+            EndpointParameterMetadataHelpers.PopulateMetadataLateBound(context);
+        }
+        else
+        {
+            context.EndpointMetadata.Add(new Mvc.ConsumesAttribute(typeof(TValue), "application/json"));
         };
     }
 
     private const string Template_ResolvedFromDI = nameof(IParameterBinder<object>) + "<{ParameterBinderTargetTypeName}> resolved from DI container.";
     private const string Template_NotResolvedFromDI = nameof(IParameterBinder<object>) + "<{ParameterBinderTargetTypeName}> could not be resovled from DI container, using default binder.";
 
-    private static IParameterBinder<TValue>? LookupBinder(IServiceProvider services, ILogger logger)
+    private static IParameterBinder<TValue>? LookupBinder(IServiceProvider? services, ILogger? logger)
     {
-        var binder = services.GetService<IParameterBinder<TValue>>();
+        var binder = services?.GetService<IParameterBinder<TValue>>();
 
         if (binder is not null)
         {
-            logger.LogDebug(Template_ResolvedFromDI, typeof(TValue).Name);
+            logger?.LogDebug(Template_ResolvedFromDI, typeof(TValue).Name);
 
             return binder;
         }
 
-        logger.LogDebug(Template_NotResolvedFromDI, typeof(TValue).Name);
+        logger?.LogDebug(Template_NotResolvedFromDI, typeof(TValue).Name);
 
         return null;
     }

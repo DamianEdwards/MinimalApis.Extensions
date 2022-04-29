@@ -1,32 +1,43 @@
-﻿using MinimalApis.Extensions.Metadata;
+﻿using Microsoft.AspNetCore.Http.Metadata;
 
 namespace MinimalApis.Extensions.Results;
 
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status415UnsupportedMediaType"/> response.
 /// </summary>
-public class UnsupportedMediaType : ResultBase, IProvideEndpointResponseMetadata
+public sealed class UnsupportedMediaType : IResult, IEndpointMetadataProvider
 {
-    private const int ResponseStatusCode = StatusCodes.Status415UnsupportedMediaType;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="UnsupportedMediaType"/> class.
     /// </summary>
-    /// <param name="message">An optional message to return in the response body.</param>
-    public UnsupportedMediaType(string? message = null)
+    internal UnsupportedMediaType()
     {
-        ResponseContent = message;
-        StatusCode = ResponseStatusCode;
+
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status415UnsupportedMediaType"/>
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    public int StatusCode => StatusCodes.Status415UnsupportedMediaType;
+
+    /// <inheritdoc />
+    public Task ExecuteAsync(HttpContext httpContext)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        httpContext.Response.StatusCode = StatusCode;
+
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Populates metadata for the related <see cref="Endpoint"/>.
+    /// </summary>
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    public static void PopulateMetadata(EndpointMetadataContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status415UnsupportedMediaType));
     }
 }

@@ -11,7 +11,7 @@ on:
     branches: [ main ]
 
 env:
-  DOTNET_SDK_VERSION: 6.0.100
+  DOTNET_SDK_VERSION: 7.0.100-preview.4.22222.1
 
 jobs:
   build:
@@ -25,6 +25,11 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+
+    - name: Setup .NET SDK 6.0.x
+      uses: actions/setup-dotnet@v1
+      with:
+          dotnet-version: 6.0.x
 
     - name: Restore dependencies
       run: dotnet restore

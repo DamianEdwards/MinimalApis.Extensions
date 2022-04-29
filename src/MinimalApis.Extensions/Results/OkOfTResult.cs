@@ -1,65 +1,53 @@
-﻿using System.Text;
-using MinimalApis.Extensions.Metadata;
+﻿#if NET6_0
+using Microsoft.AspNetCore.Http.Metadata;
 
-namespace MinimalApis.Extensions.Results;
+namespace Microsoft.AspNetCore.Http.HttpResults;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status200OK"/> response that serializes an object to JSON content
-/// in the response body.
+/// An <see cref="IResult"/> that on execution will write an object to the response
+/// with an Ok (200) status code.
 /// </summary>
-/// <typeparam name="TResult">The type object to be JSON serialized to the response body.</typeparam>
-public class Ok<TResult> : IResult, IProvideEndpointResponseMetadata
+/// <typeparam name="TValue">The type of object that will be JSON serialized to the response body.</typeparam>
+public sealed class Ok<TValue> : IResult, IEndpointMetadataProvider
 {
-    private const string JsonContentType = "application/json";
-
     /// <summary>
-    /// Initializes a new instance of the <see cref="Ok{TResult}"/> class.
+    /// Initializes a new instance of the <see cref="Ok"/> class with the values.
     /// </summary>
-    /// <param name="value">The object to serialize to the response body.</param>
-    public Ok(TResult value)
+    /// <param name="value">The value to format in the entity body.</param>
+    internal Ok(TValue? value)
     {
-        ArgumentNullException.ThrowIfNull(value, nameof(value));
-
         Value = value;
     }
 
     /// <summary>
-    /// Gets the value to be JSON serialized to the response body.
+    /// Gets the object result.
     /// </summary>
-    public TResult Value { get; init; }
+    public TValue? Value { get; }
 
     /// <summary>
-    /// Gets the HTTP status code.
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status200OK"/>
     /// </summary>
     public int StatusCode => StatusCodes.Status200OK;
 
-    /// <summary>
-    /// Writes an HTTP response reflecting the result.
-    /// </summary>
-    /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
-    /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
-    public async Task ExecuteAsync(HttpContext httpContext)
+    /// <inheritdoc/>
+    public Task ExecuteAsync(HttpContext httpContext)
     {
-        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+        ArgumentNullException.ThrowIfNull(httpContext);
 
-        var response = httpContext.Response;
+        httpContext.Response.StatusCode = StatusCode;
 
-        response.StatusCode = StatusCode;
-
-        if (Value is not null)
-        {
-            await httpContext.Response.WriteAsJsonAsync(Value, null, JsonContentType);
-        }
+        return httpContext.Response.WriteAsJsonAsync(Value);
     }
 
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Populates metadata for the related <see cref="Endpoint"/>.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    public static void PopulateMetadata(EndpointMetadataContext context)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(typeof(TResult), StatusCodes.Status200OK, JsonContentType);
+        ArgumentNullException.ThrowIfNull(context);
+
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(typeof(TValue), StatusCodes.Status200OK, "application/json"));
     }
 }
+#endif

@@ -1,32 +1,44 @@
-﻿using MinimalApis.Extensions.Metadata;
+﻿using Microsoft.AspNetCore.Http.Metadata;
 
 namespace MinimalApis.Extensions.Results;
 
 /// <summary>
-/// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status410Gone"/> response.
+/// An <see cref="IResult"/> that returns a Gone (410) status code.
 /// </summary>
-public class Gone : ResultBase, IProvideEndpointResponseMetadata
+public sealed class Gone : IResult, IEndpointMetadataProvider
 {
-    private const int ResponseStatusCode = StatusCodes.Status410Gone;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="Gone"/> class.
     /// </summary>
-    /// <param name="message">An optional message to return in the response body.</param>
-    public Gone(string? message = null)
+    internal Gone()
     {
-        ResponseContent = message;
-        StatusCode = ResponseStatusCode;
+
+    }
+
+    /// <summary>
+    /// Gets the HTTP status code: <see cref="StatusCodes.Status410Gone"/>
+    /// </summary>
+    public int StatusCode => StatusCodes.Status410Gone;
+
+    /// <inheritdoc/>
+    public Task ExecuteAsync(HttpContext httpContext)
+    {
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        httpContext.Response.StatusCode = StatusCode;
+
+        return Task.CompletedTask;
     }
 
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="endpoint">The <see cref="Endpoint"/> to provide metadata for.</param>
-    /// <param name="services">The <see cref="IServiceProvider"/>.</param>
+    /// <param name="context">The <see cref="EndpointMetadataContext"/> to provide metadata for.</param>
     /// <returns>The metadata.</returns>
-    public static IEnumerable<object> GetMetadata(Endpoint endpoint, IServiceProvider services)
+    public static void PopulateMetadata(EndpointMetadataContext context)
     {
-        yield return new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode);
+        ArgumentNullException.ThrowIfNull(context);
+
+        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status410Gone));
     }
 }
