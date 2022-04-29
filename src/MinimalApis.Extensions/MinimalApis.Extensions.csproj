@@ -17,7 +17,7 @@
   <ItemGroup>
     <None Include="../../README.md" Pack="true" PackagePath="\" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <PackageReference Include="MiniValidation" Version="0.5.0-pre.20220315.50" />
+    <PackageReference Include="MiniValidation" Version="0.5.1-pre.20220429.53" />
   </ItemGroup>
 
 </Project>
