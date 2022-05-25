@@ -29,10 +29,10 @@ If you wish to use builds from this repo's `main` branch you can install them fr
     ``` shell
     > dotnet add package MinimalApis.Extensions --prerelease
     ```
-1. In your project's `Program.cs`, call the `AddEndpointsProvidesMetadataApiExplorer()` method on `builder.Services` to enable enhanced endpoint metadata in `ApiExplorer`:
+1. In your project's `Program.cs`, call the `AddEndpointsMetadataProviderApiExplorer()` method on `builder.Services` to enable enhanced endpoint metadata in `ApiExplorer`:
     ``` c#
     var builder = WebApplication.CreateBuilder(args);
-    builder.Services.AddEndpointsProvidesMetadataApiExplorer(); // <-- Add this line
+    builder.Services.AddEndpointsMetadataProviderApiExplorer(); // <-- Add this line
     builder.Services.AddSwaggerGen();
     ...
     ```
