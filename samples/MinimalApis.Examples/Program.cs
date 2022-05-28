@@ -30,4 +30,12 @@ app.MapPost("/bodyas/rom", (Body<ReadOnlyMemory<byte>> body) => $"Received {body
 app.MapPost("/bodyas/string", (Body<string> body) => $"Received the following: {body}");
 app.MapPost("/bodyas/string/max100", ([MaxLength(100)] Body<string> body) => $"Received the following: {body}");
 
+#if NET7_0_OR_GREATER
+app.MapGet("/todos/{id}", (int id) => TypedResults.Ok(new Todo(id, "Buy the groceries")));
+app.MapPost("/todos", (Todo todo) => TypedResults.Created($"/todos/{123}", todo with { Id = 123 }))
+    .WithParameterValidation();
+#endif
+
 app.Run();
+
+record Todo(int Id, [property: Required] string Title);
