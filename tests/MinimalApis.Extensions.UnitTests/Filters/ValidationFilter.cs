@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MinimalApis.Extensions.UnitTests.Filters;
 
@@ -77,7 +78,7 @@ internal class TodoValidateableObject : IValidatableObject
 
 internal class TestEndpointRouteBuilder : IEndpointRouteBuilder
 {
-    public IServiceProvider ServiceProvider { get; } = null!;
+    public IServiceProvider ServiceProvider { get; } = new ServiceCollection().AddLogging().BuildServiceProvider();
 
     public ICollection<EndpointDataSource> DataSources { get; } = new List<EndpointDataSource>();
 

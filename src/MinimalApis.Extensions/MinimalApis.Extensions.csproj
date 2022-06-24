@@ -5,6 +5,7 @@
     <Description>A set of extensions and helpers for working with ASP.NET Core Minimal APIs.</Description>
     <PackageTags>ASP.NET Web MinimalApis Apis REST Binding IResult</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <LangVersion Condition="'$(TargetFramework)' == 'net7.0'">preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

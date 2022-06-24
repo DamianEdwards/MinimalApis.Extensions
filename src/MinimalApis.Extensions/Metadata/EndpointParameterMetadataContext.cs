@@ -21,7 +21,7 @@ public sealed class EndpointParameterMetadataContext
 
         Parameter = parameter;
         EndpointMetadata = endpointMetadata;
-        Services = services;
+        ApplicationServices = services;
     }
 
     /// <summary>
@@ -37,6 +37,6 @@ public sealed class EndpointParameterMetadataContext
     /// <summary>
     /// Gets the <see cref="IServiceProvider"/> instance used to access application services.
     /// </summary>
-    public IServiceProvider? Services { get; }
+    public IServiceProvider? ApplicationServices { get; }
 }
 #endif

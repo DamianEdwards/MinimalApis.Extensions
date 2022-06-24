@@ -2,6 +2,7 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MiniValidation;
 
@@ -22,35 +23,55 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
     /// <param name="builder">The <see cref="RouteHandlerBuilder"/>.</param>
     /// <param name="statusCode">The status code to return on validation failure. Defaults to <see cref="StatusCodes.Status400BadRequest"/>.</param>
     /// <returns></returns>
-    public static RouteHandlerBuilder WithParameterValidation(this RouteHandlerBuilder builder, int statusCode = StatusCodes.Status400BadRequest)
+    public static TBuilder WithParameterValidation<TBuilder>(this TBuilder builder, int statusCode = StatusCodes.Status400BadRequest)
+        where TBuilder : IEndpointConventionBuilder
     {
-        builder.Add(eb =>
+        builder.AddRouteHandlerFilter((RouteHandlerContext context, RouteHandlerFilterDelegate next) =>
         {
-            var methodInfo = eb.Metadata.OfType<MethodInfo>().SingleOrDefault();
-            if (methodInfo is not null && IsValidatable(methodInfo))
-            {
-                eb.Metadata.Add(new ProducesResponseTypeAttribute(typeof(HttpValidationProblemDetails), statusCode, "application/problem+json"));
-            }
-        });
-        builder.AddFilter((RouteHandlerContext context, RouteHandlerFilterDelegate next) =>
-        {
-            // TODO: Blocked by https://github.com/dotnet/aspnetcore/issues/41900
-            //var loggerFactory = context.Services.GetRequiredService<ILoggerFactory>();
-            //var logger = loggerFactory.Create("MinimalApis.Extensions.Filters.ValidationRouteHandlerFilterFactory");
+            var loggerFactory = context.ApplicationServices.GetRequiredService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger("MinimalApis.Extensions.Filters.ValidationRouteHandlerFilterFactory");
 
             if (!IsValidatable(context.MethodInfo))
             {
+                if (logger.IsEnabled(LogLevel.Trace))
+                {
+                    logger.LogTrace("Route handler method does not contain any validatable parameters, skipping adding validation filter.");
+                }
                 return next;
             }
 
-            return rhic =>
+            if (logger.IsEnabled(LogLevel.Trace))
             {
-                foreach (var parameter in rhic.Parameters)
+                logger.LogTrace("Adding metadata to endpoint to document that it can produce a validation problem result.");
+            }
+
+            // PERF: Add metadata that details which args to validate, e.g. index, type, etc.?
+            //       Rather than just looping over all arguments and calling TryValidate().
+
+            context.EndpointMetadata.Add(new ProducesResponseTypeAttribute(typeof(HttpValidationProblemDetails), statusCode, "application/problem+json"));
+
+            return (RouteHandlerInvocationContext rhic) =>
+            {
+                if (logger.IsEnabled(LogLevel.Trace))
+                {
+                    logger.LogTrace("Validation filter running on {argumentCount} argument(s).", rhic.Arguments.Count);
+                }
+
+                foreach (var parameter in rhic.Arguments)
                 {
                     if (parameter is not null && !MiniValidator.TryValidate(parameter, out var errors))
                     {
-                        return new(Results.ValidationProblem(errors));
+                        if (logger.IsEnabled(LogLevel.Trace))
+                        {
+                            logger.LogTrace("Parameter '{parameterName}' failed validation.", errors.Keys.FirstOrDefault());
+                        }
+                        return new(TypedResults.ValidationProblem(errors));
                     }
+                }
+
+                if (logger.IsEnabled(LogLevel.Trace))
+                {
+                    logger.LogTrace("Validation filter completed.");
                 }
 
                 return next(rhic);

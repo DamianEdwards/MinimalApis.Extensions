@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿#if NET6_0
+using System.Data;
 using Microsoft.AspNetCore.Http.HttpResults;
 using MinimalApis.Extensions.Binding;
 using Dapper;
@@ -98,3 +99,4 @@ public class Todo
 
     public bool IsComplete { get; set; }
 }
+#endif

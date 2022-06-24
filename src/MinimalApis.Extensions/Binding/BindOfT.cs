@@ -79,8 +79,8 @@ public struct Bind<TValue> : IEndpointParameterMetadataProvider
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        var logger = context.Services?.GetRequiredService<ILogger<Bind<TValue>>>();
-        var binder = LookupBinder(context.Services, logger);
+        var logger = context.ApplicationServices?.GetRequiredService<ILogger<Bind<TValue>>>();
+        var binder = LookupBinder(context.ApplicationServices, logger);
 
         if (binder is IEndpointParameterMetadataProvider)
         {
