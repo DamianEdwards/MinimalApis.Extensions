@@ -1,5 +1,7 @@
 ﻿#if NET7_0_OR_GREATER
+using System.IO.Pipelines;
 using System.Reflection;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,18 +22,19 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
     /// 
     /// The filter will not be added if the route handler does not have any validatable parameters.
     /// </remarks>
-    /// <param name="builder">The <see cref="RouteHandlerBuilder"/>.</param>
+    /// <param name="endpoint">The <see cref="IEndpointConventionBuilder"/>.</param>
     /// <param name="statusCode">The status code to return on validation failure. Defaults to <see cref="StatusCodes.Status400BadRequest"/>.</param>
     /// <returns></returns>
-    public static TBuilder WithParameterValidation<TBuilder>(this TBuilder builder, int statusCode = StatusCodes.Status400BadRequest)
+    public static TBuilder WithParameterValidation<TBuilder>(this TBuilder endpoint, int statusCode = StatusCodes.Status400BadRequest)
         where TBuilder : IEndpointConventionBuilder
     {
-        builder.AddRouteHandlerFilter((RouteHandlerContext context, RouteHandlerFilterDelegate next) =>
+        endpoint.AddRouteHandlerFilter((RouteHandlerContext context, RouteHandlerFilterDelegate next) =>
         {
             var loggerFactory = context.ApplicationServices.GetRequiredService<ILoggerFactory>();
             var logger = loggerFactory.CreateLogger("MinimalApis.Extensions.Filters.ValidationRouteHandlerFilterFactory");
 
-            if (!IsValidatable(context.MethodInfo))
+            var isService = context.ApplicationServices.GetService<IServiceProviderIsService>();
+            if (!IsValidatable(context.MethodInfo, isService))
             {
                 if (logger.IsEnabled(LogLevel.Trace))
                 {
@@ -59,7 +62,7 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
 
                 foreach (var parameter in rhic.Arguments)
                 {
-                    if (parameter is not null && !MiniValidator.TryValidate(parameter, out var errors))
+                    if (parameter is not null && IsValidatable(parameter.GetType(), isService) && !MiniValidator.TryValidate(parameter, out var errors))
                     {
                         if (logger.IsEnabled(LogLevel.Trace))
                         {
@@ -78,11 +81,26 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
             };
         });
 
-        return builder;
+        return endpoint;
     }
 
-    private static bool IsValidatable(MethodInfo methodInfo) => methodInfo.GetParameters().Any(IsValidatable);
+    private static bool IsValidatable(MethodInfo methodInfo, IServiceProviderIsService? isService) =>
+        methodInfo.GetParameters().Any(p => IsValidatable(p.ParameterType, isService));
 
-    private static bool IsValidatable(ParameterInfo parameter) => MiniValidator.RequiresValidation(parameter.ParameterType);
+    private static bool IsValidatable(Type type, IServiceProviderIsService? isService) =>
+        !IsRequestDelegateFactorySpecialBoundType(type, isService)
+        && MiniValidator.RequiresValidation(type);
+
+    private static bool IsRequestDelegateFactorySpecialBoundType(Type type, IServiceProviderIsService? isService) =>
+        typeof(HttpContext) == type
+        || typeof(HttpRequest) == type
+        || typeof(HttpResponse) == type
+        || typeof(ClaimsPrincipal) == type
+        || typeof(CancellationToken) == type
+        || typeof(IFormFileCollection) == type
+        || typeof(IFormFile) == type
+        || typeof(Stream) == type
+        || typeof(PipeReader) == type
+        || isService?.IsService(type) == true;
 }
 #endif
