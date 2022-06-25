@@ -1,4 +1,5 @@
 ﻿#if NET7_0_OR_GREATER
+using System.Diagnostics;
 using System.IO.Pipelines;
 using System.Reflection;
 using System.Security.Claims;
@@ -34,47 +35,133 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
             var logger = loggerFactory.CreateLogger("MinimalApis.Extensions.Filters.ValidationRouteHandlerFilterFactory");
 
             var isService = context.ApplicationServices.GetService<IServiceProviderIsService>();
+
             if (!IsValidatable(context.MethodInfo, isService))
             {
-                if (logger.IsEnabled(LogLevel.Trace))
+                if (logger.IsEnabled(LogLevel.Debug))
                 {
-                    logger.LogTrace("Route handler method does not contain any validatable parameters, skipping adding validation filter.");
+                    logger.LogDebug("Route handler method '{methodName}' does not contain any validatable parameters, skipping adding validation filter.", context.MethodInfo.Name);
                 }
                 return next;
             }
 
-            if (logger.IsEnabled(LogLevel.Trace))
+            if (logger.IsEnabled(LogLevel.Debug))
             {
-                logger.LogTrace("Adding metadata to endpoint to document that it can produce a validation problem result.");
+                logger.LogDebug("Validation filter will be added as route handler method '{methodName}' has validatable parameters.");
+                if (logger.IsEnabled(LogLevel.Trace))
+                {
+                    logger.LogTrace("Updating endpoint metadata to indicate it can produce a validation problem result (400 Bad Request).", context.MethodInfo.Name);
+                }
             }
-
-            // PERF: Add metadata that details which args to validate, e.g. index, type, etc.?
-            //       Rather than just looping over all arguments and calling TryValidate().
-
             context.EndpointMetadata.Add(new ProducesResponseTypeAttribute(typeof(HttpValidationProblemDetails), statusCode, "application/problem+json"));
+
+            // PERF: Add metadata that details which args to validate, rather than just looping over all arguments and calling TryValidate().
+            var validationMetadata = new ValidationFilterMetadata();
+            foreach (var parameter in context.MethodInfo.GetParameters())
+            {
+                if (IsValidatable(parameter.ParameterType, isService))
+                {
+                    validationMetadata.Parameters.Add(parameter.ParameterType);
+                    if (logger.IsEnabled(LogLevel.Trace))
+                    {
+                        logger.LogTrace("Parameter '{parameterType} {parameterName}' has a validatable type and will be validated by the filter.", parameter.ParameterType, parameter.Name);
+                    }
+                }
+                else
+                {
+                    validationMetadata.Parameters.Add(null);
+                    if (logger.IsEnabled(LogLevel.Trace))
+                    {
+                        logger.LogTrace("Parameter '{parameterType} {parameterName}' does not have validatable type and will not be validated by the filter.", parameter.ParameterType, parameter.Name);
+                    }
+                }
+            }
+            context.EndpointMetadata.Add(validationMetadata);
 
             return (RouteHandlerInvocationContext rhic) =>
             {
-                if (logger.IsEnabled(LogLevel.Trace))
+                var endpoint = rhic.HttpContext.GetEndpoint();
+                if (endpoint is null) return next(rhic);
+
+                if (logger.IsEnabled(LogLevel.Debug))
                 {
-                    logger.LogTrace("Validation filter running on {argumentCount} argument(s).", rhic.Arguments.Count);
+                    logger.LogDebug("Validation filter running on {argumentCount} argument(s).", rhic.Arguments.Count);
                 }
 
-                foreach (var parameter in rhic.Arguments)
+                var validationMetadata = endpoint.Metadata.GetMetadata<ValidationFilterMetadata>();
+
+                Debug.Assert(validationMetadata is not null);
+                Debug.Assert(validationMetadata.Parameters.Count == rhic.Arguments.Count);
+
+                var useParameterValidationMetadata = validationMetadata is not null && validationMetadata.Parameters.Count == rhic.Arguments.Count;
+                if (!useParameterValidationMetadata && logger.IsEnabled(LogLevel.Debug))
                 {
-                    if (parameter is not null && IsValidatable(parameter.GetType(), isService) && !MiniValidator.TryValidate(parameter, out var errors))
+                    logger.LogDebug("Falling back to validating all arguments as parameter metadata is invalid: ParameterCount={parameterCount}, ArgumentCount={argumentCount}", validationMetadata?.Parameters.Count ?? 0, rhic.Arguments.Count);
+                }
+
+                for (var i = 0; i < rhic.Arguments.Count; i++)
+                {
+                    var argument = rhic.Arguments[i];
+
+                    if (argument is null)
                     {
                         if (logger.IsEnabled(LogLevel.Trace))
                         {
-                            logger.LogTrace("Parameter '{parameterName}' failed validation.", errors.Keys.FirstOrDefault());
+                            logger.LogTrace("Argument skipped as it is null.");
+                        }
+                        continue;
+                    }
+
+                    if (useParameterValidationMetadata)
+                    {
+                        var parameterType = validationMetadata!.Parameters[i];
+                        if (parameterType is null)
+                        {
+                            if (logger.IsEnabled(LogLevel.Trace))
+                            {
+                                logger.LogTrace("Argument with type '{argumentType}' skipped as the parameter it maps to is declared with a type that is not validatable.", argument.GetType());
+                            }
+                            continue;
+                        }
+                        else if (!parameterType.IsAssignableFrom(argument.GetType()))
+                        {
+                            if (logger.IsEnabled(LogLevel.Trace))
+                            {
+                                logger.LogTrace("Argument with type '{argumentType}' skipped as it doesn't match the parameter type {parameterType}.", argument.GetType(), parameterType);
+                            }
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        if (!IsValidatable(argument.GetType()))
+                        {
+                            if (logger.IsEnabled(LogLevel.Trace))
+                            {
+                                logger.LogTrace("Argument with type '{argumentType}' skipped as the type is not validatable.", argument.GetType());
+                            }
+                            continue;
+                        }
+                    }
+
+                    if (!MiniValidator.TryValidate(argument, out var errors))
+                    {
+                        if (logger.IsEnabled(LogLevel.Debug))
+                        {
+                            logger.LogDebug("Argument for parameter '{parameterName}' failed validation. Will not validate any more parameters.", errors.Keys.FirstOrDefault());
                         }
                         return new(TypedResults.ValidationProblem(errors));
                     }
+
+                    if (logger.IsEnabled(LogLevel.Debug))
+                    {
+                        logger.LogDebug("Argument with type '{argumentType}' was validated and no errors were found.", argument.GetType());
+                    }
                 }
 
-                if (logger.IsEnabled(LogLevel.Trace))
+                if (logger.IsEnabled(LogLevel.Debug))
                 {
-                    logger.LogTrace("Validation filter completed.");
+                    logger.LogDebug("Validation is complete.");
                 }
 
                 return next(rhic);
@@ -87,7 +174,7 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
     private static bool IsValidatable(MethodInfo methodInfo, IServiceProviderIsService? isService) =>
         methodInfo.GetParameters().Any(p => IsValidatable(p.ParameterType, isService));
 
-    private static bool IsValidatable(Type type, IServiceProviderIsService? isService) =>
+    private static bool IsValidatable(Type type, IServiceProviderIsService? isService = null) =>
         !IsRequestDelegateFactorySpecialBoundType(type, isService)
         && MiniValidator.RequiresValidation(type);
 
@@ -102,5 +189,10 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
         || typeof(Stream) == type
         || typeof(PipeReader) == type
         || isService?.IsService(type) == true;
+}
+
+internal class ValidationFilterMetadata
+{
+    public List<Type?> Parameters { get; } = new();
 }
 #endif
