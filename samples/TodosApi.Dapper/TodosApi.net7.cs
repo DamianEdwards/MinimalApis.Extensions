@@ -24,7 +24,9 @@ public static class TodosApi
         todos.MapDelete("/delete-all", DeleteAll);
 
         todos.WithParameterValidation();
+
         // BLOCKED by change to Swashbuckle being merged & released
+        // https://github.com/domaindrivendev/Swashbuckle.AspNetCore/pull/2441
         //todos.WithOpenApi();
     }
 

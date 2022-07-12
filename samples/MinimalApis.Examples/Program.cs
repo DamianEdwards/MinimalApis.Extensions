@@ -31,8 +31,10 @@ app.MapPost("/bodyas/string", (Body<string> body) => $"Received the following: {
 app.MapPost("/bodyas/string/max100", ([MaxLength(100)] Body<string> body) => $"Received the following: {body}");
 
 #if NET7_0_OR_GREATER
-app.MapGet("/todos/{id}", (int id) => TypedResults.Ok(new Todo(id, "Buy the groceries")));
-app.MapPost("/todos", (Todo todo) => TypedResults.Created($"/todos/{123}", todo with { Id = 123 }))
+var todos = app.MapGroup("/todos");
+todos.WithTags("Todos");
+todos.MapGet("/{id}", (int id) => TypedResults.Ok(new Todo(id, "Buy the groceries")));
+todos.MapPost("/", (Todo todo) => TypedResults.Created($"/todos/{123}", todo with { Id = 123 }))
     .WithParameterValidation();
 #endif
 
