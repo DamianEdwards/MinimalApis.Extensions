@@ -47,7 +47,7 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
 
             if (logger.IsEnabled(LogLevel.Debug))
             {
-                logger.LogDebug("Validation filter will be added as route handler method '{methodName}' has validatable parameters.");
+                logger.LogDebug("Validation filter will be added as route handler method '{methodName}' has validatable parameters.", context.MethodInfo.Name);
                 if (logger.IsEnabled(LogLevel.Trace))
                 {
                     logger.LogTrace("Updating endpoint metadata to indicate it can produce a validation problem result (400 Bad Request).", context.MethodInfo.Name);
