@@ -1,0 +1,18 @@
+<Project InitialTargets="HackTargetingPackBack">
+
+  <Target Name="HackTargetingPackBack">
+    <ItemGroup>
+      <KnownFrameworkReference>
+          <TargetingPackVersion Condition="'%(TargetFramework)' == 'net6.0'">6.0.8</TargetingPackVersion>
+          <LatestRuntimeFrameworkVersion Condition="'%(TargetFramework)' == 'net6.0'">6.0.8</LatestRuntimeFrameworkVersion>
+      </KnownFrameworkReference>
+      <KnownRuntimePack>
+          <LatestRuntimeFrameworkVersion Condition="'%(TargetFramework)' == 'net6.0'">6.0.8</LatestRuntimeFrameworkVersion>
+      </KnownRuntimePack>
+      <KnownAppHostPack>
+        <AppHostPackVersion Condition="'%(TargetFramework)' == 'net6.0'">6.0.8</AppHostPackVersion>
+      </KnownAppHostPack>
+    </ItemGroup>
+  </Target>
+
+</Project>
