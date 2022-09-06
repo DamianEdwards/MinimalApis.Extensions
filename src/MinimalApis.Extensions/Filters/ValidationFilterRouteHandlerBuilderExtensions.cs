@@ -29,7 +29,7 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
     public static TBuilder WithParameterValidation<TBuilder>(this TBuilder endpoint, int statusCode = StatusCodes.Status400BadRequest)
         where TBuilder : IEndpointConventionBuilder
     {
-        endpoint.AddRouteHandlerFilter((RouteHandlerContext context, RouteHandlerFilterDelegate next) =>
+        endpoint.AddEndpointFilter((EndpointFilterFactoryContext context, EndpointFilterDelegate next) =>
         {
             var loggerFactory = context.ApplicationServices.GetRequiredService<ILoggerFactory>();
             var logger = loggerFactory.CreateLogger("MinimalApis.Extensions.Filters.ValidationRouteHandlerFilterFactory");
@@ -78,30 +78,30 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
             }
             context.EndpointMetadata.Add(validationMetadata);
 
-            return (RouteHandlerInvocationContext rhic) =>
+            return (EndpointFilterInvocationContext efic) =>
             {
-                var endpoint = rhic.HttpContext.GetEndpoint();
-                if (endpoint is null) return next(rhic);
+                var endpoint = efic.HttpContext.GetEndpoint();
+                if (endpoint is null) return next(efic);
 
                 if (logger.IsEnabled(LogLevel.Debug))
                 {
-                    logger.LogDebug("Validation filter running on {argumentCount} argument(s).", rhic.Arguments.Count);
+                    logger.LogDebug("Validation filter running on {argumentCount} argument(s).", efic.Arguments.Count);
                 }
 
                 var validationMetadata = endpoint.Metadata.GetMetadata<ValidationFilterMetadata>();
 
                 Debug.Assert(validationMetadata is not null);
-                Debug.Assert(validationMetadata.Parameters.Count == rhic.Arguments.Count);
+                Debug.Assert(validationMetadata.Parameters.Count == efic.Arguments.Count);
 
-                var useParameterValidationMetadata = validationMetadata is not null && validationMetadata.Parameters.Count == rhic.Arguments.Count;
+                var useParameterValidationMetadata = validationMetadata is not null && validationMetadata.Parameters.Count == efic.Arguments.Count;
                 if (!useParameterValidationMetadata && logger.IsEnabled(LogLevel.Debug))
                 {
-                    logger.LogDebug("Falling back to validating all arguments as parameter metadata is invalid: ParameterCount={parameterCount}, ArgumentCount={argumentCount}", validationMetadata?.Parameters.Count ?? 0, rhic.Arguments.Count);
+                    logger.LogDebug("Falling back to validating all arguments as parameter metadata is invalid: ParameterCount={parameterCount}, ArgumentCount={argumentCount}", validationMetadata?.Parameters.Count ?? 0, efic.Arguments.Count);
                 }
 
-                for (var i = 0; i < rhic.Arguments.Count; i++)
+                for (var i = 0; i < efic.Arguments.Count; i++)
                 {
-                    var argument = rhic.Arguments[i];
+                    var argument = efic.Arguments[i];
 
                     if (argument is null)
                     {
@@ -164,7 +164,7 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
                     logger.LogDebug("Validation is complete.");
                 }
 
-                return next(rhic);
+                return next(efic);
             };
         });
 
