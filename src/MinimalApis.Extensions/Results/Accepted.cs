@@ -8,7 +8,7 @@ namespace Microsoft.AspNetCore.Http.HttpResults;
 /// with status code Accepted (202) and Location header.
 /// Targets a registered route.
 /// </summary>
-public sealed class Accepted : IEndpointMetadataProvider
+public sealed class Accepted : IEndpointMetadataProvider, IStatusCodeHttpResult
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Accepted"/> class.
@@ -42,6 +42,8 @@ public sealed class Accepted : IEndpointMetadataProvider
     /// Gets the HTTP status code: <see cref="StatusCodes.Status202Accepted"/>
     /// </summary>
     public int StatusCode => StatusCodes.Status202Accepted;
+
+    int? IStatusCodeHttpResult.StatusCode => StatusCode;
 
     /// <summary>
     /// Gets the location at which the status of the requested content can be monitored.

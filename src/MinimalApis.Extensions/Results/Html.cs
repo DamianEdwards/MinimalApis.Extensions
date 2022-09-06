@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> that returns HTML content in the response body.
 /// </summary>
-public sealed class Html : IResult, IEndpointMetadataProvider
+public sealed class Html : IResult, IEndpointMetadataProvider, IStatusCodeHttpResult, IContentTypeHttpResult
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Html"/> class.
@@ -20,6 +20,8 @@ public sealed class Html : IResult, IEndpointMetadataProvider
     /// Gets the status code: <see cref="StatusCodes.Status200OK"/>
     /// </summary>
     public int StatusCode => StatusCodes.Status200OK;
+
+    int? IStatusCodeHttpResult.StatusCode => StatusCode;
 
     /// <summary>
     /// Gets the content type: <c>text/html</c>

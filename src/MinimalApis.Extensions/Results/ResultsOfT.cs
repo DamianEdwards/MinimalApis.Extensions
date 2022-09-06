@@ -6,7 +6,7 @@ namespace Microsoft.AspNetCore.Http.HttpResults;
 /// <summary>
 /// Represents the result of an <see cref="Endpoint"/> route handler delegate that can return more than one <see cref="IResult"/> type.
 /// </summary>
-public abstract class ResultsBase : IResult
+public abstract class ResultsBase : IResult, INestedHttpResult
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ResultsBase"/> class.

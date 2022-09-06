@@ -7,7 +7,7 @@ namespace MinimalApis.Extensions.Results;
 /// with a Gone (410) status code.
 /// </summary>
 /// <typeparam name="TValue">The type of value object that will be JSON serialized to the response body.</typeparam>
-public sealed class Gone<TValue> : IResult, IEndpointMetadataProvider
+public sealed class Gone<TValue> : IResult, IEndpointMetadataProvider, IStatusCodeHttpResult, IValueHttpResult, IValueHttpResult<TValue>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Gone{TValue}"/> class with the values
@@ -24,10 +24,15 @@ public sealed class Gone<TValue> : IResult, IEndpointMetadataProvider
     /// </summary>
     public TValue? Value { get; }
 
+    object? IValueHttpResult.Value => Value;
+
     /// <summary>
     /// Gets the HTTP status code: <see cref="StatusCodes.Status410Gone"/>
     /// </summary>
     public int StatusCode => StatusCodes.Status410Gone;
+
+    int? IStatusCodeHttpResult.StatusCode => StatusCode;
+
 
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)

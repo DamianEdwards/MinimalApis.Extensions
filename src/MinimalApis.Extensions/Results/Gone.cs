@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// An <see cref="IResult"/> that returns a Gone (410) status code.
 /// </summary>
-public sealed class Gone : IResult, IEndpointMetadataProvider
+public sealed class Gone : IResult, IEndpointMetadataProvider, IStatusCodeHttpResult
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Gone"/> class.
@@ -19,6 +19,8 @@ public sealed class Gone : IResult, IEndpointMetadataProvider
     /// Gets the HTTP status code: <see cref="StatusCodes.Status410Gone"/>
     /// </summary>
     public int StatusCode => StatusCodes.Status410Gone;
+
+    int? IStatusCodeHttpResult.StatusCode => StatusCode;
 
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)

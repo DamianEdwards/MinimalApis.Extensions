@@ -8,7 +8,7 @@ namespace Microsoft.AspNetCore.Http.HttpResults;
 /// An <see cref="IResult"/> that on execution will write Problem Details
 /// HTTP API responses based on https://tools.ietf.org/html/rfc7807
 /// </summary>
-public sealed class ValidationProblem : IResult, IEndpointMetadataProvider
+public sealed class ValidationProblem : IResult, IEndpointMetadataProvider, IStatusCodeHttpResult, IContentTypeHttpResult, IValueHttpResult, IValueHttpResult<HttpValidationProblemDetails>
 {
     internal ValidationProblem(HttpValidationProblemDetails problemDetails)
     {
@@ -38,6 +38,10 @@ public sealed class ValidationProblem : IResult, IEndpointMetadataProvider
     /// </summary>
     public HttpValidationProblemDetails ProblemDetails { get; }
 
+    object? IValueHttpResult.Value => ProblemDetails;
+
+    HttpValidationProblemDetails? IValueHttpResult<HttpValidationProblemDetails>.Value => ProblemDetails;
+
     /// <summary>
     /// Gets the value for the <c>Content-Type</c> header: <c>application/problem+json</c>.
     /// </summary>
@@ -47,6 +51,8 @@ public sealed class ValidationProblem : IResult, IEndpointMetadataProvider
     /// Gets the HTTP status code: <see cref="StatusCodes.Status400BadRequest"/>
     /// </summary>
     public int StatusCode => StatusCodes.Status400BadRequest;
+
+    int? IStatusCodeHttpResult.StatusCode => StatusCode;
 
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)

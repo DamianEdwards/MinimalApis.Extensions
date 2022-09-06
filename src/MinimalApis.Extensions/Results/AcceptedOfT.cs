@@ -9,7 +9,7 @@ namespace Microsoft.AspNetCore.Http.HttpResults;
 /// Targets a registered route.
 /// </summary>
 /// <typeparam name="TValue">The type of value object that will be JSON serialized to the response body.</typeparam>
-public sealed class Accepted<TValue> : IResult, IEndpointMetadataProvider
+public sealed class Accepted<TValue> : IResult, IEndpointMetadataProvider, IStatusCodeHttpResult, IValueHttpResult, IValueHttpResult<TValue>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Accepted"/> class with the values
@@ -55,10 +55,14 @@ public sealed class Accepted<TValue> : IResult, IEndpointMetadataProvider
     /// </summary>
     public TValue? Value { get; }
 
+    object? IValueHttpResult.Value => Value;
+
     /// <summary>
     /// Gets the HTTP status code: <see cref="StatusCodes.Status202Accepted"/>
     /// </summary>
     public int StatusCode => StatusCodes.Status202Accepted;
+
+    int? IStatusCodeHttpResult.StatusCode => StatusCode;
 
     /// <summary>
     /// Gets the location at which the status of the requested content can be monitored.

@@ -6,7 +6,7 @@ namespace Microsoft.AspNetCore.Http.HttpResults;
 /// <summary>
 /// An <see cref="IResult"/> that returns an No Content (204) status code.
 /// </summary>
-public class NoContent : IResult, IEndpointMetadataProvider
+public class NoContent : IResult, IEndpointMetadataProvider, IStatusCodeHttpResult
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="NoContent"/> class.
@@ -21,6 +21,8 @@ public class NoContent : IResult, IEndpointMetadataProvider
     /// Gets the HTTP status code: <see cref="StatusCodes.Status204NoContent"/>
     /// </summary>
     public int StatusCode => StatusCodes.Status204NoContent;
+
+    int? IStatusCodeHttpResult.StatusCode => StatusCode;
 
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)
