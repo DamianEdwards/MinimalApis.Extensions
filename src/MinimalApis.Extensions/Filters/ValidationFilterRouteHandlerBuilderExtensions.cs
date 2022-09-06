@@ -29,7 +29,7 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
     public static TBuilder WithParameterValidation<TBuilder>(this TBuilder endpoint, int statusCode = StatusCodes.Status400BadRequest)
         where TBuilder : IEndpointConventionBuilder
     {
-        endpoint.AddEndpointFilter((EndpointFilterFactoryContext context, EndpointFilterDelegate next) =>
+        endpoint.AddEndpointFilterFactory((EndpointFilterFactoryContext context, EndpointFilterDelegate next) =>
         {
             var loggerFactory = context.ApplicationServices.GetRequiredService<ILoggerFactory>();
             var logger = loggerFactory.CreateLogger("MinimalApis.Extensions.Filters.ValidationRouteHandlerFilterFactory");
