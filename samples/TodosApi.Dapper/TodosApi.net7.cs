@@ -25,9 +25,7 @@ public static class TodosApi
 
         todos.WithParameterValidation();
 
-        // BLOCKED by change to Swashbuckle being merged & released
-        // https://github.com/domaindrivendev/Swashbuckle.AspNetCore/pull/2441
-        //todos.WithOpenApi();
+        todos.WithOpenApi();
     }
 
     public static async Task<Ok<IEnumerable<Todo>>> GetAllTodos(IDbConnection db) =>
