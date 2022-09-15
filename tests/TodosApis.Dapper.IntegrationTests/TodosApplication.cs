@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Dapper;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TodosApi.Dapper;
