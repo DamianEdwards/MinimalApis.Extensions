@@ -25,9 +25,7 @@ public static class TodosApi
 
         todos.WithParameterValidation();
 
-        // BLOCKED by change to Swashbuckle being merged & released
-        // https://github.com/domaindrivendev/Swashbuckle.AspNetCore/pull/2441
-        //todos.WithOpenApi();
+        todos.WithOpenApi();
     }
 
     public static async Task<Ok<IEnumerable<Todo>>> GetAllTodos(IDbConnection db) =>
@@ -45,7 +43,7 @@ public static class TodosApi
             ? TypedResults.Ok(todo)
             : TypedResults.NotFound();
 
-    public static async Task<Results<ValidationProblem, Created<Todo>>> CreateTodo(NewTodo inputTodo, IDbConnection db)
+    public static async Task<Created<Todo>> CreateTodo(NewTodo inputTodo, IDbConnection db)
     {
         var todo = await db.QuerySingleAsync<Todo>(
             "INSERT INTO Todos(Title, IsComplete) Values(@Title, @IsComplete) RETURNING * ", inputTodo);
@@ -53,7 +51,7 @@ public static class TodosApi
         return TypedResults.Created($"/todos/{todo.Id}", todo);
     }
 
-    public static async Task<Results<ValidationProblem, NoContent, NotFound>> UpdateTodo(int id, Todo inputTodo, IDbConnection db)
+    public static async Task<Results<NoContent, NotFound>> UpdateTodo(int id, Todo inputTodo, IDbConnection db)
     {
         inputTodo.Id = id;
 

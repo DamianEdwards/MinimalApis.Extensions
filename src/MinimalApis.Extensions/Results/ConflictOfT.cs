@@ -1,7 +1,5 @@
 ﻿#if NET6_0
 using Microsoft.AspNetCore.Http.Metadata;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.Http.HttpResults;
 
@@ -10,7 +8,7 @@ namespace Microsoft.AspNetCore.Http.HttpResults;
 /// with Conflict (409) status code.
 /// </summary>
 /// <typeparam name="TValue">The type of object that will be JSON serialized to the response body.</typeparam>
-public sealed class Conflict<TValue> : IResult, IEndpointMetadataProvider
+public sealed class Conflict<TValue> : IResult, IEndpointMetadataProvider, IStatusCodeHttpResult, IValueHttpResult, IValueHttpResult<TValue>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Conflict"/> class with the values
@@ -27,10 +25,14 @@ public sealed class Conflict<TValue> : IResult, IEndpointMetadataProvider
     /// </summary>
     public TValue? Value { get; }
 
+    object? IValueHttpResult.Value => Value;
+
     /// <summary>
     /// Gets the HTTP status code: <see cref="StatusCodes.Status409Conflict"/>
     /// </summary>
     public int StatusCode => StatusCodes.Status409Conflict;
+
+    int? IStatusCodeHttpResult.StatusCode => StatusCode;
 
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)

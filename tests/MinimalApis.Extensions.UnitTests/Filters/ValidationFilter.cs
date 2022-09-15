@@ -9,7 +9,7 @@ namespace MinimalApis.Extensions.UnitTests.Filters;
 
 public class ValidationFilter
 {
-    private static List<object[]> UnvalidatableRouteHandlers() => new()
+    public static List<object[]> UnvalidatableRouteHandlers() => new()
     {
         new [] { () => "Hello" },
         new [] { (int id) => "Hello" },
@@ -33,7 +33,7 @@ public class ValidationFilter
             && produces.Type == typeof(HttpValidationProblemDetails));
     }
 
-    private static List<object[]> ValidatableRouteHandlers() => new()
+    public static List<object[]> ValidatableRouteHandlers() => new()
     {
         new [] { (Todo todo) => "Hello" },
         new [] { (TodoValidateableObject todo) => "Hello" }

@@ -5,7 +5,7 @@ A set of extensions and helpers that extend the functionality of ASP.NET Core Mi
 [![Nuget](https://img.shields.io/nuget/v/MinimalApis.Extensions)](https://www.nuget.org/packages/MinimalApis.Extensions/)
 
 ## Prerelease Builds
-This package is currently available in prerelease from nuget.org:
+This package is currently available in prerelease from [nuget.org](https://www.nuget.org/packages/MinimalApis.Extensions/):
 
 ``` console
 > dotnet add package MinimalApis.Extensions --prerelease
@@ -17,7 +17,7 @@ If you wish to use builds from this repo's `main` branch you can install them fr
 1. [Create a personal access token](https://github.com/settings/tokens/new) for your GitHub account with the `read:packages` scope with your desired expiration length:
     
     [<img width="583" alt="image" src="https://user-images.githubusercontent.com/249088/160220117-7e79822e-a18a-445c-89ff-b3d9ca84892f.png">](https://github.com/settings/tokens/new)
-3. At the command line, navigate to your user profile directory and run the following command to add the package feed to your NuGet configuration, replacing the `<GITHUB_USER_NAME>` and `<PERSONAL_ACCESS_TOKEN>` placeholders with the relevant values:
+1. At the command line, navigate to your user profile directory and run the following command to add the package feed to your NuGet configuration, replacing the `<GITHUB_USER_NAME>` and `<PERSONAL_ACCESS_TOKEN>` placeholders with the relevant values:
     ``` shell
     ~> dotnet nuget add source -n GitHub -u <GITHUB_USER_NAME> -p <PERSONAL_ACCESS_TOKEN> https://nuget.pkg.github.com/DamianEdwards/index.json
     ```
@@ -29,10 +29,10 @@ If you wish to use builds from this repo's `main` branch you can install them fr
     ``` shell
     > dotnet add package MinimalApis.Extensions --prerelease
     ```
-1. In your project's `Program.cs`, call the `AddEndpointsMetadataProviderApiExplorer()` method on `builder.Services` to enable enhanced endpoint metadata in `ApiExplorer`:
+1. **.NET 6.0 projects only** In your project's `Program.cs`, call the `AddEndpointsMetadataProviderApiExplorer()` method on `builder.Services` to enable enhanced endpoint metadata in `ApiExplorer`:
     ``` c#
     var builder = WebApplication.CreateBuilder(args);
-    builder.Services.AddEndpointsMetadataProviderApiExplorer(); // <-- Add this line
+    builder.Services.AddEndpointsMetadataProviderApiExplorer(); // <-- Add this line in .NET 6.0 projects
     builder.Services.AddSwaggerGen();
     ...
     ```
@@ -41,22 +41,24 @@ If you wish to use builds from this repo's `main` branch you can install them fr
     app.MapPost("/todos", async Task<Results<ValidationProblem, Created<Todo>>> (Validated<Todo> input, TodoDb db) =>
     {
         if (!input.IsValid)
-            return Results.Extensions.ValidationProblem(input.Errors);
+            return TypedResults.ValidationProblem(input.Errors);
         
         var todo = input.Value;
         db.Todos.Add(todo);
         await db.SaveChangesAsync();
 
-        return Results.Extensions.Created($"/todos/{todo.Id}", todo);
+        return TypedResults.Created($"/todos/{todo.Id}", todo);
     });
     ```
 
 # What's Included?
 This library provides types that help extend the core functionality of ASP.NET Core Minimal APIs in the following ways:
-- Enhanced parameter binding
-- Typed `IResult` objects for easier unit testing (available via `Results.Extensions`)
-- Automatic population of detailed endpoint descriptions in Swagger/OpenAPI via the ability for input and result types to add to endpoint metadata via `IProvideEndpointParameterMetadata` and `IProvideEndpointResponseMetadata`
-- Union `IResult` return types via `Results<TResult1, TResultN>` that enable route handler delegates to declare all the possible `IResult` types they can return, enabling compile-time type checking and automatic population of possible responses in Swagger/OpenAPI
+- Enhanced parameter binding via `IParameterBinder` and `Bind<TValue>`, `Body<TValue>`, `JsonFormFile`, `Validated<TValue>`, and others
+- Extra result types available via `Results.Extensions` including `PlainText`, `Html`, and `UnsupportedMediaType`
+- Poly-filling of .NET 7.0 features for use in .NET 6.0 projects including:
+  - Typed `IResult` objects for easier unit testing (available via `TypedResults`) including the `IStatusCodeHttpResult`, `IContentTypeHttpResult`, and `IValueHttpResult` interfaces
+  - Automatic population of detailed endpoint descriptions in Swagger/OpenAPI via the ability for input and result types to populate endpoint metadata via `IEndpointParameterMetadataProvider` and `IEndpointMetadataProvider`
+  - Union `IResult` return types via `Results<TResult1, TResultN>` that enable route handler delegates to declare all the possible `IResult` types they can return, enabling compile-time type checking and automatic population of all possible responses in Swagger/OpenAPI from type information
 
 # Sample Projects
 ## [TodoApis.Dapper](https://github.com/DamianEdwards/MinimalApis.Extensions/tree/main/samples/TodosApi.Dapper)

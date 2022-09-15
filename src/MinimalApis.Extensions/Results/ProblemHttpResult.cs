@@ -9,7 +9,7 @@ namespace Microsoft.AspNetCore.Http.HttpResults;
 /// An <see cref="IResult"/> that on execution will write Problem Details
 /// HTTP API responses based on <see href="https://tools.ietf.org/html/rfc7807"/>
 /// </summary>
-public sealed class ProblemHttpResult : IResult
+public sealed class ProblemHttpResult : IResult, IStatusCodeHttpResult, IContentTypeHttpResult, IValueHttpResult, IValueHttpResult<ProblemDetails>
 {
     /// <summary>
     /// Creates a new <see cref="ProblemHttpResult"/> instance with
@@ -40,6 +40,10 @@ public sealed class ProblemHttpResult : IResult
     /// Gets the <see cref="ProblemDetails"/> instance.
     /// </summary>
     public ProblemDetails ProblemDetails { get; }
+
+    object? IValueHttpResult.Value => ProblemDetails;
+
+    ProblemDetails? IValueHttpResult<ProblemDetails>.Value => ProblemDetails;
 
     /// <summary>
     /// Gets or sets a value indicating whether a request ID should be included in the response.

@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// Represents an <see cref="IResult"/> for a <see cref="StatusCodes.Status415UnsupportedMediaType"/> response.
 /// </summary>
-public sealed class UnsupportedMediaType : IResult, IEndpointMetadataProvider
+public sealed class UnsupportedMediaType : IResult, IEndpointMetadataProvider, IStatusCodeHttpResult
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="UnsupportedMediaType"/> class.
@@ -19,6 +19,8 @@ public sealed class UnsupportedMediaType : IResult, IEndpointMetadataProvider
     /// Gets the HTTP status code: <see cref="StatusCodes.Status415UnsupportedMediaType"/>
     /// </summary>
     public int StatusCode => StatusCodes.Status415UnsupportedMediaType;
+
+    int? IStatusCodeHttpResult.StatusCode => StatusCode;
 
     /// <inheritdoc />
     public Task ExecuteAsync(HttpContext httpContext)

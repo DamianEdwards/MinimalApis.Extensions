@@ -6,7 +6,7 @@ namespace Microsoft.AspNetCore.Http.HttpResults;
 /// <summary>
 /// An <see cref="IResult"/> that returns a Not Found (404) status code.
 /// </summary>
-public sealed class NotFound : IResult, IEndpointMetadataProvider
+public sealed class NotFound : IResult, IEndpointMetadataProvider, IStatusCodeHttpResult
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="NotFound"/> class with the values.
@@ -21,6 +21,8 @@ public sealed class NotFound : IResult, IEndpointMetadataProvider
     /// Gets the HTTP status code: <see cref="StatusCodes.Status404NotFound"/>
     /// </summary>
     public int StatusCode => StatusCodes.Status404NotFound;
+
+    int? IStatusCodeHttpResult.StatusCode => StatusCode;
 
     /// <inheritdoc/>
     public Task ExecuteAsync(HttpContext httpContext)

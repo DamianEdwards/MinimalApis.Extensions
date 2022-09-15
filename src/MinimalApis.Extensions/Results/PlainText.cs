@@ -5,7 +5,7 @@ namespace MinimalApis.Extensions.Results;
 /// <summary>
 /// An <see cref="IResult"/> that returns an Ok (200) status code response with a plain text response body.
 /// </summary>
-public sealed class PlainText : IResult, IEndpointMetadataProvider
+public sealed class PlainText : IResult, IEndpointMetadataProvider, IStatusCodeHttpResult, IContentTypeHttpResult
 {
     private const int ResponseStatusCode = StatusCodes.Status200OK;
 
@@ -22,6 +22,8 @@ public sealed class PlainText : IResult, IEndpointMetadataProvider
     /// Gets the HTTP status code: <see cref="StatusCodes.Status200OK"/>
     /// </summary>
     public int StatusCode => StatusCodes.Status200OK;
+
+    int? IStatusCodeHttpResult.StatusCode => StatusCode;
 
     /// <summary>
     /// Gets the value that will be set on the <c>Content-Type</c> header.
