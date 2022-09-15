@@ -8,8 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="6.0.8" Condition="'$(TargetFramework)'=='net6.0'" />
-    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="7.0.0-rc.1.22427.1" Condition="'$(TargetFramework)'=='net7.0'" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="6.0.9" Condition="'$(TargetFramework)'=='net6.0'" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="7.0.0-rc.1.22427.2" Condition="'$(TargetFramework)'=='net7.0'" />
   </ItemGroup>
 
   <ItemGroup>
