@@ -19,6 +19,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         Assert.Empty(todos);
     }
 
@@ -40,6 +41,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         Assert.NotEmpty(todos);
     }
 
@@ -61,6 +63,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         var todo = Assert.Single(todos);
         Assert.Equal(newTodo.Title, todo.Title);
         Assert.False(todo.IsComplete);
@@ -84,6 +87,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         Assert.Empty(todos);
     }
 
@@ -107,6 +111,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         var todo = Assert.Single(todos);
         Assert.Equal(newTodoExpected.Title, todo.Title);
         Assert.False(todo.IsComplete);
@@ -140,6 +145,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         var todo = Assert.Single(todos);
         Assert.Equal(newTodoExpected.Title, todo.Title);
         Assert.False(todo.IsComplete);
@@ -170,6 +176,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         var todoTobeUpdated = Assert.Single(todos);
 
         todoTobeUpdated.Title = "New Title";
@@ -205,6 +212,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         var todo = Assert.Single(todos);
         Assert.Equal(newTodoExpected.Title, todo.Title);
         Assert.False(todo.IsComplete);
@@ -236,6 +244,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         var todo = Assert.Single(todos);
         Assert.Equal(newTodoExpected.Title, todo.Title);
         Assert.False(todo.IsComplete);
@@ -258,6 +267,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         Assert.Empty(todos);
 
         var expectedTodos = new[]
@@ -284,6 +294,7 @@ public class TodosApiIntegration
 
         todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         Assert.Empty(todos);
     }
 
@@ -324,6 +335,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/complete");
 
+        Assert.NotNull(todos);
         Assert.Empty(todos);
     }
 
@@ -352,6 +364,7 @@ public class TodosApiIntegration
 
         var completedTodos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/incomplete");
 
+        Assert.NotNull(completedTodos);
         Assert.Equal(expectedTodos.Where(x => x.IsComplete == false).Count(), completedTodos?.Count);
     }
 
@@ -364,6 +377,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/incomplete");
 
+        Assert.NotNull(todos);
         Assert.Empty(todos);
     }
 
@@ -385,6 +399,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         var todo = Assert.Single(todos);
         Assert.Equal(newTodo.Title, todo.Title);
         Assert.False(todo.IsComplete);
@@ -395,6 +410,7 @@ public class TodosApiIntegration
 
         todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/complete");
 
+        Assert.NotNull(todos);
         todo = Assert.Single(todos);
         Assert.Equal(newTodo.Title, todo.Title);
         Assert.True(todo.IsComplete);
@@ -418,6 +434,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         var todo = Assert.Single(todos);
         Assert.Equal(newTodo.Title, todo.Title);
         Assert.False(todo.IsComplete);
@@ -428,6 +445,7 @@ public class TodosApiIntegration
 
         todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/complete");
 
+        Assert.NotNull(todos);
         Assert.Empty(todos);
     }
 
@@ -449,6 +467,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         var todo = Assert.Single(todos);
         Assert.Equal(newTodo.Title, todo.Title);
         Assert.False(todo.IsComplete);
@@ -457,6 +476,7 @@ public class TodosApiIntegration
 
         todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/complete");
 
+        Assert.NotNull(todos);
         todo = Assert.Single(todos);
         Assert.Equal(newTodo.Title, todo.Title);
         Assert.True(todo.IsComplete);
@@ -467,6 +487,7 @@ public class TodosApiIntegration
 
         todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/incomplete");
 
+        Assert.NotNull(todos);
         Assert.Empty(todos);
     }
 
@@ -488,6 +509,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         var todo = Assert.Single(todos);
         Assert.Equal(newTodo.Title, todo.Title);
         Assert.False(todo.IsComplete);
@@ -496,6 +518,7 @@ public class TodosApiIntegration
 
         todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/complete");
 
+        Assert.NotNull(todos);
         todo = Assert.Single(todos);
         Assert.Equal(newTodo.Title, todo.Title);
         Assert.True(todo.IsComplete);
@@ -506,6 +529,7 @@ public class TodosApiIntegration
 
         todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos/incomplete");
 
+        Assert.NotNull(todos);
         todo = Assert.Single(todos);
         Assert.Equal(newTodo.Title, todo.Title);
         Assert.False(todo.IsComplete);
@@ -529,6 +553,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         var todo = Assert.Single(todos);
 
         response = await httpClient.GetAsync($"/todos/{todo.Id}");
@@ -554,6 +579,7 @@ public class TodosApiIntegration
 
         var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
 
+        Assert.NotNull(todos);
         var todo = Assert.Single(todos);
 
         response = await httpClient.GetAsync($"/todos/2");
