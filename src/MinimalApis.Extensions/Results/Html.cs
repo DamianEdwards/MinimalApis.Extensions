@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http.Metadata;
+﻿using Microsoft.AspNetCore.Builder;
+using System.Reflection;
+using Microsoft.AspNetCore.Http.Metadata;
 
 namespace MinimalApis.Extensions.Results;
 
@@ -7,6 +9,8 @@ namespace MinimalApis.Extensions.Results;
 /// </summary>
 public sealed class Html : IResult, IEndpointMetadataProvider, IStatusCodeHttpResult, IContentTypeHttpResult
 {
+    private const int ResponseStatusCode = StatusCodes.Status200OK;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Html"/> class.
     /// </summary>
@@ -19,7 +23,7 @@ public sealed class Html : IResult, IEndpointMetadataProvider, IStatusCodeHttpRe
     /// <summary>
     /// Gets the status code: <see cref="StatusCodes.Status200OK"/>
     /// </summary>
-    public int StatusCode => StatusCodes.Status200OK;
+    public int StatusCode => ResponseStatusCode;
 
     int? IStatusCodeHttpResult.StatusCode => StatusCode;
 
@@ -33,11 +37,7 @@ public sealed class Html : IResult, IEndpointMetadataProvider, IStatusCodeHttpRe
     /// </summary>
     public string? Content { get; }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="httpContext"></param>
-    /// <returns></returns>
+    /// <inheritdoc />
     public async Task ExecuteAsync(HttpContext httpContext)
     {
         ArgumentNullException.ThrowIfNull(httpContext);
@@ -50,13 +50,32 @@ public sealed class Html : IResult, IEndpointMetadataProvider, IStatusCodeHttpRe
         }
     }
 
+#if NET7_0_OR_GREATER
     /// <summary>
-    /// Populates metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
-    public static void PopulateMetadata(EndpointMetadataContext context)
+    /// <param name="method"></param>
+    /// <param name="builder"></param>
+    public static void PopulateMetadata(MethodInfo method, EndpointBuilder builder)
     {
-        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status200OK));
-        context.EndpointMetadata.Add(new Mvc.ProducesAttribute("text/html"));
+        ArgumentNullException.ThrowIfNull(method);
+        ArgumentNullException.ThrowIfNull(builder);
+
+        PopulateMetadataImpl(method, builder.Metadata, builder.ApplicationServices);
+    }
+#else
+    public static void PopulateMetadata(MethodInfo method, IList<object> metadata, IServiceProvider services)
+    {
+        ArgumentNullException.ThrowIfNull(method);
+        ArgumentNullException.ThrowIfNull(metadata);
+        ArgumentNullException.ThrowIfNull(services);
+
+        PopulateMetadataImpl(method, metadata, services);
+    }
+#endif
+
+    private static void PopulateMetadataImpl(MethodInfo method, IList<object> metadata, IServiceProvider services)
+    {
+        metadata.Add(new ProducesResponseTypeMetadata(ResponseStatusCode, "text/html"));
     }
 }

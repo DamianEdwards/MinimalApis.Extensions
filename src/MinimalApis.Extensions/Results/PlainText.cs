@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http.Metadata;
+﻿using Microsoft.AspNetCore.Builder;
+using System.Reflection;
+using Microsoft.AspNetCore.Http.Metadata;
 
 namespace MinimalApis.Extensions.Results;
 
@@ -21,7 +23,7 @@ public sealed class PlainText : IResult, IEndpointMetadataProvider, IStatusCodeH
     /// <summary>
     /// Gets the HTTP status code: <see cref="StatusCodes.Status200OK"/>
     /// </summary>
-    public int StatusCode => StatusCodes.Status200OK;
+    public int StatusCode => ResponseStatusCode;
 
     int? IStatusCodeHttpResult.StatusCode => StatusCode;
 
@@ -49,15 +51,32 @@ public sealed class PlainText : IResult, IEndpointMetadataProvider, IStatusCodeH
         }
     }
 
+#if NET7_0_OR_GREATER
     /// <summary>
-    /// Populates metadata for the related <see cref="Endpoint"/>.
+    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
-    public static void PopulateMetadata(EndpointMetadataContext context)
+    /// <param name="method"></param>
+    /// <param name="builder"></param>
+    public static void PopulateMetadata(MethodInfo method, EndpointBuilder builder)
     {
-        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(method);
+        ArgumentNullException.ThrowIfNull(builder);
 
-        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(ResponseStatusCode));
-        context.EndpointMetadata.Add(new Mvc.ProducesAttribute("text/plain"));
+        PopulateMetadataImpl(method, builder.Metadata, builder.ApplicationServices);
+    }
+#else
+    public static void PopulateMetadata(MethodInfo method, IList<object> metadata, IServiceProvider services)
+    {
+        ArgumentNullException.ThrowIfNull(method);
+        ArgumentNullException.ThrowIfNull(metadata);
+        ArgumentNullException.ThrowIfNull(services);
+
+        PopulateMetadataImpl(method, metadata, services);
+    }
+#endif
+
+    private static void PopulateMetadataImpl(MethodInfo method, IList<object> metadata, IServiceProvider services)
+    {
+        metadata.Add(new ProducesResponseTypeMetadata(ResponseStatusCode, "text/plain"));
     }
 }

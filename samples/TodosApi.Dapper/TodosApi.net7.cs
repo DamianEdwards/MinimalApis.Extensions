@@ -24,8 +24,6 @@ public static class TodosApi
         todos.MapDelete("/delete-all", DeleteAll);
 
         todos.WithParameterValidation();
-
-        todos.WithOpenApi();
     }
 
     public static async Task<Ok<IEnumerable<Todo>>> GetAllTodos(IDbConnection db) =>

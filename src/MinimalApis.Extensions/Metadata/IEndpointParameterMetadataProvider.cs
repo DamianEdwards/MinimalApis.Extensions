@@ -1,41 +1,52 @@
 ﻿using System.Reflection;
+using Microsoft.AspNetCore.Builder;
+using MinimalApis.Extensions.Metadata;
 
 namespace Microsoft.AspNetCore.Http.Metadata;
 
 #if NET6_0
 /// <summary>
-/// Marker interface that indicates a type provides a static method that returns <see cref="Endpoint"/> metadata for a
+/// Marker interface that indicates a type provides a static method that populates <see cref="Endpoint"/> metadata for a
 /// parameter on a route handler delegate. The method must be of the form:
-/// <code>public static void PopulateMetadata(<see cref="EndpointParameterMetadataContext"/> context)</code>
+/// <code>public static void PopulateMetadata(<see cref="ParameterInfo"/> parameter, <see cref="EndpointBuilder"/> builder)</code>
 /// </summary>
 public interface IEndpointParameterMetadataProvider
 {
-    //static abstract void PopulateMetadata(EndpointParameterMetadataContext context);
+    //static abstract void PopulateMetadata(ParameterInfo parameter, EndpointBuilder builder);
 }
 #endif
 
 internal static class EndpointParameterMetadataHelpers
 {
     internal static readonly string PopulateMetadataMethodName = "PopulateMetadata";
+    internal static readonly string[] DefaultAcceptsContentTypes = new[] { "application/json" };
 
-    public static void PopulateDefaultMetadataForWrapperType<TValue>(EndpointParameterMetadataContext context)
+    public static void PopulateDefaultMetadataForWrapperType<TValue>(ParameterInfo parameter, IList<object> metadata, IServiceProvider services)
     {
         if (typeof(TValue).IsAssignableTo(typeof(IEndpointParameterMetadataProvider)))
         {
-            PopulateMetadataLateBound(context);
+            PopulateMetadataLateBound(parameter, metadata, services);
             return;
         }
 
-        context.EndpointMetadata.Add(new Mvc.ConsumesAttribute(typeof(TValue), "application/json"));
+        metadata.Add(new AcceptsMetadata(typeof(TValue), false, DefaultAcceptsContentTypes));
     }
 
-    public static void PopulateMetadataLateBound(EndpointParameterMetadataContext context)
+#if NET7_0_OR_GREATER
+    public static void PopulateMetadata<T>(ParameterInfo parameter, EndpointBuilder builder)
+        where T : IEndpointParameterMetadataProvider
     {
-        var targetType = context.Parameter.ParameterType;
+        T.PopulateMetadata(parameter, builder);
+    }
+#endif
+
+    public static void PopulateMetadataLateBound(ParameterInfo parameter, IList<object> metadata, IServiceProvider services)
+    {
+        var targetType = parameter.ParameterType;
 
         if (!targetType.IsAssignableTo(typeof(IEndpointParameterMetadataProvider)))
         {
-            throw new ArgumentException($"Target type {targetType.FullName} must implement {nameof(IEndpointParameterMetadataProvider)}", nameof(context));
+            throw new ArgumentException($"Target type {targetType.FullName} must implement {nameof(IEndpointParameterMetadataProvider)}", nameof(parameter));
         }
 
         // TODO: Cache the method lookup and delegate creation? This is only called during first calls to ApiExplorer.
@@ -46,8 +57,8 @@ internal static class EndpointParameterMetadataHelpers
             return;
         }
 
-        // void PopulateMetadata(EndpointParameterMetadataContext context)
-        var populateMetadata = method.CreateDelegate<Action<EndpointParameterMetadataContext>>();
-        populateMetadata(context);
+        // void PopulateMetadata(ParameterInfo parameter, EndpointBuilder builder)
+        var populateMetadata = method.CreateDelegate<Action<ParameterInfo, IList<object>, IServiceProvider>>();
+        populateMetadata(parameter, metadata, services);
     }
 }
