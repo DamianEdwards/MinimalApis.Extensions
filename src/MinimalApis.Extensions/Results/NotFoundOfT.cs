@@ -1,5 +1,7 @@
 ﻿#if NET6_0
+using System.Reflection;
 using Microsoft.AspNetCore.Http.Metadata;
+using MinimalApis.Extensions.Metadata;
 
 namespace Microsoft.AspNetCore.Http.HttpResults;
 
@@ -44,12 +46,18 @@ public sealed class NotFound<TValue> : IResult, IEndpointMetadataProvider, IStat
     }
 
     /// <summary>
-    /// Populates metadata for the related <see cref="Endpoint"/>.
+    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
-    public static void PopulateMetadata(EndpointMetadataContext context)
+    /// <param name="method"></param>
+    /// <param name="metadata"></param>
+    /// <param name="services"></param>
+    public static void PopulateMetadata(MethodInfo method, IList<object> metadata, IServiceProvider services)
     {
-        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(typeof(TValue), StatusCodes.Status404NotFound, "application/json"));
+        ArgumentNullException.ThrowIfNull(method);
+        ArgumentNullException.ThrowIfNull(metadata);
+        ArgumentNullException.ThrowIfNull(services);
+
+        metadata.Add(new ProducesResponseTypeMetadata(typeof(TValue), StatusCodes.Status404NotFound, "application/json"));
     }
 }
 #endif

@@ -1,4 +1,5 @@
 ﻿#if NET6_0
+using System.Reflection;
 using Microsoft.AspNetCore.Http.Metadata;
 using MinimalApis.Extensions.Results;
 
@@ -64,15 +65,20 @@ public sealed class ValidationProblem : IResult, IEndpointMetadataProvider, ISta
         return httpContext.Response.WriteAsJsonAsync(ProblemDetails, null, ContentType);
     }
 
-    /// <summary>
-    /// Populates metadata for the related <see cref="Endpoint"/>.
-    /// </summary>
-    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
-    public static void PopulateMetadata(EndpointMetadataContext context)
-    {
-        ArgumentNullException.ThrowIfNull(context);
 
-        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(typeof(HttpValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json"));
+    /// <summary>
+    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// </summary>
+    /// <param name="method"></param>
+    /// <param name="metadata"></param>
+    /// <param name="services"></param>
+    public static void PopulateMetadata(MethodInfo method, IList<object> metadata, IServiceProvider services)
+    {
+        ArgumentNullException.ThrowIfNull(method);
+        ArgumentNullException.ThrowIfNull(metadata);
+        ArgumentNullException.ThrowIfNull(services);
+
+        metadata.Add(new ProducesResponseTypeMetadata(typeof(HttpValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json"));
     }
 }
 #endif

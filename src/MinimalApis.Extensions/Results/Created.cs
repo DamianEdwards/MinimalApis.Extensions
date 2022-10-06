@@ -1,4 +1,5 @@
 ﻿#if NET6_0
+using System.Reflection;
 using Microsoft.AspNetCore.Http.Metadata;
 
 namespace Microsoft.AspNetCore.Http.HttpResults;
@@ -70,12 +71,16 @@ public sealed class Created : IResult, IEndpointMetadataProvider, IStatusCodeHtt
     /// <summary>
     /// Populates metadata for the related <see cref="Endpoint"/>.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
-    public static void PopulateMetadata(EndpointMetadataContext context)
+    /// <param name="methodInfo"></param>
+    /// <param name="metadata"></param>
+    /// <param name="services"></param>
+    public static void PopulateMetadata(MethodInfo methodInfo, IList<object> metadata, IServiceProvider services)
     {
-        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(methodInfo);
+        ArgumentNullException.ThrowIfNull(metadata);
+        ArgumentNullException.ThrowIfNull(services);
 
-        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status201Created));
+        metadata.Add(new ProducesResponseTypeMetadata(StatusCodes.Status201Created));
     }
 }
 #endif

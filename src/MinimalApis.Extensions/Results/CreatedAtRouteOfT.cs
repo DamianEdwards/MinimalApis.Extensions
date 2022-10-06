@@ -1,4 +1,5 @@
 ﻿#if NET6_0
+using System.Reflection;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -91,12 +92,16 @@ public sealed class CreatedAtRoute<TValue> : IResult, IEndpointMetadataProvider,
     /// <summary>
     /// Populates metadata for the related <see cref="Endpoint"/>.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
-    public static void PopulateMetadata(EndpointMetadataContext context)
+    /// <param name="methodInfo"></param>
+    /// <param name="metadata"></param>
+    /// <param name="services"></param>
+    public static void PopulateMetadata(MethodInfo methodInfo, IList<object> metadata, IServiceProvider services)
     {
-        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(methodInfo);
+        ArgumentNullException.ThrowIfNull(metadata);
+        ArgumentNullException.ThrowIfNull(services);
 
-        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(typeof(TValue), StatusCodes.Status201Created, "application/json"));
+        metadata.Add(new ProducesResponseTypeMetadata(typeof(TValue), StatusCodes.Status201Created, "application/json"));
     }
 }
 #endif

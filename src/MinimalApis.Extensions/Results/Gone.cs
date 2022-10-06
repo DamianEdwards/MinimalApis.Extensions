@@ -48,6 +48,12 @@ public sealed class Gone : IResult, IEndpointMetadataProvider, IStatusCodeHttpRe
         PopulateMetadataImpl(method, builder.Metadata, builder.ApplicationServices);
     }
 #else
+    /// <summary>
+    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// </summary>
+    /// <param name="method"></param>
+    /// <param name="metadata"></param>
+    /// <param name="services"></param>
     public static void PopulateMetadata(MethodInfo method, IList<object> metadata, IServiceProvider services)
     {
         ArgumentNullException.ThrowIfNull(method);
@@ -60,6 +66,6 @@ public sealed class Gone : IResult, IEndpointMetadataProvider, IStatusCodeHttpRe
 
     private static void PopulateMetadataImpl(MethodInfo method, IList<object> metadata, IServiceProvider services)
     {
-        metadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status410Gone));
+        metadata.Add(new ProducesResponseTypeMetadata(StatusCodes.Status410Gone));
     }
 }

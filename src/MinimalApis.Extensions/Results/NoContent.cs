@@ -1,4 +1,5 @@
 ﻿#if NET6_0
+using System.Reflection;
 using Microsoft.AspNetCore.Http.Metadata;
 
 namespace Microsoft.AspNetCore.Http.HttpResults;
@@ -35,14 +36,18 @@ public class NoContent : IResult, IEndpointMetadataProvider, IStatusCodeHttpResu
     }
 
     /// <summary>
-    /// Populates metadata for the related <see cref="Endpoint"/>.
+    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
-    public static void IEndpointMetadataProviderPopulateMetadata(EndpointMetadataContext context)
+    /// <param name="method"></param>
+    /// <param name="metadata"></param>
+    /// <param name="services"></param>
+    public static void PopulateMetadata(MethodInfo method, IList<object> metadata, IServiceProvider services)
     {
-        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(method);
+        ArgumentNullException.ThrowIfNull(metadata);
+        ArgumentNullException.ThrowIfNull(services);
 
-        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status204NoContent));
+        metadata.Add(new ProducesResponseTypeMetadata(StatusCodes.Status204NoContent));
     }
 }
 #endif

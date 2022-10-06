@@ -1,4 +1,5 @@
 ﻿#if NET6_0
+using System.Reflection;
 using Microsoft.AspNetCore.Http.Metadata;
 
 namespace Microsoft.AspNetCore.Http.HttpResults;
@@ -40,18 +41,21 @@ public abstract class ResultsBase : IResult, INestedHttpResult
     /// Gets the <see cref="Endpoint"/> metadata for the set of result types that the given
     /// <see cref="Endpoint"/> route handler delegate delclares it can return.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    /// <param name="metadata">The list of endpoint metadata.</param>
+    /// <param name="services">The application services.</param>
     /// <param name="resultTypes">The different result types the route handler delegate can return.</param>
     /// <returns></returns>
-    protected static void PopulateMetadata(EndpointMetadataContext context, params Type[] resultTypes)
+    protected static void PopulateMetadata(IList<object> metadata, IServiceProvider services, params Type[] resultTypes)
     {
-        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(metadata);
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(resultTypes);
 
         foreach (var resultType in resultTypes)
         {
             if (resultType.IsAssignableTo(typeof(IEndpointMetadataProvider)))
             {
-                EndpointMetadataHelpers.PopulateMetadataLateBound(resultType, context);
+                EndpointMetadataHelpers.PopulateMetadataLateBound(resultType, metadata, services);
             }
         }
     }
@@ -87,9 +91,10 @@ public sealed class Results<TResult1, TResult2> : ResultsBase, IEndpointMetadata
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    /// <param name="metadata">The list of endpoint metadata.</param>
+    /// <param name="services">The application services.</param>
     /// <returns>The metadata.</returns>
-    public static void PopulateMetadata(EndpointMetadataContext context) => PopulateMetadata(context, typeof(TResult1), typeof(TResult2));
+    public static void PopulateMetadata(IList<object> metadata, IServiceProvider services) => PopulateMetadata(metadata, services, typeof(TResult1), typeof(TResult2));
 }
 
 /// <summary>
@@ -165,9 +170,10 @@ public sealed class Results<TResult1, TResult2, TResult3> : ResultsBase, IEndpoi
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    /// <param name="metadata">The list of endpoint metadata.</param>
+    /// <param name="services">The application services.</param>
     /// <returns>The metadata.</returns>
-    public static void PopulateMetadata(EndpointMetadataContext context) => PopulateMetadata(context, typeof(TResult1), typeof(TResult2), typeof(TResult3));
+    public static void PopulateMetadata(IList<object> metadata, IServiceProvider services) => PopulateMetadata(metadata, services, typeof(TResult1), typeof(TResult2), typeof(TResult3));
 }
 
 /// <summary>
@@ -215,9 +221,10 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4> : ResultsBas
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    /// <param name="metadata">The list of endpoint metadata.</param>
+    /// <param name="services">The application services.</param>
     /// <returns>The metadata.</returns>
-    public static void PopulateMetadata(EndpointMetadataContext context) => PopulateMetadata(context, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4));
+    public static void PopulateMetadata(IList<object> metadata, IServiceProvider services) => PopulateMetadata(metadata, services, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4));
 }
 
 // TODO: Add the rest of the implicit operators to convert every Results combo to every other Results combo, should likely code-gen this :\
@@ -275,9 +282,10 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5> : 
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    /// <param name="metadata">The list of endpoint metadata.</param>
+    /// <param name="services">The application services.</param>
     /// <returns>The metadata.</returns>
-    public static void PopulateMetadata(EndpointMetadataContext context) => PopulateMetadata(context, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4), typeof(TResult5));
+    public static void PopulateMetadata(IList<object> metadata, IServiceProvider services) => PopulateMetadata(metadata, services, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4), typeof(TResult5));
 }
 
 /// <summary>
@@ -341,8 +349,9 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5, TR
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
+    /// <param name="metadata">The list of endpoint metadata.</param>
+    /// <param name="services">The application services.</param>
     /// <returns>The metadata.</returns>
-    public static void PopulateMetadata(EndpointMetadataContext context) => PopulateMetadata(context, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4), typeof(TResult5), typeof(TResult6));
+    public static void PopulateMetadata(IList<object> metadata, IServiceProvider services) => PopulateMetadata(metadata, services, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4), typeof(TResult5), typeof(TResult6));
 }
 #endif

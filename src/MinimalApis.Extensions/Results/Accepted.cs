@@ -82,7 +82,7 @@ public sealed class Accepted : IEndpointMetadataProvider, IStatusCodeHttpResult
         ArgumentNullException.ThrowIfNull(metadata);
         ArgumentNullException.ThrowIfNull(services);
 
-        metadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status202Accepted));
+        metadata.Add(new ProducesResponseTypeMetadata(StatusCodes.Status202Accepted));
     }
 }
 #endif
