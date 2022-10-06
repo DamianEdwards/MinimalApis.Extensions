@@ -44,7 +44,6 @@ public abstract class ResultsBase : IResult, INestedHttpResult
     /// <param name="metadata">The list of endpoint metadata.</param>
     /// <param name="services">The application services.</param>
     /// <param name="resultTypes">The different result types the route handler delegate can return.</param>
-    /// <returns></returns>
     protected static void PopulateMetadata(IList<object> metadata, IServiceProvider services, params Type[] resultTypes)
     {
         ArgumentNullException.ThrowIfNull(metadata);
@@ -70,7 +69,6 @@ public sealed class Results<TResult1, TResult2> : ResultsBase, IEndpointMetadata
     where TResult1 : IResult
     where TResult2 : IResult
 {
-
     private Results(IResult activeResult) : base(activeResult)
     {
 
@@ -91,10 +89,10 @@ public sealed class Results<TResult1, TResult2> : ResultsBase, IEndpointMetadata
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
+    /// <param name="method">The route handler delegate.</param>
     /// <param name="metadata">The list of endpoint metadata.</param>
     /// <param name="services">The application services.</param>
-    /// <returns>The metadata.</returns>
-    public static void PopulateMetadata(IList<object> metadata, IServiceProvider services) => PopulateMetadata(metadata, services, typeof(TResult1), typeof(TResult2));
+    public static void PopulateMetadata(MethodInfo method, IList<object> metadata, IServiceProvider services) => PopulateMetadata(metadata, services, typeof(TResult1), typeof(TResult2));
 }
 
 /// <summary>
@@ -170,10 +168,10 @@ public sealed class Results<TResult1, TResult2, TResult3> : ResultsBase, IEndpoi
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
+    /// <param name="method">The route handler delegate.</param>
     /// <param name="metadata">The list of endpoint metadata.</param>
     /// <param name="services">The application services.</param>
-    /// <returns>The metadata.</returns>
-    public static void PopulateMetadata(IList<object> metadata, IServiceProvider services) => PopulateMetadata(metadata, services, typeof(TResult1), typeof(TResult2), typeof(TResult3));
+    public static void PopulateMetadata(MethodInfo method, IList<object> metadata, IServiceProvider services) => PopulateMetadata(metadata, services, typeof(TResult1), typeof(TResult2), typeof(TResult3));
 }
 
 /// <summary>
@@ -221,10 +219,10 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4> : ResultsBas
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
+    /// <param name="method">The route handler delegate.</param>
     /// <param name="metadata">The list of endpoint metadata.</param>
     /// <param name="services">The application services.</param>
-    /// <returns>The metadata.</returns>
-    public static void PopulateMetadata(IList<object> metadata, IServiceProvider services) => PopulateMetadata(metadata, services, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4));
+    public static void PopulateMetadata(MethodInfo method, IList<object> metadata, IServiceProvider services) => PopulateMetadata(metadata, services, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4));
 }
 
 // TODO: Add the rest of the implicit operators to convert every Results combo to every other Results combo, should likely code-gen this :\
@@ -282,10 +280,10 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5> : 
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
+    /// <param name="method">The route handler delegate.</param>
     /// <param name="metadata">The list of endpoint metadata.</param>
     /// <param name="services">The application services.</param>
-    /// <returns>The metadata.</returns>
-    public static void PopulateMetadata(IList<object> metadata, IServiceProvider services) => PopulateMetadata(metadata, services, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4), typeof(TResult5));
+    public static void PopulateMetadata(MethodInfo method, IList<object> metadata, IServiceProvider services) => PopulateMetadata(metadata, services, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4), typeof(TResult5));
 }
 
 /// <summary>
@@ -349,9 +347,9 @@ public sealed class Results<TResult1, TResult2, TResult3, TResult4, TResult5, TR
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
+    /// <param name="method">The route handler delegate.</param>
     /// <param name="metadata">The list of endpoint metadata.</param>
     /// <param name="services">The application services.</param>
-    /// <returns>The metadata.</returns>
-    public static void PopulateMetadata(IList<object> metadata, IServiceProvider services) => PopulateMetadata(metadata, services, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4), typeof(TResult5), typeof(TResult6));
+    public static void PopulateMetadata(MethodInfo method, IList<object> metadata, IServiceProvider services) => PopulateMetadata(metadata, services, typeof(TResult1), typeof(TResult2), typeof(TResult3), typeof(TResult4), typeof(TResult5), typeof(TResult6));
 }
 #endif

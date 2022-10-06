@@ -54,8 +54,8 @@ internal static class EndpointMetadataHelpers
             return;
         }
 
-        // void PopulateMetadata(IList<object> metadata, IServiceProvider services)
-        var populateMetadata = method.CreateDelegate<Action<IList<object>, IServiceProvider>>();
-        populateMetadata(metadata, services);
+        // void PopulateMetadata(MethodInfo method, IList<object> metadata, IServiceProvider services)
+        var populateMetadata = method.CreateDelegate<Action<MethodInfo, IList<object>, IServiceProvider>>();
+        populateMetadata(method, metadata, services);
     }
 }

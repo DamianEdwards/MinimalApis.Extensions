@@ -1,6 +1,7 @@
 ﻿#if NET7_0_OR_GREATER
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,7 +53,7 @@ public class ValidationFilter
 
         // Assert
         var endpoint = builder.DataSources.Single().Endpoints.Single();
-        Assert.Contains(endpoint.Metadata, m => m is IApiResponseMetadataProvider produces
+        Assert.Contains(endpoint.Metadata, m => m is IProducesResponseTypeMetadata produces
             && produces.Type == typeof(HttpValidationProblemDetails)
             && produces.StatusCode == StatusCodes.Status400BadRequest);
     }

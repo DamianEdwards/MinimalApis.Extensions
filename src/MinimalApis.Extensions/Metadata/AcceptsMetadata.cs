@@ -29,9 +29,9 @@ internal sealed class AcceptsMetadata : IAcceptsMetadata
 
     public AcceptsMetadata(Type? type, bool isOptional, string[] contentTypes)
     {
-        //RequestType = type ?? throw new ArgumentNullException(nameof(type));
         ArgumentNullException.ThrowIfNull(contentTypes);
 
+        RequestType = type;
         ContentTypes = contentTypes;
         IsOptional = isOptional;
     }

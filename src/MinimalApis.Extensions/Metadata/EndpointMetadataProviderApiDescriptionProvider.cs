@@ -93,7 +93,7 @@ public class EndpointMetadataProviderApiDescriptionProvider : IApiDescriptionPro
             {
                 EndpointMetadataHelpers.PopulateMetadataLateBound(returnType, apiDescription.ActionDescriptor.EndpointMetadata, _services);
 
-                var responseMetadata = apiDescription.ActionDescriptor.EndpointMetadata.OfType<IApiResponseMetadataProvider>().ToList();
+                var responseMetadata = apiDescription.ActionDescriptor.EndpointMetadata.OfType<IProducesResponseTypeMetadata>().ToList();
 
                 if (apiDescription.SupportedResponseTypes.Count == 1 && responseMetadata.Count > 0)
                 {
@@ -115,10 +115,11 @@ public class EndpointMetadataProviderApiDescriptionProvider : IApiDescriptionPro
                     };
                     apiResponseType.ModelMetadata = CreateModelMetadata(apiResponseType.Type);
 
-                    var contentTypes = new MediaTypeCollection();
-                    responseType.SetContentTypes(contentTypes);
+                    //var contentTypes = new MediaTypeCollection();
+                    //responseType.
+                    //responseType.SetContentTypes(contentTypes);
 
-                    foreach (var format in contentTypes.Select(ct => new ApiResponseFormat { MediaType = ct }))
+                    foreach (var format in responseType.ContentTypes.Select(ct => new ApiResponseFormat { MediaType = ct }))
                     {
                         apiResponseType.ApiResponseFormats.Add(format);
                     }
