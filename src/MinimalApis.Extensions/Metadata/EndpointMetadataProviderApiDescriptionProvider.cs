@@ -91,10 +91,9 @@ public class EndpointMetadataProviderApiDescriptionProvider : IApiDescriptionPro
 
             if (returnTypeProvidesMetadata)
             {
-                var endpointMetadataContext = new EndpointMetadataContext(method, apiDescription.ActionDescriptor.EndpointMetadata, _services);
-                EndpointMetadataHelpers.PopulateMetadataLateBound(returnType, endpointMetadataContext);
+                EndpointMetadataHelpers.PopulateMetadataLateBound(returnType, apiDescription.ActionDescriptor.EndpointMetadata, _services);
 
-                var responseMetadata = apiDescription.ActionDescriptor.EndpointMetadata.OfType<IApiResponseMetadataProvider>().ToList();
+                var responseMetadata = apiDescription.ActionDescriptor.EndpointMetadata.OfType<IProducesResponseTypeMetadata>().ToList();
 
                 if (apiDescription.SupportedResponseTypes.Count == 1 && responseMetadata.Count > 0)
                 {
@@ -116,10 +115,11 @@ public class EndpointMetadataProviderApiDescriptionProvider : IApiDescriptionPro
                     };
                     apiResponseType.ModelMetadata = CreateModelMetadata(apiResponseType.Type);
 
-                    var contentTypes = new MediaTypeCollection();
-                    responseType.SetContentTypes(contentTypes);
+                    //var contentTypes = new MediaTypeCollection();
+                    //responseType.
+                    //responseType.SetContentTypes(contentTypes);
 
-                    foreach (var format in contentTypes.Select(ct => new ApiResponseFormat { MediaType = ct }))
+                    foreach (var format in responseType.ContentTypes.Select(ct => new ApiResponseFormat { MediaType = ct }))
                     {
                         apiResponseType.ApiResponseFormats.Add(format);
                     }
@@ -143,8 +143,7 @@ public class EndpointMetadataProviderApiDescriptionProvider : IApiDescriptionPro
                         continue;
                     }
 
-                    var endpointParameterMetadataContext = new EndpointParameterMetadataContext(parameter, apiDescription.ActionDescriptor.EndpointMetadata, _services);
-                    EndpointParameterMetadataHelpers.PopulateMetadataLateBound(endpointParameterMetadataContext);
+                    EndpointParameterMetadataHelpers.PopulateMetadataLateBound(parameter, apiDescription.ActionDescriptor.EndpointMetadata, _services);
 
                     var acceptsMetadata = apiDescription.ActionDescriptor.EndpointMetadata.OfType<IAcceptsMetadata>().FirstOrDefault();
                     if (acceptsMetadata is null)

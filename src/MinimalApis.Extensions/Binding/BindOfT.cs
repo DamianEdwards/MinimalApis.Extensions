@@ -1,7 +1,9 @@
 ﻿using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Binding;
 
@@ -70,25 +72,48 @@ public struct Bind<TValue> : IEndpointParameterMetadataProvider
         return WrapResult(defaultBinderResult);
     }
 
+#if NET7_0_OR_GREATER
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointMetadataContext"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static void PopulateMetadata(EndpointParameterMetadataContext context)
+    /// <param name="parameter"></param>
+    /// <param name="builder"></param>
+    public static void PopulateMetadata(ParameterInfo parameter, EndpointBuilder builder)
     {
-        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(parameter);
+        ArgumentNullException.ThrowIfNull(builder);
 
-        var logger = context.ApplicationServices?.GetRequiredService<ILogger<Bind<TValue>>>();
-        var binder = LookupBinder(context.ApplicationServices, logger);
+        PopulateMetadataImpl(parameter, builder.Metadata, builder.ApplicationServices);
+    }
+#else
+    /// <summary>
+    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// </summary>
+    /// <param name="parameter"></param>
+    /// <param name="metadata"></param>
+    /// <param name="services"></param>
+    public static void PopulateMetadata(ParameterInfo parameter, IList<object> metadata, IServiceProvider services)
+    {
+        ArgumentNullException.ThrowIfNull(parameter);
+        ArgumentNullException.ThrowIfNull(metadata);
+        ArgumentNullException.ThrowIfNull(services);
+
+        PopulateMetadataImpl(parameter, metadata, services);
+    }
+#endif
+
+    private static void PopulateMetadataImpl(ParameterInfo parameter, IList<object> metadata, IServiceProvider services)
+    {
+        var logger = services.GetRequiredService<ILogger<Bind<TValue>>>();
+        var binder = LookupBinder(services, logger);
 
         if (binder is IEndpointParameterMetadataProvider)
         {
-            EndpointParameterMetadataHelpers.PopulateMetadataLateBound(context);
+            EndpointParameterMetadataHelpers.PopulateMetadataLateBound(parameter, metadata, services);
         }
         else
         {
-            context.EndpointMetadata.Add(new Mvc.ConsumesAttribute(typeof(TValue), "application/json"));
+            metadata.Add(new AcceptsMetadata(typeof(TValue)));
         };
     }
 

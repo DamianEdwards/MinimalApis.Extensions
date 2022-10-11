@@ -1,8 +1,10 @@
 ﻿using System.Reflection;
 using System.Text.Json;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.Extensions.DependencyInjection;
+using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Binding;
 
@@ -174,17 +176,41 @@ public class JsonFormFile : IEndpointParameterMetadataProvider
         return null;
     }
 
+#if NET7_0_OR_GREATER
     /// <summary>
     /// Populates metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointParameterMetadataContext"/>.</param>
-    public static void PopulateMetadata(EndpointParameterMetadataContext context)
+    /// <param name="parameter"></param>
+    /// <param name="builder"></param>
+    public static void PopulateMetadata(ParameterInfo parameter, EndpointBuilder builder)
     {
-        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(parameter);
+        ArgumentNullException.ThrowIfNull(builder);
 
-        context.EndpointMetadata.Add(new Mvc.ConsumesAttribute("multipart/form-data"));
-        // TODO: Ensure this metadata is consumed by EndpointProvidesMetadataApiDescriptionProvider to configure the parameter
+        PopulateMetadataImpl(parameter, builder.Metadata, builder.ApplicationServices);
+    }
+#else
+    /// <summary>
+    /// Populates metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// </summary>
+    /// <param name="parameter"></param>
+    /// <param name="metadata"></param>
+    /// <param name="services"></param>
+    public static void PopulateMetadata(ParameterInfo parameter, IList<object> metadata, IServiceProvider services)
+    {
+        ArgumentNullException.ThrowIfNull(parameter);
+        ArgumentNullException.ThrowIfNull(metadata);
+        ArgumentNullException.ThrowIfNull(services);
+
+        PopulateMetadataImpl(parameter, metadata, services);
+    }
+#endif
+
+    private static void PopulateMetadataImpl(ParameterInfo parameter, IList<object> metadata, IServiceProvider services)
+    {
+        metadata.Add(new AcceptsMetadata(AcceptsMetadata.MultipartFormContentType));
+        // TODO: Ensure this metadata is consumed by EndpointMetadataProviderApiDescriptionProvider to configure the parameter
         //       such that the Swagger UI will render the file upload UI automatically.
-        context.EndpointMetadata.Add(new Mvc.ApiExplorer.ApiParameterDescription { Name = context.Parameter.Name ?? "file", Source = Mvc.ModelBinding.BindingSource.FormFile });
+        metadata.Add(new Mvc.ApiExplorer.ApiParameterDescription { Name = parameter.Name ?? "file", Source = Mvc.ModelBinding.BindingSource.FormFile });
     }
 }

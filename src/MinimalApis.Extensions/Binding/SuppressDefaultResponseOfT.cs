@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Metadata;
 
 namespace MinimalApis.Extensions.Binding;
@@ -72,10 +73,36 @@ public class SuppressDefaultResponse<TValue> : IEndpointParameterMetadataProvide
         }
     }
 
+#if NET7_0_OR_GREATER
     /// <summary>
     /// Populates metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointParameterMetadataContext"/>.</param>
-    public static void PopulateMetadata(EndpointParameterMetadataContext context) =>
-        EndpointParameterMetadataHelpers.PopulateDefaultMetadataForWrapperType<TValue>(context);
+    /// <param name="parameter"></param>
+    /// <param name="builder"></param>
+    public static void PopulateMetadata(ParameterInfo parameter, EndpointBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(parameter);
+        ArgumentNullException.ThrowIfNull(builder);
+
+        PopulateMetadataImpl(parameter, builder.Metadata, builder.ApplicationServices);
+    }
+#else
+    /// <summary>
+    /// Populates metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// </summary>
+    /// <param name="parameter"></param>
+    /// <param name="metadata"></param>
+    /// <param name="services"></param>
+    public static void PopulateMetadata(ParameterInfo parameter, IList<object> metadata, IServiceProvider services)
+    {
+        ArgumentNullException.ThrowIfNull(parameter);
+        ArgumentNullException.ThrowIfNull(metadata);
+        ArgumentNullException.ThrowIfNull(services);
+
+        PopulateMetadataImpl(parameter, metadata, services);
+    }
+#endif
+
+    private static void PopulateMetadataImpl(ParameterInfo parameter, IList<object> metadata, IServiceProvider services) =>
+        EndpointParameterMetadataHelpers.PopulateDefaultMetadataForWrapperType<TValue>(parameter, metadata, services);
 }

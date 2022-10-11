@@ -3,8 +3,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.Net.Http.Headers;
+using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Binding;
 
@@ -195,18 +197,41 @@ public record struct Body<TBody> : IEndpointParameterMetadataProvider
         throw new InvalidOperationException("Supported types mismatch.");
     }
 
+#if NET7_0_OR_GREATER
     /// <summary>
-    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// Populates metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointParameterMetadataContext"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static void PopulateMetadata(EndpointParameterMetadataContext context)
+    /// <param name="parameter"></param>
+    /// <param name="builder"></param>
+    public static void PopulateMetadata(ParameterInfo parameter, EndpointBuilder builder)
     {
-        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(parameter);
+        ArgumentNullException.ThrowIfNull(builder);
 
+        PopulateMetadataImpl(parameter, builder.Metadata, builder.ApplicationServices);
+    }
+#else
+    /// <summary>
+    /// Populates metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// </summary>
+    /// <param name="parameter"></param>
+    /// <param name="metadata"></param>
+    /// <param name="services"></param>
+    public static void PopulateMetadata(ParameterInfo parameter, IList<object> metadata, IServiceProvider services)
+    {
+        ArgumentNullException.ThrowIfNull(parameter);
+        ArgumentNullException.ThrowIfNull(metadata);
+        ArgumentNullException.ThrowIfNull(services);
+
+        PopulateMetadataImpl(parameter, metadata, services);
+    }
+#endif
+
+    private static void PopulateMetadataImpl(ParameterInfo parameter, IList<object> metadata, IServiceProvider services)
+    {
         if (typeof(TBody) == typeof(string))
         {
-            context.EndpointMetadata.Add(new Mvc.ConsumesAttribute(typeof(string), "text/plain"));
+            metadata.Add(new AcceptsMetadata(typeof(string), AcceptsMetadata.TextPlainContentType));
         }
     }
 

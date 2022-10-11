@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -114,16 +115,41 @@ public class ModelBinder<TValue> : IEndpointParameterMetadataProvider
         return new ModelBinder<TValue>((TValue?)result.Model, actionContext.ModelState);
     }
 
+#if NET7_0_OR_GREATER
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointParameterMetadataContext"/>.</param>
-    /// <returns>The metadata.</returns>
-    public static void PopulateMetadata(EndpointParameterMetadataContext context)
+    /// <param name="parameter"></param>
+    /// <param name="builder"></param>
+    public static void PopulateMetadata(ParameterInfo parameter, EndpointBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(parameter);
+        ArgumentNullException.ThrowIfNull(builder);
+
+        PopulateMetadataImpl(parameter, builder.Metadata, builder.ApplicationServices);
+    }
+#else
+    /// <summary>
+    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// </summary>
+    /// <param name="parameter"></param>
+    /// <param name="metadata"></param>
+    /// <param name="services"></param>
+    public static void PopulateMetadata(ParameterInfo parameter, IList<object> metadata, IServiceProvider services)
+    {
+        ArgumentNullException.ThrowIfNull(parameter);
+        ArgumentNullException.ThrowIfNull(metadata);
+        ArgumentNullException.ThrowIfNull(services);
+
+        PopulateMetadataImpl(parameter, metadata, services);
+    }
+#endif
+
+    private static void PopulateMetadataImpl(ParameterInfo parameter, IList<object> metadata, IServiceProvider services)
     {
         if (typeof(TValue).IsAssignableTo(typeof(IEndpointParameterMetadataProvider)))
         {
-            EndpointParameterMetadataHelpers.PopulateMetadataLateBound(context);
+            EndpointParameterMetadataHelpers.PopulateMetadataLateBound(parameter, metadata, services);
         }
     }
 }

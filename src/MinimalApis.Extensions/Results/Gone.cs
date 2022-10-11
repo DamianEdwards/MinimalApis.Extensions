@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http.Metadata;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http.Metadata;
 
 namespace MinimalApis.Extensions.Results;
 
@@ -32,15 +34,38 @@ public sealed class Gone : IResult, IEndpointMetadataProvider, IStatusCodeHttpRe
         return Task.CompletedTask;
     }
 
+#if NET7_0_OR_GREATER
     /// <summary>
     /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
     /// </summary>
-    /// <param name="context">The <see cref="EndpointMetadataContext"/> to provide metadata for.</param>
-    /// <returns>The metadata.</returns>
-    public static void PopulateMetadata(EndpointMetadataContext context)
+    /// <param name="method"></param>
+    /// <param name="builder"></param>
+    public static void PopulateMetadata(MethodInfo method, EndpointBuilder builder)
     {
-        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(method);
+        ArgumentNullException.ThrowIfNull(builder);
 
-        context.EndpointMetadata.Add(new Mvc.ProducesResponseTypeAttribute(StatusCodes.Status410Gone));
+        PopulateMetadataImpl(method, builder.Metadata, builder.ApplicationServices);
+    }
+#else
+    /// <summary>
+    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// </summary>
+    /// <param name="method"></param>
+    /// <param name="metadata"></param>
+    /// <param name="services"></param>
+    public static void PopulateMetadata(MethodInfo method, IList<object> metadata, IServiceProvider services)
+    {
+        ArgumentNullException.ThrowIfNull(method);
+        ArgumentNullException.ThrowIfNull(metadata);
+        ArgumentNullException.ThrowIfNull(services);
+
+        PopulateMetadataImpl(method, metadata, services);
+    }
+#endif
+
+    private static void PopulateMetadataImpl(MethodInfo method, IList<object> metadata, IServiceProvider services)
+    {
+        metadata.Add(new ProducesResponseTypeMetadata(StatusCodes.Status410Gone));
     }
 }
