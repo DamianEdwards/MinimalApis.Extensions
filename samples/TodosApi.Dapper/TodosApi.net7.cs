@@ -12,16 +12,16 @@ public static class TodosApi
     {
         var todos = app.MapGroup("/todos");
 
-        todos.MapGet("/", GetAllTodos);
-        todos.MapGet("/complete", GetCompleteTodos);
-        todos.MapGet("/incomplete", GetIncompleteTodos);
-        todos.MapGet("/{id}", GetTodoById);
-        todos.MapPost("/", CreateTodo);
-        todos.MapPut("/{id}", UpdateTodo);
-        todos.MapPut("/{id}/mark-complete", MarkComplete);
-        todos.MapPut("/{id}/mark-incomplete", MarkIncomplete);
-        todos.MapDelete("/{id}", DeleteTodo);
-        todos.MapDelete("/delete-all", DeleteAll);
+        todos.MapGet("/", GetAllTodos).WithOpenApi(o => new(o) { Summary = "Get all todos" });
+        todos.MapGet("/complete", GetCompleteTodos).WithOpenApi(o => new(o) { Summary = "Get all completed todos" });
+        todos.MapGet("/incomplete", GetIncompleteTodos).WithOpenApi(o => new(o) { Summary = "Get all incomplete todos" });
+        todos.MapGet("/{id}", GetTodoById).WithOpenApi(o => new(o) { Summary = "Get a specific todo by ID" });
+        todos.MapPost("/", CreateTodo).WithOpenApi(o => new(o) { Summary = "Create a new todo" });
+        todos.MapPut("/{id}", UpdateTodo).WithOpenApi(o => new(o) { Summary = "Update an existing todo" });
+        todos.MapPut("/{id}/mark-complete", MarkComplete).WithOpenApi(o => new(o) { Summary = "Mark a todo complete" });
+        todos.MapPut("/{id}/mark-incomplete", MarkIncomplete).WithOpenApi(o => new(o) { Summary = "Mark a todo incomplete" });
+        todos.MapDelete("/{id}", DeleteTodo).WithOpenApi(o => new(o) { Summary = "Delete a specific todo by ID" });
+        todos.MapDelete("/delete-all", DeleteAll).WithOpenApi(o => new(o) { Summary = "Delete all todos" });
 
         todos.WithParameterValidation();
     }

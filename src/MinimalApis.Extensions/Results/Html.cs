@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
-using System.Reflection;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Metadata;
 
 namespace MinimalApis.Extensions.Results;
@@ -64,6 +64,12 @@ public sealed class Html : IResult, IEndpointMetadataProvider, IStatusCodeHttpRe
         PopulateMetadataImpl(method, builder.Metadata, builder.ApplicationServices);
     }
 #else
+    /// <summary>
+    /// Provides metadata for parameters to <see cref="Endpoint"/> route handler delegates.
+    /// </summary>
+    /// <param name="method"></param>
+    /// <param name="metadata"></param>
+    /// <param name="services"></param>
     public static void PopulateMetadata(MethodInfo method, IList<object> metadata, IServiceProvider services)
     {
         ArgumentNullException.ThrowIfNull(method);
