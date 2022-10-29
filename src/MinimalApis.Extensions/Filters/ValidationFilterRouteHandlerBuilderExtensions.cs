@@ -97,9 +97,6 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
 
                 return (EndpointFilterInvocationContext efic) =>
                 {
-                    var endpoint = efic.HttpContext.GetEndpoint();
-                    if (endpoint is null) return next(efic);
-
                     if (logger.IsEnabled(LogLevel.Debug))
                     {
                         logger.LogDebug("Validation filter running on {argumentCount} argument(s).", efic.Arguments.Count);
