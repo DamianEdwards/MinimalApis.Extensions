@@ -57,6 +57,8 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
                 }
                 return;
             }
+            // We're going to add the filter so add metadata as well
+            builder.Metadata.Add(new ProducesResponseTypeMetadata(typeof(HttpValidationProblemDetails), statusCode, "application/problem+json"));
 
             builder.FilterFactories.Add((EndpointFilterFactoryContext context, EndpointFilterDelegate next) =>
             {
@@ -92,8 +94,6 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
                         logger.LogTrace("Updating endpoint metadata to indicate it can produce a validation problem result ({StatusCode}).", statusCode);
                     }
                 }
-
-                builder.Metadata.Add(new ProducesResponseTypeMetadata(typeof(HttpValidationProblemDetails), statusCode, "application/problem+json"));
 
                 return (EndpointFilterInvocationContext efic) =>
                 {
