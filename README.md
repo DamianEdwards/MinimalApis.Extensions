@@ -4,11 +4,11 @@ A set of extensions and helpers that extend the functionality of ASP.NET Core Mi
 # Installation
 [![Nuget](https://img.shields.io/nuget/v/MinimalApis.Extensions)](https://www.nuget.org/packages/MinimalApis.Extensions/)
 
-## Prerelease Builds
-This package is currently available in prerelease from [nuget.org](https://www.nuget.org/packages/MinimalApis.Extensions/):
+## NuGet Releases
+This package is currently available from [nuget.org](https://www.nuget.org/packages/MinimalApis.Extensions/):
 
 ``` console
-> dotnet add package MinimalApis.Extensions --prerelease
+> dotnet add package MinimalApis.Extensions
 ```
 
 ## CI Builds
@@ -36,25 +36,30 @@ If you wish to use builds from this repo's `main` branch you can install them fr
     builder.Services.AddSwaggerGen();
     ...
     ```
-1. Update your Minimal APIs to use the helper binding and result types from this library, e.g.:
+1. Update your Minimal APIs to use the filters, binding, and result types from this library, e.g.:
     ``` c#
-    app.MapPost("/todos", async Task<Results<ValidationProblem, Created<Todo>>> (Validated<Todo> input, TodoDb db) =>
+    app.MapPut("/todos/{id}", async Task<Results<NotFound, NoContent>> (int id, Todo todo, TodoDb db) =>
     {
-        if (!input.IsValid)
-            return TypedResults.ValidationProblem(input.Errors);
-        
-        var todo = input.Value;
-        db.Todos.Add(todo);
+        var existingTodo = await db.Todos.FindAsync(id);
+
+        if (existingTodo is null)
+            return TypedResults.NotFound();
+
+        existingTodo.Title = todo.Title;
+        existingTodo.IsCompleted = todo.IsCompleted;
+
         await db.SaveChangesAsync();
 
-        return TypedResults.Created($"/todos/{todo.Id}", todo);
-    });
+        return TypedResults.NoContent();
+    })
+    .WithParameterValidation();
     ```
 
 # What's Included?
 This library provides types that help extend the core functionality of ASP.NET Core Minimal APIs in the following ways:
-- Enhanced parameter binding via `IParameterBinder` and `Bind<TValue>`, `Body<TValue>`, `JsonFormFile`, `Validated<TValue>`, and others
+- Enhanced parameter binding via `IParameterBinder` and `Bind<TValue>`, `Body<TValue>`, `JsonFormFile`, and others
 - Extra result types available via `Results.Extensions` including `PlainText`, `Html`, and `UnsupportedMediaType`
+- For .NET 7.0 apps, an endpoint filter that validates route handler parameters and auto-responds with validation problem if validation fails 
 - Poly-filling of .NET 7.0 features for use in .NET 6.0 projects including:
   - Typed `IResult` objects for easier unit testing (available via `TypedResults`) including the `IStatusCodeHttpResult`, `IContentTypeHttpResult`, and `IValueHttpResult` interfaces
   - Automatic population of detailed endpoint descriptions in Swagger/OpenAPI via the ability for input and result types to populate endpoint metadata via `IEndpointParameterMetadataProvider` and `IEndpointMetadataProvider`
