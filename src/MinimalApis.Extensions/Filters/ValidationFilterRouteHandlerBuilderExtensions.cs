@@ -4,12 +4,10 @@ using System.IO.Pipelines;
 using System.Reflection;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MinimalApis.Extensions.Filters;
 using MiniValidation;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Microsoft.AspNetCore.Http;
 
@@ -22,13 +20,13 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
     /// Adds a filter that validates route handler parameters using <see cref="MiniValidator"/>.
     /// </summary>
     /// <remarks>
-    /// 
     /// The filter will not be added if the route handler does not have any validatable parameters.
     /// </remarks>
     /// <param name="endpoint">The <see cref="IEndpointConventionBuilder"/>.</param>
+    /// <param name="requireParameterAttribute">If <c>true</c>, only parameters decorated with <see cref="ValidateAttribute"/> will be validated. Default is <c>false</c>.</param>
     /// <param name="statusCode">The status code to return on validation failure. Defaults to <see cref="StatusCodes.Status400BadRequest"/>.</param>
     /// <returns></returns>
-    public static TBuilder WithParameterValidation<TBuilder>(this TBuilder endpoint, int statusCode = StatusCodes.Status400BadRequest)
+    public static TBuilder WithParameterValidation<TBuilder>(this TBuilder endpoint, bool requireParameterAttribute = false, int statusCode = StatusCodes.Status400BadRequest)
         where TBuilder : IEndpointConventionBuilder
     {
         endpoint.Add(builder =>
@@ -49,7 +47,7 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
 
             var isService = builder.ApplicationServices.GetService<IServiceProviderIsService>();
 
-            if (!IsValidatable(methodInfo, isService))
+            if (!IsValidatable(requireParameterAttribute, methodInfo, isService))
             {
                 if (logger.IsEnabled(LogLevel.Debug))
                 {
@@ -57,6 +55,7 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
                 }
                 return;
             }
+
             // We're going to add the filter so add metadata as well
             builder.Metadata.Add(new ProducesResponseTypeMetadata(typeof(HttpValidationProblemDetails), statusCode, "application/problem+json"));
 
@@ -68,12 +67,13 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
                 var validationDetails = new ValidationFilterDetails();
                 foreach (var parameter in methodInfo.GetParameters())
                 {
-                    if (IsValidatable(parameter.ParameterType, isService))
+                    if ((requireParameterAttribute && parameter.GetCustomAttribute<ValidateAttribute>() is not null)
+                        || IsValidatable(parameter.ParameterType, isService))
                     {
                         validationDetails.Parameters.Add(parameter.ParameterType);
                         if (logger.IsEnabled(LogLevel.Trace))
                         {
-                            logger.LogTrace("Parameter '{parameterType} {parameterName}' has a validatable type and will be validated by the filter.", parameter.ParameterType, parameter.Name);
+                            logger.LogTrace("Parameter '{parameterType} {parameterName}' was marked for validation or has a validatable type and will be validated by the filter.", parameter.ParameterType, parameter.Name);
                         }
                     }
                     else
@@ -81,7 +81,7 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
                         validationDetails.Parameters.Add(null);
                         if (logger.IsEnabled(LogLevel.Trace))
                         {
-                            logger.LogTrace("Parameter '{parameterType} {parameterName}' does not have validatable type and will not be validated by the filter.", parameter.ParameterType, parameter.Name);
+                            logger.LogTrace("Parameter '{parameterType} {parameterName}' was not marked for validation or does not have validatable type and will not be validated by the filter.", parameter.ParameterType, parameter.Name);
                         }
                     }
                 }
@@ -95,7 +95,7 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
                     }
                 }
 
-                return (EndpointFilterInvocationContext efic) =>
+                return async (EndpointFilterInvocationContext efic) =>
                 {
                     if (logger.IsEnabled(LogLevel.Debug))
                     {
@@ -106,36 +106,49 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
                     Debug.Assert(validationDetails.Parameters.Count == efic.Arguments.Count);
 
                     var useParameterValidationDetails = validationDetails is not null && validationDetails.Parameters.Count == efic.Arguments.Count;
-                    if (!useParameterValidationDetails && logger.IsEnabled(LogLevel.Debug))
+                    if (!useParameterValidationDetails)
                     {
-                        logger.LogDebug("Falling back to validating all arguments as computed validation details are invalid: ParameterCount={parameterCount}, ArgumentCount={argumentCount}", validationDetails?.Parameters.Count ?? 0, efic.Arguments.Count);
+                        if (requireParameterAttribute && logger.IsEnabled(LogLevel.Warning))
+                        {
+                            logger.LogWarning("Validation filter will not run for this request as 'requireParameterAttribute' was specified and computed validation details are invalid: ParameterCount={parameterCount}, ArgumentCount={argumentCount}", validationDetails?.Parameters.Count ?? 0, efic.Arguments.Count);
+                        }
+                        else if (logger.IsEnabled(LogLevel.Debug))
+                        {
+                            logger.LogDebug("Falling back to validating all arguments as computed validation details are invalid: ParameterCount={parameterCount}, ArgumentCount={argumentCount}", validationDetails?.Parameters.Count ?? 0, efic.Arguments.Count);
+                        }
                     }
 
-                    for (var i = 0; i < efic.Arguments.Count; i++)
+                    for (var i = 0; i < validationDetails!.Parameters.Count; i++)
                     {
+                        Type? parameterType = null;
+                        if (useParameterValidationDetails)
+                        {
+                            parameterType = validationDetails!.Parameters[i];
+
+                            if (parameterType is null)
+                            {
+                                if (logger.IsEnabled(LogLevel.Trace))
+                                {
+                                    logger.LogTrace("Argument skipped as the parameter it maps to is declared with a type that is not validatable.");
+                                }
+                                continue;
+                            }
+                        }
+
                         var argument = efic.Arguments[i];
 
                         if (argument is null)
                         {
                             if (logger.IsEnabled(LogLevel.Trace))
                             {
-                                logger.LogTrace("Argument skipped as it is null.");
+                                logger.LogTrace("Argument skipped because it is null.");
                             }
                             continue;
                         }
 
                         if (useParameterValidationDetails)
                         {
-                            var parameterType = validationDetails!.Parameters[i];
-                            if (parameterType is null)
-                            {
-                                if (logger.IsEnabled(LogLevel.Trace))
-                                {
-                                    logger.LogTrace("Argument with type '{argumentType}' skipped as the parameter it maps to is declared with a type that is not validatable.", argument.GetType());
-                                }
-                                continue;
-                            }
-                            else if (!parameterType.IsAssignableFrom(argument.GetType()))
+                            if (parameterType is not null && !parameterType.IsAssignableFrom(argument.GetType()))
                             {
                                 if (logger.IsEnabled(LogLevel.Trace))
                                 {
@@ -156,13 +169,15 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
                             }
                         }
 
-                        if (!MiniValidator.TryValidate(argument, out var errors))
+                        var (isValid, errors) = await MiniValidator.TryValidateAsync(argument, recurse: true);
+
+                        if (!isValid)
                         {
                             if (logger.IsEnabled(LogLevel.Debug))
                             {
                                 logger.LogDebug("Argument for parameter '{parameterName}' failed validation. Will not validate any more parameters.", errors.Keys.FirstOrDefault());
                             }
-                            return new(TypedResults.ValidationProblem(errors));
+                            return TypedResults.ValidationProblem(errors);
                         }
 
                         if (logger.IsEnabled(LogLevel.Debug))
@@ -176,7 +191,7 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
                         logger.LogDebug("Validation is complete.");
                     }
 
-                    return next(efic);
+                    return await next(efic);
                 };
             });
         });
@@ -184,8 +199,10 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
         return endpoint;
     }
 
-    private static bool IsValidatable(MethodInfo methodInfo, IServiceProviderIsService? isService) =>
-        methodInfo.GetParameters().Any(p => IsValidatable(p.ParameterType, isService));
+    private static bool IsValidatable(bool requireParameterAttribute, MethodInfo methodInfo, IServiceProviderIsService? isService) =>
+        methodInfo.GetParameters().Any(p => requireParameterAttribute
+            ? p.GetCustomAttribute<ValidateAttribute>() is not null
+            : IsValidatable(p.ParameterType, isService));
 
     private static bool IsValidatable(Type type, IServiceProviderIsService? isService = null) =>
         !IsRequestDelegateFactorySpecialBoundType(type, isService)
