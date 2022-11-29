@@ -17,7 +17,7 @@ class TodosApplication : WebApplicationFactory<Program>
         {
             services.AddScoped<IDbConnection>(_ => new SqliteConnection("Data Source=todos-default.db;Cache=Shared"));
 
-            TodosApplication.EnsureDbRecreated(services).Wait();
+            EnsureDbRecreated(services).Wait();
         });
 
         return base.CreateHost(builder);
@@ -29,7 +29,7 @@ class TodosApplication : WebApplicationFactory<Program>
 
         using var db = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IDbConnection>();
 
-        await TodosApplication.EnsureTableDeleted(db);
+        await EnsureTableDeleted(db);
         await EnsureTableCreated(db);
     }
 
