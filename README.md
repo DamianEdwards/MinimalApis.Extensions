@@ -27,7 +27,7 @@ If you wish to use builds from this repo's `main` branch you can install them fr
 # Getting Started
 1. [Install the NuGet package](#installation) into your ASP.NET Core project:
     ``` shell
-    > dotnet add package MinimalApis.Extensions --prerelease
+    > dotnet add package MinimalApis.Extensions
     ```
 1. **.NET 6.0 projects only** In your project's `Program.cs`, call the `AddEndpointsMetadataProviderApiExplorer()` method on `builder.Services` to enable enhanced endpoint metadata in `ApiExplorer`:
     ``` c#
