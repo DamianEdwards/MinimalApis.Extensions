@@ -1,4 +1,5 @@
-﻿namespace MinimalApis.Extensions.Filters;
+﻿#if NET7_0_OR_GREATER
+namespace MinimalApis.Extensions.Filters;
 
 /// <summary>
 /// Indicates a route handler delegate parameter should be validated before the route handler is invoked.
@@ -12,3 +13,4 @@ public class ValidateAttribute : Attribute
 {
 
 }
+#endif
