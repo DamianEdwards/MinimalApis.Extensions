@@ -8,19 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-    <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.0" Condition="'$(TargetFramework)'=='net6.0'" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.0" Condition="'$(TargetFramework)'=='net7.0'" />
-    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="7.0.0" Condition="'$(TargetFramework)'=='net6.0'">
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="7.0.0" Condition="'$(TargetFramework)'=='net7.0'">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" Condition="'$(TargetFramework)'=='net7.0'" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)'=='net7.0'" />
   </ItemGroup>
 
   <ItemGroup>
