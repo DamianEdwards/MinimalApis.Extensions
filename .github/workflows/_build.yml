@@ -28,7 +28,9 @@ jobs:
     - name: Create build number
       run: |
         now=$(date +'%Y%m%d')
-        echo "BUILD_NUMBER=$now.$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+        buildNumber=$now.$GITHUB_RUN_NUMBER
+        echo "BUILD_NUMBER=$buildNumber" >> $GITHUB_ENV
+        echo "$buildNumber"
 
     - name: Build
       run: dotnet build --configuration Release --no-restore -p:BuildNumber=$BUILD_NUMBER -p:SourceRevisionId=$GITHUB_SHA -p:ContinuousIntegrationBuild=true
