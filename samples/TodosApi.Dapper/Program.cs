@@ -15,6 +15,7 @@ builder.Services.AddScoped<IDbConnection>(_ => new SqliteConnection(connectionSt
 builder.Services.AddEndpointsMetadataProviderApiExplorer();
 #else
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSingleton<AllowedNameProvider>();
 #endif
 builder.Services.AddSwaggerGen(ConfigureSwaggerGen);
 
