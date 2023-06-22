@@ -77,12 +77,21 @@ public static class TodosApi
         TypedResults.Ok(await db.ExecuteAsync("DELETE FROM Todos"));
 }
 
-public class NewTodo
+public class NewTodo : IValidatableObject
 {
     [Required]
     public string? Title { get; set; }
 
     public bool IsComplete { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        var nameValidation = validationContext.GetRequiredService<AllowedNameProvider>();
+        if (Title is not null && !nameValidation.IsAllowed(Title))
+        {
+            yield return new($"'{Title}' is not an allowed title.", new[] { nameof(Title) });
+        }
+    }
 
     public static implicit operator Todo(NewTodo todo) => new() { Title = todo.Title, IsComplete = todo.IsComplete };
 }

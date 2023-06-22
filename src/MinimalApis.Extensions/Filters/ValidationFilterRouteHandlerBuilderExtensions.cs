@@ -169,7 +169,7 @@ public static class ValidationFilterRouteHandlerBuilderExtensions
                             }
                         }
 
-                        var (isValid, errors) = await MiniValidator.TryValidateAsync(argument, recurse: true);
+                        var (isValid, errors) = await MiniValidator.TryValidateAsync(argument, efic.HttpContext.RequestServices, recurse: true);
 
                         if (!isValid)
                         {

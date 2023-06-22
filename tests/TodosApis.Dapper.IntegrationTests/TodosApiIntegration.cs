@@ -91,6 +91,30 @@ public class TodosApiIntegration
         Assert.Empty(todos);
     }
 
+#if NET7_0_OR_GREATER
+    [Fact]
+    public async Task PostTodo_Returns_BadRequest_For_Todo_With_Disallowed_Name()
+    {
+        using var application = new TodosApplication();
+
+        var httpClient = application.CreateClient();
+
+        var newTodo = new NewTodo
+        {
+            Title = "Title"
+        };
+
+        var response = await httpClient.PostAsJsonAsync("/todos", newTodo);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var todos = await httpClient.GetFromJsonAsync<List<Todo>>("/todos");
+
+        Assert.NotNull(todos);
+        Assert.Empty(todos);
+    }
+#endif
+
     [Fact]
     public async Task UpdateTodo_Returns_NoContent_For_Valid_Todo()
     {
