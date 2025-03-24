@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.Extensions.DependencyInjection;
-using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Binding;
 
@@ -208,7 +207,7 @@ public class JsonFormFile : IEndpointParameterMetadataProvider
 
     private static void PopulateMetadataImpl(ParameterInfo parameter, IList<object> metadata, IServiceProvider services)
     {
-        metadata.Add(new AcceptsMetadata(AcceptsMetadata.MultipartFormContentType));
+        metadata.Add(new MinimalApis.Extensions.Metadata.AcceptsMetadata(Metadata.AcceptsMetadata.MultipartFormContentType));
         // TODO: Ensure this metadata is consumed by EndpointMetadataProviderApiDescriptionProvider to configure the parameter
         //       such that the Swagger UI will render the file upload UI automatically.
         metadata.Add(new Mvc.ApiExplorer.ApiParameterDescription { Name = parameter.Name ?? "file", Source = Mvc.ModelBinding.BindingSource.FormFile });

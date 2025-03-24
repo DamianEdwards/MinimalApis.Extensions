@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Binding;
 
@@ -113,8 +112,8 @@ public struct Bind<TValue> : IEndpointParameterMetadataProvider
         }
         else
         {
-            metadata.Add(new AcceptsMetadata(typeof(TValue)));
-        };
+            metadata.Add(new MinimalApis.Extensions.Metadata.AcceptsMetadata(typeof(TValue)));
+        }
     }
 
     private const string Template_ResolvedFromDI = nameof(IParameterBinder<object>) + "<{ParameterBinderTargetTypeName}> resolved from DI container.";

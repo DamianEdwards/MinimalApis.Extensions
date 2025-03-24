@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Microsoft.AspNetCore.Builder;
-using MinimalApis.Extensions.Metadata;
 
 namespace Microsoft.AspNetCore.Http.Metadata;
 
@@ -29,7 +28,7 @@ internal static class EndpointParameterMetadataHelpers
             return;
         }
 
-        metadata.Add(new AcceptsMetadata(typeof(TValue), false, DefaultAcceptsContentTypes));
+        metadata.Add(new MinimalApis.Extensions.Metadata.AcceptsMetadata(typeof(TValue), false, DefaultAcceptsContentTypes));
     }
 
 #if NET7_0_OR_GREATER

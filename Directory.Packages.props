@@ -11,17 +11,20 @@
     <PackageVersion Include="Dapper" Version="2.0.123" />
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="6.0.0" Condition="'$(TargetFramework)'=='net6.0'" />
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="7.0.0" Condition="'$(TargetFramework)'=='net7.0'" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.0-preview.2.25163.8" Condition="'$(TargetFramework)'=='net10.0'" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
-    <PackageVersion Include="xunit" Version="2.4.2" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.5" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.0-preview-25107-01" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageVersion Include="coverlet.collector" Version="3.2.0" />
     <PackageVersion Include="Moq" Version="4.18.2" />
     <PackageVersion Include="Moq.Dapper" Version="1.0.4" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.2" />
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.11" Condition="'$(TargetFramework)'=='net6.0'" />
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.0" Condition="'$(TargetFramework)'=='net7.0'" />
-    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="6.0.11" Condition="'$(TargetFramework)'=='net6.0'" />
-    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="7.0.0" Condition="'$(TargetFramework)'=='net7.0'" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.36" Condition="'$(TargetFramework)'=='net6.0'" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.20" Condition="'$(TargetFramework)'=='net7.0'" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0-preview.2.25164.1 " Condition="'$(TargetFramework)'=='net10.0'" />
+    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="6.0.36" Condition="'$(TargetFramework)'=='net6.0'" />
+    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="7.0.20" Condition="'$(TargetFramework)'=='net7.0'" />
+    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.0-preview.2.25164.1" Condition="'$(TargetFramework)'=='net10.0'" />
   </ItemGroup>
 </Project>

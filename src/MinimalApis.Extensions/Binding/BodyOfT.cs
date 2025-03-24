@@ -6,7 +6,6 @@ using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.Net.Http.Headers;
-using MinimalApis.Extensions.Metadata;
 
 namespace MinimalApis.Extensions.Binding;
 
@@ -231,7 +230,7 @@ public record struct Body<TBody> : IEndpointParameterMetadataProvider
     {
         if (typeof(TBody) == typeof(string))
         {
-            metadata.Add(new AcceptsMetadata(typeof(string), AcceptsMetadata.TextPlainContentType));
+            metadata.Add(new MinimalApis.Extensions.Metadata.AcceptsMetadata(typeof(string), MinimalApis.Extensions.Metadata.AcceptsMetadata.TextPlainContentType));
         }
     }
 

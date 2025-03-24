@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0;net10.0</TargetFrameworks>
     <Description>A set of extensions and helpers for working with ASP.NET Core Minimal APIs.</Description>
     <PackageTags>ASP.NET Web MinimalApis Apis REST Binding IResult</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>

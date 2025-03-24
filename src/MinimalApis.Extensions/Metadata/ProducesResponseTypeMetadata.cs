@@ -64,6 +64,11 @@ internal sealed class ProducesResponseTypeMetadata : IProducesResponseTypeMetada
     /// </summary>
     public int StatusCode { get; set; }
 
+    /// <summary>
+    /// Gets the description of the response.
+    /// </summary>
+    public string? Description { get; set; }
+
     public IEnumerable<string> ContentTypes => _contentTypes;
 
     //internal static ProducesResponseTypeMetadata CreateUnvalidated(Type? type, int statusCode, IEnumerable<string> contentTypes) => new(type, statusCode, contentTypes);
