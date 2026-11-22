@@ -56,7 +56,7 @@ jobs:
       run: dotnet pack --configuration Release --output ./artifacts/ship --verbosity normal -p:BuildNumber=$BUILD_NUMBER -p:SourceRevisionId=$GITHUB_SHA -p:ContinuousIntegrationBuild=true -p:IsShipCandidate=true
 
     - name: Upload artifacts (packages)
-      uses: actions/upload-artifact@0c366cb4fc8897159c94880f94b55bc716ad6a66 # master
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
         name: nupkg
         path: ./artifacts/**/*.nupkg
