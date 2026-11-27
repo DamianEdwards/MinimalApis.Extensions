@@ -19,7 +19,9 @@ jobs:
     - name: Install .NET SDK
       uses: actions/setup-dotnet@55ec9447dda3d1cf6bd587150f3262f30ee10815 # v3
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: |
+          6.0.x
+          7.0.x
         global-json-file: "./global.json"
     
     - name: Restore dependencies
